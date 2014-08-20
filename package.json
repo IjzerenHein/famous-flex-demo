@@ -49,6 +49,8 @@
   },
   "scripts": {
     "dev": "webpack-dev-server --reload=localhost",
-    "dist": "webpack --minify"
+    "open-dev": "open http://localhost:8080",
+    "dist": "webpack --minify",
+    "open": "open dist/index.html"
   }
 }
