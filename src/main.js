@@ -24,12 +24,12 @@ define(function(require) {
     // import dependencies
     var Engine = require('famous/core/Engine');
     var Surface = require('famous/core/Surface');
+    var Transform = require('famous/core/Transform');
     var FastClick = require('famous/inputs/FastClick');
     var LayoutController = require('famous-flex/LayoutController');
     var LayoutUtility = require('famous-flex/LayoutUtility');
     var GridLayout = require('famous-flex-layouts/GridLayout');
     var NavBarLayout = require('famous-flex-layouts/NavBarLayout');
-    var HeaderFooterLayout = require('famous-flex-layouts/HeaderFooterLayout');
     var Easing = require('famous/transitions/Easing');
     var Dogs = require('./data/dogs/collection');
 
@@ -39,9 +39,11 @@ define(function(require) {
     // Create the shell
     var collection = [];
     var navbar = _createNavbar();
+    var sidebar = _createSidebar();
     var collectionView = _createCollectionView(collection);
     var shell = _createShell({
-        header: navbar,
+        navbar: navbar,
+        sidebar: sidebar,
         content: collectionView
     });
     mainContext.add(shell);
@@ -49,11 +51,42 @@ define(function(require) {
     // Add layout types
     _addCollectionLayouts();
 
+    function ShellLayout(context, options) {
+
+        // Create a rect from the size
+        var r = {left: 0, top: 0, right: context.size[0], bottom: context.size[1]};
+
+        // Layout the sidebar (when width < height it is positioned on the bottom)
+        var sidebar = context.nodeById('sidebar');
+        if (context.size[0] >= context.size[1]) {
+            sidebar.setSize([options.sidebarWidth, context.size[1]]);
+            r.left += options.sidebarWidth;
+        }
+        else {
+            sidebar.setSize([r.right - r.left, options.sidebarHeight]);
+            sidebar.setTransform(Transform.translate(0, r.bottom - options.sidebarHeight, 0));
+            r.bottom -= options.sidebarHeight;
+        }
+
+        // Layout the navbar
+        var navbar = context.nodeById('navbar');
+        navbar.setSize([r.right - r.left, options.navbarHeight]);
+        navbar.setTransform(Transform.translate(r.left, r.top, 0));
+        r.top += options.navbarHeight;
+
+        // Use what's left to the content
+        var content = context.nodeById('content');
+        content.setSize([r.right - r.left, r.bottom - r.top]);
+        content.setTransform(Transform.translate(r.left, r.top, 0));
+    }
+
     function _createShell(renderables) {
         return new LayoutController({
-            layout: HeaderFooterLayout,
+            layout: ShellLayout,
             layoutOptions: {
-                headerHeight: 50
+                navbarHeight: 50,
+                sidebarWidth: 100,
+                sidebarHeight: 200
             },
             dataSource: renderables
         });
@@ -91,6 +124,13 @@ define(function(require) {
             content: '<button type="button" class="btn btn-default">' + content + '</button>'
         });
     }
+
+    function _createSidebar() {
+        return new Surface({
+            classes: ['navbar']
+        });
+    }
+
     function _createNavbar() {
         var layoutController = new LayoutController({
             layout: NavBarLayout,
