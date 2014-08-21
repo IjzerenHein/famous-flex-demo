@@ -82,6 +82,7 @@ define(function(require) {
 
     function _createShell(renderables) {
         return new LayoutController({
+            reflowTransition: {duration: 500, curve: Easing.outBack},
             layout: ShellLayout,
             layoutOptions: {
                 navbarHeight: 50,
@@ -127,7 +128,7 @@ define(function(require) {
 
     function _createSidebar() {
         return new Surface({
-            classes: ['navbar']
+            classes: ['sidebar']
         });
     }
 

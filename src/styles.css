@@ -7,6 +7,10 @@ body, div {
   border-radius: 0;
 }
 
+.sidebar {
+  background-color: black;
+}
+
 .title {
   text-align: center;
   font-size: 18px;
