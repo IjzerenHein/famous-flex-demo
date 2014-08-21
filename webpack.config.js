@@ -20,7 +20,7 @@ var config = {
     publicPath: './'
   },
   devServer: {
-    publicPath: 'src/'
+    publicPath: './'
   },
   reload: isDevServer()? 'localhost': null,
   module:{
@@ -37,14 +37,19 @@ var config = {
     ]
   },
   resolve: {
-    modulesDirectories: ['bower_components', 'node_modules'],
+    modulesDirectories: ['bower_components'],
     alias: {
+      'famous-polyfills': '../node_modules/famous-polyfills',
       'famous-flex': 'famous-flex/src',
       'famous-flex-layouts': 'famous-flex-layouts/src'
     }
   },
   copyContext: 'src',
   plugins:[
+    new webpack.DefinePlugin({
+      VERSION: JSON.stringify(require('./package.json').version),
+      ENV: JSON.stringify(argv.env)
+    }),
     new ReloadPlugin()
   ]
 };
