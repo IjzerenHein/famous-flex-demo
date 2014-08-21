@@ -58,13 +58,14 @@ define(function(require) {
 
         // Layout the sidebar (when width < height it is positioned on the bottom)
         var sidebar = context.nodeById('sidebar');
+        sidebar.setOrigin([0, 1]);
+        sidebar.setAlign([0, 1]);
         if (context.size[0] >= context.size[1]) {
             sidebar.setSize([options.sidebarWidth, context.size[1]]);
             r.left += options.sidebarWidth;
         }
         else {
             sidebar.setSize([r.right - r.left, options.sidebarHeight]);
-            sidebar.setTransform(Transform.translate(0, r.bottom - options.sidebarHeight, 0));
             r.bottom -= options.sidebarHeight;
         }
 
