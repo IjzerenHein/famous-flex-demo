@@ -116,7 +116,7 @@ define(function(require) {
             }
         });
         var background = new Surface({classes: ['navbar', 'navbar-default']});
-        var title = new Surface({content: 'famous-layout', classes: ['title']});
+        var title = new Surface({content: 'famous-flex', classes: ['title']});
         var addButton = _createButton('<i class="glyphicon glyphicon-plus"></i>');
         addButton.on('click', _addCollectionItem);
         var removeButton = _createButton('<i class="glyphicon glyphicon-minus"></i>');
