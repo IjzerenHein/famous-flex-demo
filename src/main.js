@@ -32,6 +32,7 @@ define(function(require) {
     var NavBarLayout = require('famous-flex-layouts/NavBarLayout');
     var Easing = require('famous/transitions/Easing');
     var Dogs = require('./data/dogs/collection');
+    var LayoutDockHelper = require('famous-flex/helpers/LayoutDockHelper');
 
     // create the main context
     var mainContext = Engine.createContext();
@@ -51,44 +52,19 @@ define(function(require) {
     // Add layout types
     _addCollectionLayouts();
 
-    function ShellLayout(context, options) {
-
-        // Create a rect from the size
-        var r = {left: 0, top: 0, right: context.size[0], bottom: context.size[1]};
-
-        // Layout the sidebar (when width < height it is positioned on the bottom)
-        var sidebar = context.nodeById('sidebar');
-        sidebar.setOrigin([0, 1]);
-        sidebar.setAlign([0, 1]);
-        if (context.size[0] >= context.size[1]) {
-            sidebar.setSize([options.sidebarWidth, context.size[1]]);
-            r.left += options.sidebarWidth;
-        }
-        else {
-            sidebar.setSize([r.right - r.left, options.sidebarHeight]);
-            r.bottom -= options.sidebarHeight;
-        }
-
-        // Layout the navbar
-        var navbar = context.nodeById('navbar');
-        navbar.setSize([r.right - r.left, options.navbarHeight]);
-        navbar.setTransform(Transform.translate(r.left, r.top, 0));
-        r.top += options.navbarHeight;
-
-        // Use what's left to the content
-        var content = context.nodeById('content');
-        content.setSize([r.right - r.left, r.bottom - r.top]);
-        content.setTransform(Transform.translate(r.left, r.top, 0));
-    }
-
     function _createShell(renderables) {
         return new LayoutController({
             reflowTransition: {duration: 500, curve: Easing.outBack},
-            layout: ShellLayout,
-            layoutOptions: {
-                navbarHeight: 50,
-                sidebarWidth: 100,
-                sidebarHeight: 200
+            layout: function(context) {
+                var dock = new LayoutDockHelper(context);
+                if (context.size[0] >= context.size[1]) {
+                    dock.left(context.nodeById('sidebar'), 200);
+                }
+                else {
+                    dock.bottom(context.nodeById('sidebar'), 200);
+                }
+                dock.top(context.nodeById('navbar'), 50);
+                dock.fill(context.nodeById('content'));
             },
             dataSource: renderables
         });
@@ -128,8 +104,21 @@ define(function(require) {
     }
 
     function _createSidebar() {
-        return new Surface({
-            classes: ['sidebar']
+        return new LayoutController({
+            layout: function(context) {
+                var dock = new LayoutDockHelper(context);
+                if (context.size[0] < 300) {
+                    dock.bottom(context.nodeById('details'), 200);
+                }
+                else {
+                    dock.right(context.nodeById('details'), 200);
+                }
+                dock.fill(context.nodeById('list'));
+            },
+            dataSource: {
+                'list': _createLayoutListView(),
+                'details': _createLayoutDetailsView()
+            }
         });
     }
 
@@ -171,6 +160,18 @@ define(function(require) {
             },
             dataSource: collection,
             reflowTransition: {duration: 500, curve: Easing.outBack}
+        });
+    }
+
+    function _createLayoutListView() {
+        return new Surface({
+            classes: ['navbar', 'navbar-default']
+        });
+    }
+
+    function _createLayoutDetailsView() {
+        return new Surface({
+            classes: ['navbar', 'navbar-default']
         });
     }
 
