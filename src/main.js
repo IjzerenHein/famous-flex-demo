@@ -52,13 +52,15 @@ define(function(require) {
 
     function _createShell(renderables) {
         return new LayoutController({
-            layout: function(context) {
+            layout: function(context, options) {
                 var dock = new LayoutDockHelper(context);
-                if (context.size[0] >= context.size[1]) {
-                    dock.left(context.nodeById('sidebar'), 200);
-                }
-                else {
-                    dock.bottom(context.nodeById('sidebar'), 200);
+                if (options.showSidebar) {
+                    if (context.size[0] >= context.size[1]) {
+                        dock.left(context.nodeById('sidebar'), 200);
+                    }
+                    else {
+                        dock.bottom(context.nodeById('sidebar'), 200);
+                    }
                 }
                 dock.top(context.nodeById('navbar'), 50);
                 dock.fill(context.nodeById('content'));
@@ -97,6 +99,12 @@ define(function(require) {
         collectionView.remove(0, removeSpec);
     }
 
+    function _toggleSidebar() {
+        shell.patchLayoutOptions({
+            showSidebar: !shell.getLayoutOptions().showSidebar
+        });
+    }
+
     function _createButton(content) {
         return new Surface({
             size: [38, undefined],
@@ -128,7 +136,7 @@ define(function(require) {
             layout: NavBarLayout,
             layoutOptions: {
                 margins: [8],
-                rightItemSpacer: 5
+                itemSpacer: 5
             }
         });
         var background = new Surface({classes: ['navbar', 'navbar-default']});
@@ -137,12 +145,17 @@ define(function(require) {
         addButton.on('click', _addCollectionItem);
         var removeButton = _createButton('<i class="glyphicon glyphicon-minus"></i>');
         removeButton.on('click', _removeCollectionItem);
+        var menuButton = _createButton('<i class="glyphicon glyphicon-tasks"></i>');
+        menuButton.on('click', _toggleSidebar);
         layoutController.setDataSource({
             background: background,
             title: title,
             rightItems: [
                 removeButton,
                 addButton
+            ],
+            leftItems: [
+                menuButton
             ]
         });
         return layoutController;
