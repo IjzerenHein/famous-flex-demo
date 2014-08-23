@@ -24,13 +24,11 @@ define(function(require) {
     // import dependencies
     var Engine = require('famous/core/Engine');
     var Surface = require('famous/core/Surface');
-    var Transform = require('famous/core/Transform');
     var FastClick = require('famous/inputs/FastClick');
     var LayoutController = require('famous-flex/LayoutController');
     var LayoutUtility = require('famous-flex/LayoutUtility');
     var GridLayout = require('famous-flex-layouts/GridLayout');
     var NavBarLayout = require('famous-flex-layouts/NavBarLayout');
-    var Easing = require('famous/transitions/Easing');
     var Dogs = require('./data/dogs/collection');
     var LayoutDockHelper = require('famous-flex/helpers/LayoutDockHelper');
 
@@ -54,7 +52,6 @@ define(function(require) {
 
     function _createShell(renderables) {
         return new LayoutController({
-            reflowTransition: {duration: 500, curve: Easing.outBack},
             layout: function(context) {
                 var dock = new LayoutDockHelper(context);
                 if (context.size[0] >= context.size[1]) {
@@ -80,8 +77,10 @@ define(function(require) {
     function _addCollectionItem() {
         if (collectionView) {
             var rightItems = navbar.getLayoutNodeById('rightItems');
-            var insertSpec = LayoutUtility.cloneSpec(navbar.getLayoutNode(rightItems[1])._current);
+            var insertSpec = LayoutUtility.cloneSpec(navbar.getLayoutNode(rightItems[1]).getSpec());
             insertSpec.opacity = 0;
+            insertSpec.origin = [1, 0];
+            insertSpec.align = [1, 0];
             collectionView.insert(-1, _createCollectionItem(), insertSpec);
         }
         else {
@@ -91,8 +90,10 @@ define(function(require) {
 
     function _removeCollectionItem() {
         var rightItems = navbar.getLayoutNodeById('rightItems');
-        var removeSpec = LayoutUtility.cloneSpec(navbar.getLayoutNode(rightItems[0])._current);
+        var removeSpec = LayoutUtility.cloneSpec(navbar.getLayoutNode(rightItems[0]).getSpec);
         removeSpec.opacity = 0;
+        removeSpec.origin = [1, 0];
+        removeSpec.align = [1, 0];
         collectionView.remove(0, removeSpec);
     }
 
@@ -158,8 +159,7 @@ define(function(require) {
                 rows: 3,
                 gutter: [20, 20]
             },
-            dataSource: collection,
-            reflowTransition: {duration: 500, curve: Easing.outBack}
+            dataSource: collection
         });
     }
 
