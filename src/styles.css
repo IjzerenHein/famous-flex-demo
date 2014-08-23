@@ -17,6 +17,11 @@ body, div {
   line-height: 34px;
 }
 
+.layout-list-item {
+  text-align: center;
+  line-height: 33px;
+}
+
 .image-frame {
   background-color: #fbfbfb;
   text-align: center;

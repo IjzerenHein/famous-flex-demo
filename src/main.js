@@ -29,6 +29,7 @@ define(function(require) {
     var LayoutUtility = require('famous-flex/LayoutUtility');
     var GridLayout = require('famous-flex-layouts/GridLayout');
     var NavBarLayout = require('famous-flex-layouts/NavBarLayout');
+    var ListLayout = require('famous-flex-layouts/ListLayout');
     var Dogs = require('./data/dogs/collection');
     var LayoutDockHelper = require('famous-flex/helpers/LayoutDockHelper');
 
@@ -36,10 +37,12 @@ define(function(require) {
     var mainContext = Engine.createContext();
 
     // Create the shell
+    var layoutListRenderables = [];
     var collection = [];
+    var layouts = [];
     var navbar = _createNavbar();
     var sidebar = _createSidebar();
-    var collectionView = _createCollectionView(collection);
+    var collectionView = _createCollectionView();
     var shell = _createShell({
         navbar: navbar,
         sidebar: sidebar,
@@ -47,9 +50,9 @@ define(function(require) {
     });
     mainContext.add(shell);
 
-    // Add layout types
-    _addCollectionLayouts();
-
+    /**
+     * Shell
+     */
     function _createShell(renderables) {
         return new LayoutController({
             layout: function(context, options) {
@@ -68,50 +71,6 @@ define(function(require) {
             dataSource: renderables
         });
     }
-
-    function _createCollectionItem() {
-        var imageUrl = Dogs[collection.length % Dogs.length];
-        return new Surface({
-            classes: ['image-frame'],
-            content: '<span class="image-helper"></span><img src="' + imageUrl + '" class="image-content">'
-        });
-    }
-    function _addCollectionItem() {
-        if (collectionView) {
-            var rightItems = navbar.getLayoutNodeById('rightItems');
-            var insertSpec = LayoutUtility.cloneSpec(navbar.getLayoutNode(rightItems[1]).getSpec());
-            insertSpec.opacity = 0;
-            insertSpec.origin = [1, 0];
-            insertSpec.align = [1, 0];
-            collectionView.insert(-1, _createCollectionItem(), insertSpec);
-        }
-        else {
-            collection.unshift(_createCollectionItem());
-        }
-    }
-
-    function _removeCollectionItem() {
-        var rightItems = navbar.getLayoutNodeById('rightItems');
-        var removeSpec = LayoutUtility.cloneSpec(navbar.getLayoutNode(rightItems[0]).getSpec);
-        removeSpec.opacity = 0;
-        removeSpec.origin = [1, 0];
-        removeSpec.align = [1, 0];
-        collectionView.remove(0, removeSpec);
-    }
-
-    function _toggleSidebar() {
-        shell.patchLayoutOptions({
-            showSidebar: !shell.getLayoutOptions().showSidebar
-        });
-    }
-
-    function _createButton(content) {
-        return new Surface({
-            size: [38, undefined],
-            content: '<button type="button" class="btn btn-default">' + content + '</button>'
-        });
-    }
-
     function _createSidebar() {
         return new LayoutController({
             layout: function(context) {
@@ -130,7 +89,21 @@ define(function(require) {
             }
         });
     }
+    function _toggleSidebar() {
+        shell.patchLayoutOptions({
+            showSidebar: !shell.getLayoutOptions().showSidebar
+        });
+    }
 
+    /**
+     * Navbar
+     */
+    function _createButton(content) {
+        return new Surface({
+            size: [38, undefined],
+            content: '<button type="button" class="btn btn-default">' + content + '</button>'
+        });
+    }
     function _createNavbar() {
         var layoutController = new LayoutController({
             layout: NavBarLayout,
@@ -161,7 +134,38 @@ define(function(require) {
         return layoutController;
     }
 
-    function _createCollectionView(collection) {
+    /**
+     * Collection
+     */
+    function _createCollectionItem() {
+        var imageUrl = Dogs[collection.length % Dogs.length];
+        return new Surface({
+            classes: ['image-frame'],
+            content: '<span class="image-helper"></span><img src="' + imageUrl + '" class="image-content">'
+        });
+    }
+    function _addCollectionItem() {
+        if (collectionView) {
+            var rightItems = navbar.getLayoutNodeById('rightItems');
+            var insertSpec = LayoutUtility.cloneSpec(navbar.getLayoutNode(rightItems[1]).getSpec());
+            insertSpec.opacity = 0;
+            insertSpec.origin = [1, 0];
+            insertSpec.align = [1, 0];
+            collectionView.insert(-1, _createCollectionItem(), insertSpec);
+        }
+        else {
+            collection.unshift(_createCollectionItem());
+        }
+    }
+    function _removeCollectionItem() {
+        var rightItems = navbar.getLayoutNodeById('rightItems');
+        var removeSpec = LayoutUtility.cloneSpec(navbar.getLayoutNode(rightItems[0]).getSpec);
+        removeSpec.opacity = 0;
+        removeSpec.origin = [1, 0];
+        removeSpec.align = [1, 0];
+        collectionView.remove(0, removeSpec);
+    }
+    function _createCollectionView() {
         for (var i = 0; i < 3; i++) {
             _addCollectionItem();
         }
@@ -176,29 +180,57 @@ define(function(require) {
         });
     }
 
+    /**
+     * Layouts
+     */
     function _createLayoutListView() {
-        return new Surface({
-            classes: ['navbar', 'navbar-default']
+        return new LayoutController({
+            layout: ListLayout,
+            layoutOptions: { itemHeight: 50 },
+            dataSource: layoutListRenderables
         });
     }
-
     function _createLayoutDetailsView() {
         return new Surface({
             classes: ['navbar', 'navbar-default']
         });
     }
 
-    function _addCollectionLayouts() {
-        _addCollectionLayout('GridLayout', GridLayout, [
+
+
+
+    function _addLayout(name, layoutFn, options) {
+        var layout = {
+            name: name,
+            layout: layoutFn,
+            options: options
+        };
+        layouts.push(layout);
+        var listRenderable = new Surface({
+            classes: ['navbar', 'navbar-default', 'layout-list-item'],
+            content: name
+        });
+        listRenderable.on('click', function() {
+            var layoutOptions = {};
+            for (var i = 0; i < options.length; i++) {
+                layoutOptions[options[i].name] = options[i].value;
+            }
+            collectionView.setLayout(layoutFn, layoutOptions);
+        });
+        layoutListRenderables.push(listRenderable);
+    }
+    function _addLayouts() {
+        _addLayout('GridLayout', GridLayout, [
             {name: 'columns',   value: 3, min: 1, max: 50},
             {name: 'rows',      value: 3, min: 1, max: 50},
             {name: 'gutter',    value: [20, 20], min: [0, 0], max: [100, 100]},
             {name: 'direction', value: 0, min: 0, max: 1}
         ]);
+        _addLayout('ListLayout', ListLayout, [
+            {name: 'itemWidth',  value: 50, min: 0, max: 1000},
+            {name: 'itemHeight', value: 50, min: 0, max: 1000},
+            {name: 'direction',  value: 1, min: 0, max: 1}
+        ]);
     }
-
-    function _addCollectionLayout(text, layout, options) {
-        // TODO
-    }
-
+    _addLayouts();
 });
