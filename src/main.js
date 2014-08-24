@@ -26,6 +26,7 @@ define(function(require) {
     var Surface = require('famous/core/Surface');
     var FastClick = require('famous/inputs/FastClick');
     var LayoutController = require('famous-flex/LayoutController');
+    var FlowLayoutController = require('famous-flex/FlowLayoutController');
     var LayoutUtility = require('famous-flex/LayoutUtility');
     var GridLayout = require('famous-flex-layouts/GridLayout');
     var NavBarLayout = require('famous-flex-layouts/NavBarLayout');
@@ -57,6 +58,7 @@ define(function(require) {
         return new LayoutController({
             layout: function(context, options) {
                 var dock = new LayoutDockHelper(context);
+                dock.top(context.nodeById('navbar'), 50);
                 if (options.showSidebar) {
                     if (context.size[0] >= context.size[1]) {
                         dock.left(context.nodeById('sidebar'), 200);
@@ -65,7 +67,6 @@ define(function(require) {
                         dock.bottom(context.nodeById('sidebar'), 200);
                     }
                 }
-                dock.top(context.nodeById('navbar'), 50);
                 dock.fill(context.nodeById('content'));
             },
             dataSource: renderables
@@ -146,8 +147,8 @@ define(function(require) {
     }
     function _addCollectionItem() {
         if (collectionView) {
-            var rightItems = navbar.getLayoutNodeById('rightItems');
-            var insertSpec = LayoutUtility.cloneSpec(navbar.getLayoutNode(rightItems[1]).getSpec());
+            var rightItems = navbar.getSpecByNodeId('rightItems');
+            var insertSpec = LayoutUtility.cloneSpec(navbar.getSpecByNode(rightItems[1]));
             insertSpec.opacity = 0;
             insertSpec.origin = [1, 0];
             insertSpec.align = [1, 0];
@@ -158,8 +159,8 @@ define(function(require) {
         }
     }
     function _removeCollectionItem() {
-        var rightItems = navbar.getLayoutNodeById('rightItems');
-        var removeSpec = LayoutUtility.cloneSpec(navbar.getLayoutNode(rightItems[0]).getSpec);
+        var rightItems = navbar.getSpecByNodeId('rightItems');
+        var removeSpec = LayoutUtility.cloneSpec(navbar.getSpecByNode(rightItems[0]));
         removeSpec.opacity = 0;
         removeSpec.origin = [1, 0];
         removeSpec.align = [1, 0];
@@ -169,7 +170,7 @@ define(function(require) {
         for (var i = 0; i < 3; i++) {
             _addCollectionItem();
         }
-        return new LayoutController({
+        return new FlowLayoutController({
             layout: GridLayout,
             layoutOptions: {
                 columns: 3,
@@ -195,9 +196,6 @@ define(function(require) {
             classes: ['navbar', 'navbar-default']
         });
     }
-
-
-
 
     function _addLayout(name, layoutFn, options) {
         var layout = {
