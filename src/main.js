@@ -26,7 +26,7 @@ define(function(require) {
     var Surface = require('famous/core/Surface');
     var FastClick = require('famous/inputs/FastClick');
     var LayoutController = require('famous-flex/LayoutController');
-    var FlowLayoutController = require('famous-flex/FlowLayoutController');
+    var FlowLayoutController = require('famous-flex/LayoutController');
     var LayoutUtility = require('famous-flex/LayoutUtility');
     var GridLayout = require('famous-flex-layouts/GridLayout');
     var NavBarLayout = require('famous-flex-layouts/NavBarLayout');
@@ -56,33 +56,33 @@ define(function(require) {
      */
     function _createShell(renderables) {
         return new LayoutController({
-            layout: function(context, options) {
-                var dock = new LayoutDockHelper(context);
-                dock.top(context.nodeById('navbar'), 50);
+            layout: function(size, nodes, options) {
+                var dock = new LayoutDockHelper(size, nodes);
+                dock.top('navbar', 50);
                 if (options.showSidebar) {
-                    if (context.size[0] >= context.size[1]) {
-                        dock.left(context.nodeById('sidebar'), 200);
+                    if (size[0] >= size[1]) {
+                        dock.left('sidebar', 200);
                     }
                     else {
-                        dock.bottom(context.nodeById('sidebar'), 200);
+                        dock.bottom('sidebar', 200);
                     }
                 }
-                dock.fill(context.nodeById('content'));
+                dock.fill('content');
             },
             dataSource: renderables
         });
     }
     function _createSidebar() {
         return new LayoutController({
-            layout: function(context) {
-                var dock = new LayoutDockHelper(context);
-                if (context.size[0] < 300) {
-                    dock.bottom(context.nodeById('details'), 200);
+            layout: function(size, nodes) {
+                var dock = new LayoutDockHelper(size, nodes);
+                if (size[0] < 300) {
+                    dock.bottom('details', 200);
                 }
                 else {
-                    dock.right(context.nodeById('details'), 200);
+                    dock.right('details', 200);
                 }
-                dock.fill(context.nodeById('list'));
+                dock.fill('list');
             },
             dataSource: {
                 'list': _createLayoutListView(),
