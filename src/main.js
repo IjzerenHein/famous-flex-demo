@@ -26,7 +26,7 @@ define(function(require) {
     var Surface = require('famous/core/Surface');
     var FastClick = require('famous/inputs/FastClick');
     var LayoutController = require('famous-flex/LayoutController');
-    var FlowLayoutController = require('famous-flex/LayoutController');
+    var FlowLayoutController = require('famous-flex/FlowLayoutController');
     var LayoutUtility = require('famous-flex/LayoutUtility');
     var GridLayout = require('famous-flex-layouts/GridLayout');
     var NavBarLayout = require('famous-flex-layouts/NavBarLayout');
