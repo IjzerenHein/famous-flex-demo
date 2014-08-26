@@ -31,8 +31,10 @@ define(function(require) {
     var GridLayout = require('famous-flex-layouts/GridLayout');
     var NavBarLayout = require('famous-flex-layouts/NavBarLayout');
     var ListLayout = require('famous-flex-layouts/ListLayout');
+    var CollectionLayout = require('famous-flex-layouts/CollectionLayout');
     var Dogs = require('./data/dogs/collection');
     var LayoutDockHelper = require('famous-flex/helpers/LayoutDockHelper');
+    var BkImageSurface = require('famous-bkimagesurface/BkImageSurface');
 
     // create the main context
     var mainContext = Engine.createContext();
@@ -140,10 +142,16 @@ define(function(require) {
      */
     function _createCollectionItem() {
         var imageUrl = Dogs[collection.length % Dogs.length];
-        return new Surface({
+        /*return new Surface({
             classes: ['image-frame'],
             content: '<span class="image-helper"></span><img src="' + imageUrl + '" class="image-content">'
+        });*/
+        return new BkImageSurface({
+            classes: ['image-frame'],
+            content: imageUrl,
+            sizeMode: 'cover'
         });
+
     }
     function _addCollectionItem() {
         if (collectionView) {
@@ -152,7 +160,8 @@ define(function(require) {
             insertSpec.opacity = 0;
             insertSpec.origin = [1, 0];
             insertSpec.align = [1, 0];
-            collectionView.insert(-1, _createCollectionItem(), insertSpec);
+            var pos = Math.floor(Math.random() * (Math.min(collection.length, 5) + 1));
+            collectionView.insert(pos, _createCollectionItem(), insertSpec);
         }
         else {
             collection.unshift(_createCollectionItem());
@@ -164,7 +173,8 @@ define(function(require) {
         removeSpec.opacity = 0;
         removeSpec.origin = [1, 0];
         removeSpec.align = [1, 0];
-        collectionView.remove(0, removeSpec);
+        var pos = Math.floor(Math.random() * Math.min(collection.length, 5));
+        collectionView.remove(pos, removeSpec);
     }
     function _createCollectionView() {
         for (var i = 0; i < 3; i++) {
@@ -228,6 +238,13 @@ define(function(require) {
             {name: 'itemWidth',  value: 50, min: 0, max: 1000},
             {name: 'itemHeight', value: 50, min: 0, max: 1000},
             {name: 'direction',  value: 1, min: 0, max: 1}
+        ]);
+        _addLayout('CollectionLayout', CollectionLayout, [
+            {name: 'itemWidth',  value: 100, min: 0, max: 1000},
+            {name: 'itemHeight', value: 100, min: 0, max: 1000},
+            {name: 'direction',  value: 1, min: 0, max: 1},
+            {name: 'justify',    value: 1, min: 0, max: 1},
+            {name: 'gutter',     value: [10, 10], min: [0, 0], max: [100, 100]}
         ]);
     }
     _addLayouts();

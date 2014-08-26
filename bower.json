@@ -25,6 +25,7 @@
   "devDependencies": {
     "requirejs": "~2.1.11",
     "famous": "~0.2.2",
-    "bootstrap": "~3.2.0"
+    "bootstrap": "~3.2.0",
+    "famous-bkimagesurface": "~0.0.4"
   }
 }
