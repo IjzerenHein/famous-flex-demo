@@ -26,16 +26,17 @@
     "node": ">= 0.10.0"
   },
   "devDependencies": {
-    "grunt": "latest",
-    "grunt-eslint": "latest",
-    "grunt-jscs": "latest",
-    "grunt-jsdoc-to-markdown": "latest",
     "css-loader": "^0.7.0",
     "expose-loader": "^0.5.3",
     "famous": "^0.2.2",
     "famous-polyfills": "^0.2.2",
     "file-loader": "^0.6.1",
     "glob": "^4.0.5",
+    "grunt": "latest",
+    "grunt-eslint": "latest",
+    "grunt-exec": "^0.4.6",
+    "grunt-ftp-deploy": "latest",
+    "grunt-jscs": "latest",
     "html-loader": "^0.2.2",
     "json-loader": "^0.5.1",
     "optimist": "^0.6.1",
@@ -51,6 +52,7 @@
     "dev": "webpack-dev-server --reload=localhost",
     "open-dev": "open http://localhost:8080",
     "dist": "webpack --minify",
-    "open": "open dist/index.html"
+    "open": "open dist/index.html",
+    "deploy": "grunt deploy"
   }
 }
