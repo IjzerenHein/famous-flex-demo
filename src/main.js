@@ -153,7 +153,9 @@ define(function(require) {
             content: imageUrl,
             sizeMode: 'cover'
         });
-
+        /*return new Surface({
+            classes: ['image-frame']
+        });*/
     }
     function _addCollectionItem() {
         if (collectionView) {
