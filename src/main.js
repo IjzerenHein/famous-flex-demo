@@ -21,10 +21,12 @@ define(function(require) {
     require('./index.html');
     //</webpack>
 
+    // Fast-click
+    require('famous/inputs/FastClick');
+
     // import dependencies
     var Engine = require('famous/core/Engine');
     var Surface = require('famous/core/Surface');
-    var FastClick = require('famous/inputs/FastClick');
     var LayoutController = require('famous-flex/LayoutController');
     var FlowLayoutController = require('famous-flex/FlowLayoutController');
     var LayoutUtility = require('famous-flex/LayoutUtility');
