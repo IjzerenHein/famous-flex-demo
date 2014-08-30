@@ -187,8 +187,7 @@ define(function(require) {
         return new FlowLayoutController({
             layout: GridLayout,
             layoutOptions: {
-                columns: 3,
-                rows: 3,
+                cells: [3, 3],
                 gutter: [20, 20]
             },
             dataSource: collection
@@ -201,7 +200,7 @@ define(function(require) {
     function _createLayoutListView() {
         return new LayoutController({
             layout: ListLayout,
-            layoutOptions: { itemHeight: 50 },
+            layoutOptions: { itemSize: 50 },
             dataSource: layoutListRenderables
         });
     }
@@ -233,19 +232,16 @@ define(function(require) {
     }
     function _addLayouts() {
         _addLayout('GridLayout', GridLayout, [
-            {name: 'columns',   value: 3, min: 1, max: 50},
-            {name: 'rows',      value: 3, min: 1, max: 50},
-            {name: 'gutter',    value: [20, 20], min: [0, 0], max: [100, 100]},
-            {name: 'direction', value: 0, min: 0, max: 1}
+            {name: 'cells',      value: [3, 3], min: [1, 1], max: [50, 50]},
+            {name: 'gutter',     value: [20, 20], min: [0, 0], max: [100, 100]},
+            {name: 'direction',  value: 0, min: 0, max: 1}
         ]);
         _addLayout('ListLayout', ListLayout, [
-            {name: 'itemWidth',  value: 50, min: 0, max: 1000},
-            {name: 'itemHeight', value: 50, min: 0, max: 1000},
+            {name: 'itemSize',   value: 50, min: 0, max: 1000},
             {name: 'direction',  value: 1, min: 0, max: 1}
         ]);
         _addLayout('CollectionLayout', CollectionLayout, [
-            {name: 'itemWidth',  value: 100, min: 0, max: 1000},
-            {name: 'itemHeight', value: 100, min: 0, max: 1000},
+            {name: 'itemSize',   value: [100, 100], min: [0, 0], max: [1000, 1000]},
             {name: 'direction',  value: 1, min: 0, max: 1},
             {name: 'justify',    value: 1, min: 0, max: 1},
             {name: 'gutter',     value: [10, 10], min: [0, 0], max: [100, 100]}
