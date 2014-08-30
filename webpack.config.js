@@ -2,7 +2,8 @@
 /*eslint no-use-before-define:0 */
 
 var webpack = require('webpack');
-var ReloadPlugin = require('webpack-reload-plugin');
+var webpackDevServer = require('webpack-dev-server');
+var path = require('path');
 
 // Support for extra commandline arguments
 var argv = require('optimist')
@@ -13,14 +14,15 @@ var argv = require('optimist')
             .argv;
 
 var config = {
-  entry: './src/main',
+  context: path.join(__dirname, 'src'),
+  entry: ['./main'],
   output:{
-    path: 'dist',
+    path: path.join(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: './'
+    publicPath: isDevServer ? '/': ''
   },
   devServer: {
-    publicPath: './'
+    publicPath: '/'
   },
   reload: isDevServer()? 'localhost': null,
   module:{
@@ -37,20 +39,16 @@ var config = {
     ]
   },
   resolve: {
-    modulesDirectories: ['bower_components'],
     alias: {
-      'famous-polyfills': '../node_modules/famous-polyfills',
       'famous-flex': 'famous-flex/src',
       'famous-flex-layouts': 'famous-flex-layouts/src'
     }
   },
-  copyContext: 'src',
   plugins:[
     new webpack.DefinePlugin({
       VERSION: JSON.stringify(require('./package.json').version),
       ENV: JSON.stringify(argv.env)
-    }),
-    new ReloadPlugin()
+    })
   ]
 };
 

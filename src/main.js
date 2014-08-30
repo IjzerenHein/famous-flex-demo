@@ -22,7 +22,7 @@ define(function(require) {
     //</webpack>
 
     // Fast-click
-    require('famous/inputs/FastClick');
+    //require('famous/inputs/FastClick');
 
     // import dependencies
     var Engine = require('famous/core/Engine');
