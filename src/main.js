@@ -35,6 +35,7 @@ define(function(require) {
     var ListLayout = require('famous-flex-layouts/ListLayout');
     var CollectionLayout = require('famous-flex-layouts/CollectionLayout');
     var Dogs = require('./data/dogs/collection');
+    var NewYork = require('./data/newyork/collection');
     var LayoutDockHelper = require('famous-flex/helpers/LayoutDockHelper');
     var BkImageSurface = require('famous-bkimagesurface/BkImageSurface');
 
@@ -143,7 +144,7 @@ define(function(require) {
      * Collection
      */
     function _createCollectionItem() {
-        var imageUrl = Dogs[collection.length % Dogs.length];
+        var imageUrl = NewYork[collection.length % NewYork.length];
         /*return new Surface({
             classes: ['image-frame'],
             content: '<span class="image-helper"></span><img src="' + imageUrl + '" class="image-content">'
