@@ -19,12 +19,12 @@ var config = {
   output:{
     path: path.join(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: isDevServer ? '/': ''
+    publicPath: isDevServer() ? '/' : ''
   },
   devServer: {
     publicPath: '/'
   },
-  reload: isDevServer()? 'localhost': null,
+  reload: isDevServer() ? 'localhost' : null,
   module:{
     loaders:[
       { test: /\.json$/,            loader: 'json-loader' },
@@ -40,8 +40,7 @@ var config = {
   },
   resolve: {
     alias: {
-      'famous-flex': 'famous-flex/src',
-      'famous-flex-layouts': 'famous-flex-layouts/src'
+      'famous-flex': 'famous-flex/src'
     }
   },
   plugins:[

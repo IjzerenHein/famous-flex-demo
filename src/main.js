@@ -29,11 +29,13 @@ define(function(require) {
     var Surface = require('famous/core/Surface');
     var LayoutController = require('famous-flex/LayoutController');
     var FlowLayoutController = require('famous-flex/FlowLayoutController');
+    var ScrollView = require('famous-flex/ScrollView');
+    var ScrollContainer = require('famous-flex/ScrollContainer');
     var LayoutUtility = require('famous-flex/LayoutUtility');
-    var GridLayout = require('famous-flex-layouts/GridLayout');
-    var NavBarLayout = require('famous-flex-layouts/NavBarLayout');
-    var ListLayout = require('famous-flex-layouts/ListLayout');
-    var CollectionLayout = require('famous-flex-layouts/CollectionLayout');
+    var GridLayout = require('famous-flex/layouts/GridLayout');
+    var NavBarLayout = require('famous-flex/layouts/NavBarLayout');
+    var ListLayout = require('famous-flex/layouts/ListLayout');
+    var CollectionLayout = require('famous-flex/layouts/CollectionLayout');
     var Dogs = require('./data/dogs/collection');
     var NewYork = require('./data/newyork/collection');
     var LayoutDockHelper = require('famous-flex/helpers/LayoutDockHelper');
@@ -160,8 +162,8 @@ define(function(require) {
     }
     function _addCollectionItem() {
         if (collectionView) {
-            var rightItems = navbar.getSpecByNodeId('rightItems');
-            var insertSpec = LayoutUtility.cloneSpec(navbar.getSpecByNode(rightItems[1]));
+            var rightItems = navbar.getSpec('rightItems');
+            var insertSpec = LayoutUtility.cloneSpec(navbar.getSpec(rightItems[1]));
             insertSpec.opacity = 0;
             insertSpec.origin = [1, 0];
             insertSpec.align = [1, 0];
@@ -173,8 +175,8 @@ define(function(require) {
         }
     }
     function _removeCollectionItem() {
-        var rightItems = navbar.getSpecByNodeId('rightItems');
-        var removeSpec = LayoutUtility.cloneSpec(navbar.getSpecByNode(rightItems[0]));
+        var rightItems = navbar.getSpec('rightItems');
+        var removeSpec = LayoutUtility.cloneSpec(navbar.getSpec(rightItems[0]));
         removeSpec.opacity = 0;
         removeSpec.origin = [1, 0];
         removeSpec.align = [1, 0];
@@ -193,6 +195,15 @@ define(function(require) {
             },
             dataSource: collection
         });
+        /*return new ScrollContainer({
+            scrollview: {
+                layout: ListLayout,
+                layoutOptions: {
+                    itemSize: 50
+                },
+                sequence: collection
+            }
+        });*/
     }
 
     /**
