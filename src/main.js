@@ -15,9 +15,9 @@ define(function(require) {
 
     //<webpack>
     require('famous-polyfills');
-    require('bootstrap/dist/css/bootstrap.min.css');
+    require('./css/bootstrap.min.css');
     require('famous/core/famous.css');
-    require('./styles.css');
+    require('./css/styles.css');
     require('./index.html');
     //</webpack>
 
@@ -65,7 +65,7 @@ define(function(require) {
         return new LayoutController({
             layout: function(size, nodes, options) {
                 var dock = new LayoutDockHelper(size, nodes);
-                dock.top('navbar', 50);
+                dock.top('navbar', 58);
                 if (options.showSidebar) {
                     if (size[0] >= size[1]) {
                         dock.left('sidebar', 200);
@@ -108,7 +108,7 @@ define(function(require) {
      */
     function _createButton(content) {
         return new Surface({
-            size: [38, undefined],
+            size: [50, undefined],
             content: '<button type="button" class="btn btn-default">' + content + '</button>'
         });
     }
