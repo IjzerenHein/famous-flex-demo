@@ -14,9 +14,20 @@ body {
   color: white;
 }
 
+.panel {
+  background-color: rgba(34, 34, 34, 0.7);
+}
+
 .layout-list-item {
-  text-align: center;
-  line-height: 33px;
+  padding-left: 10px;
+  line-height: 50px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.layout-list-item.selected {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .image-frame {

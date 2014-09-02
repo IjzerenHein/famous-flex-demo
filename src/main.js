@@ -29,14 +29,14 @@ define(function(require) {
     var Surface = require('famous/core/Surface');
     var LayoutController = require('famous-flex/LayoutController');
     var FlowLayoutController = require('famous-flex/FlowLayoutController');
-    var ScrollView = require('famous-flex/ScrollView');
-    var ScrollContainer = require('famous-flex/ScrollContainer');
+    //var ScrollView = require('famous-flex/ScrollView');
+    //var ScrollContainer = require('famous-flex/ScrollContainer');
     var LayoutUtility = require('famous-flex/LayoutUtility');
     var GridLayout = require('famous-flex/layouts/GridLayout');
     var NavBarLayout = require('famous-flex/layouts/NavBarLayout');
     var ListLayout = require('famous-flex/layouts/ListLayout');
     var CollectionLayout = require('famous-flex/layouts/CollectionLayout');
-    var Dogs = require('./data/dogs/collection');
+    //var Dogs = require('./data/dogs/collection');
     var NewYork = require('./data/newyork/collection');
     var LayoutDockHelper = require('famous-flex/helpers/LayoutDockHelper');
     var BkImageSurface = require('famous-bkimagesurface/BkImageSurface');
@@ -61,28 +61,40 @@ define(function(require) {
     /**
      * Shell
      */
+    function ShellLayout(size, context, options) {
+        context.set('navbar', {
+            size: [size[0], options.navBarHeight]
+        });
+        context.set('content', {
+            size: [size[0], size[1] - options.navBarHeight],
+            translate: [0, options.navBarHeight, 0],
+            origin: [1, 0],
+            rotate: options.showSideBar ? [0, (Math.PI/180) * -20, 0] : [0, 0, 0]
+        });
+        context.set('sidebar', {
+            size: [options.sideBarWidth, size[1] - options.navBarHeight],
+            translate: [0, options.navBarHeight, 100],
+            origin: [0, 0],
+            rotate: options.showSideBar ? [0, (Math.PI/180) * 10, 0] : [0, (Math.PI/180) * 90, 0]
+        });
+    }
     function _createShell(renderables) {
-        return new LayoutController({
-            layout: function(size, nodes, options) {
-                var dock = new LayoutDockHelper(size, nodes);
-                dock.top('navbar', 58);
-                if (options.showSidebar) {
-                    if (size[0] >= size[1]) {
-                        dock.left('sidebar', 200);
-                    }
-                    else {
-                        dock.bottom('sidebar', 200);
-                    }
-                }
-                dock.fill('content');
+        return new FlowLayoutController({
+            layout: ShellLayout,
+            layoutOptions: {
+                navBarHeight: 58,
+                sideBarWidth: 160
             },
             dataSource: renderables
         });
     }
     function _createSidebar() {
         return new LayoutController({
-            layout: function(size, nodes) {
-                var dock = new LayoutDockHelper(size, nodes);
+            layout: function(size, context) {
+                var dock = new LayoutDockHelper(size, context, {
+                    translateZ: 1
+                });
+                context.set('back', {size: size});
                 if (size[0] < 300) {
                     dock.bottom('details', 200);
                 }
@@ -93,13 +105,19 @@ define(function(require) {
             },
             dataSource: {
                 'list': _createLayoutListView(),
-                'details': _createLayoutDetailsView()
+                'details': _createLayoutDetailsView(),
+                'back': new Surface({classes:['panel']})
             }
+        });
+    }
+    function _hideSidebar() {
+        shell.patchLayoutOptions({
+            showSideBar: false
         });
     }
     function _toggleSidebar() {
         shell.patchLayoutOptions({
-            showSidebar: !shell.getLayoutOptions().showSidebar
+            showSideBar: !shell.getLayoutOptions().showSideBar
         });
     }
 
@@ -112,6 +130,14 @@ define(function(require) {
             content: '<button type="button" class="btn btn-default">' + content + '</button>'
         });
     }
+    function _insertItem() {
+        _hideSidebar.call(this);
+        _addCollectionItem.call(this);
+    }
+    function _removeItem() {
+        _hideSidebar.call(this);
+        _removeCollectionItem.call(this);
+    }
     function _createNavbar() {
         var layoutController = new LayoutController({
             layout: NavBarLayout,
@@ -123,9 +149,9 @@ define(function(require) {
         var background = new Surface({classes: ['navbar', 'navbar-default']});
         var title = new Surface({content: 'famous-flex', classes: ['title']});
         var addButton = _createButton('<i class="glyphicon glyphicon-plus"></i>');
-        addButton.on('click', _addCollectionItem);
+        addButton.on('click', _insertItem);
         var removeButton = _createButton('<i class="glyphicon glyphicon-minus"></i>');
-        removeButton.on('click', _removeCollectionItem);
+        removeButton.on('click', _removeItem);
         var menuButton = _createButton('<i class="glyphicon glyphicon-tasks"></i>');
         menuButton.on('click', _toggleSidebar);
         layoutController.setDataSource({
@@ -188,11 +214,6 @@ define(function(require) {
             _addCollectionItem();
         }
         return new FlowLayoutController({
-            layout: GridLayout,
-            layoutOptions: {
-                cells: [3, 3],
-                gutter: [20, 20]
-            },
             dataSource: collection
         });
         /*return new ScrollContainer({
@@ -218,10 +239,35 @@ define(function(require) {
     }
     function _createLayoutDetailsView() {
         return new Surface({
-            classes: ['navbar', 'navbar-default']
         });
     }
+    function _findLayout(name) {
+        for (var i =0; i < layouts.length; i++) {
+            if (layouts[i].name === name) {
+                return layouts[i];
+            }
+        }
+        return undefined;
+    }
+    function _selectLayout(name) {
+        var layout = _findLayout(name);
+        var layoutOptions = {};
+        var i;
+        for (i = 0; i < layout.options.length; i++) {
+            layoutOptions[layout.options[i].name] = layout.options[i].value;
+        }
+        collectionView.setLayout(layout.layout, layoutOptions);
 
+        for (i = 0; i < layouts.length; i++) {
+            layout = layouts[i];
+            if (layout.name === name) {
+                layout.surface.addClass('selected');
+            }
+            else {
+                layout.surface.removeClass('selected');
+            }
+        }
+    }
     function _addLayout(name, layoutFn, options) {
         var layout = {
             name: name,
@@ -230,16 +276,11 @@ define(function(require) {
         };
         layouts.push(layout);
         var listRenderable = new Surface({
-            classes: ['navbar', 'navbar-default', 'layout-list-item'],
+            classes: ['layout-list-item'],
             content: name
         });
-        listRenderable.on('click', function() {
-            var layoutOptions = {};
-            for (var i = 0; i < options.length; i++) {
-                layoutOptions[options[i].name] = options[i].value;
-            }
-            collectionView.setLayout(layoutFn, layoutOptions);
-        });
+        layout.surface = listRenderable;
+        listRenderable.on('click', _selectLayout.bind(this, name));
         layoutListRenderables.push(listRenderable);
     }
     function _addLayouts() {
@@ -260,4 +301,5 @@ define(function(require) {
         ]);
     }
     _addLayouts();
+    _selectLayout('CollectionLayout');
 });
