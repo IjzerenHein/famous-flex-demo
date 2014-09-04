@@ -29,17 +29,18 @@ define(function(require) {
     var Surface = require('famous/core/Surface');
     var LayoutController = require('famous-flex/LayoutController');
     var FlowLayoutController = require('famous-flex/FlowLayoutController');
-    //var ScrollView = require('famous-flex/ScrollView');
-    //var ScrollContainer = require('famous-flex/ScrollContainer');
+    var ScrollContainer = require('famous-flex/ScrollContainer');
     var LayoutUtility = require('famous-flex/LayoutUtility');
-    var GridLayout = require('famous-flex/layouts/GridLayout');
-    var NavBarLayout = require('famous-flex/layouts/NavBarLayout');
-    var ListLayout = require('famous-flex/layouts/ListLayout');
-    var CollectionLayout = require('famous-flex/layouts/CollectionLayout');
     //var Dogs = require('./data/dogs/collection');
     var NewYork = require('./data/newyork/collection');
     var LayoutDockHelper = require('famous-flex/helpers/LayoutDockHelper');
     var BkImageSurface = require('famous-bkimagesurface/BkImageSurface');
+    // layouts
+    var GridLayout = require('famous-flex/layouts/GridLayout');
+    var NavBarLayout = require('famous-flex/layouts/NavBarLayout');
+    var ListLayout = require('famous-flex/layouts/ListLayout');
+    var CollectionLayout = require('famous-flex/layouts/CollectionLayout');
+    var CubeLayout = require('famous-flex/layouts/CubeLayout');
 
     // create the main context
     var mainContext = Engine.createContext();
@@ -61,7 +62,8 @@ define(function(require) {
     /**
      * Shell
      */
-    function ShellLayout(size, context, options) {
+    function ShellLayout(context, options) {
+        var size = context.size;
         context.set('navbar', {
             size: [size[0], options.navBarHeight]
         });
@@ -90,8 +92,9 @@ define(function(require) {
     }
     function _createSidebar() {
         return new LayoutController({
-            layout: function(size, context) {
-                var dock = new LayoutDockHelper(size, context, {
+            layout: function(context) {
+                var size = context.size;
+                var dock = new LayoutDockHelper(context, {
                     translateZ: 1
                 });
                 context.set('back', {size: size});
@@ -187,7 +190,7 @@ define(function(require) {
         });*/
     }
     function _addCollectionItem() {
-        if (collectionView) {
+        if (collectionView && collectionView.insert) {
             var rightItems = navbar.getSpec('rightItems');
             var insertSpec = LayoutUtility.cloneSpec(navbar.getSpec(rightItems[1]));
             insertSpec.opacity = 0;
@@ -201,22 +204,24 @@ define(function(require) {
         }
     }
     function _removeCollectionItem() {
-        var rightItems = navbar.getSpec('rightItems');
-        var removeSpec = LayoutUtility.cloneSpec(navbar.getSpec(rightItems[0]));
-        removeSpec.opacity = 0;
-        removeSpec.origin = [1, 0];
-        removeSpec.align = [1, 0];
-        var pos = Math.floor(Math.random() * Math.min(collection.length, 5));
-        collectionView.remove(pos, removeSpec);
+        if (collectionView && collectionView.remove) {
+            var rightItems = navbar.getSpec('rightItems');
+            var removeSpec = LayoutUtility.cloneSpec(navbar.getSpec(rightItems[0]));
+            removeSpec.opacity = 0;
+            removeSpec.origin = [1, 0];
+            removeSpec.align = [1, 0];
+            var pos = Math.floor(Math.random() * Math.min(collection.length, 5));
+            collectionView.remove(pos, removeSpec);
+        }
     }
     function _createCollectionView() {
         for (var i = 0; i < 3; i++) {
             _addCollectionItem();
         }
-        return new FlowLayoutController({
+        /*return new FlowLayoutController({
             dataSource: collection
-        });
-        /*return new ScrollContainer({
+        });*/
+        return new ScrollContainer({
             scrollview: {
                 layout: ListLayout,
                 layoutOptions: {
@@ -224,7 +229,7 @@ define(function(require) {
                 },
                 sequence: collection
             }
-        });*/
+        });
     }
 
     /**
@@ -298,6 +303,9 @@ define(function(require) {
             {name: 'direction',  value: 1, min: 0, max: 1},
             {name: 'justify',    value: 1, min: 0, max: 1},
             {name: 'gutter',     value: [10, 10], min: [0, 0], max: [100, 100]}
+        ]);
+        _addLayout('CubeLayout', CubeLayout, [
+            {name: 'itemSize',   value: [100, 100], min: [0, 0], max: [1000, 1000]}
         ]);
     }
     _addLayouts();
