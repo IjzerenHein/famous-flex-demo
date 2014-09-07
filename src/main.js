@@ -27,6 +27,7 @@ define(function(require) {
     // import dependencies
     var Engine = require('famous/core/Engine');
     var Surface = require('famous/core/Surface');
+    var InputSurface = require('famous/surfaces/InputSurface');
     var LayoutController = require('famous-flex/LayoutController');
     var FlowLayoutController = require('famous-flex/FlowLayoutController');
     var ScrollContainer = require('famous-flex/ScrollContainer');
@@ -47,8 +48,10 @@ define(function(require) {
 
     // Create the shell
     var layoutListRenderables = [];
+    var layoutDetailsRenderables = [];
     var collection = [];
     var layouts = [];
+    var layoutDetailsView;
     var navbar = _createNavbar();
     var sidebar = _createSidebar();
     var collectionView = _createCollectionView();
@@ -91,6 +94,7 @@ define(function(require) {
         });
     }
     function _createSidebar() {
+        layoutDetailsView = _createLayoutDetailsView();
         return new LayoutController({
             layout: function(context) {
                 var size = context.size;
@@ -108,18 +112,18 @@ define(function(require) {
             },
             dataSource: {
                 'list': _createLayoutListView(),
-                'details': _createLayoutDetailsView(),
+                'details': layoutDetailsView,
                 'back': new Surface({classes:['panel']})
             }
         });
     }
     function _hideSidebar() {
-        shell.patchLayoutOptions({
+        shell.setLayoutOptions({
             showSideBar: false
         });
     }
     function _toggleSidebar() {
-        shell.patchLayoutOptions({
+        shell.setLayoutOptions({
             showSideBar: !shell.getLayoutOptions().showSideBar
         });
     }
@@ -141,6 +145,10 @@ define(function(require) {
         _hideSidebar.call(this);
         _removeCollectionItem.call(this);
     }
+    function _rotateLayout() {
+        var direction = (collectionView.getDirection() === undefined) ? 1 : collectionView.getDirection();
+        collectionView.setDirection((direction + 1) % 2);
+    }
     function _createNavbar() {
         var layoutController = new LayoutController({
             layout: NavBarLayout,
@@ -155,6 +163,8 @@ define(function(require) {
         addButton.on('click', _insertItem);
         var removeButton = _createButton('<i class="glyphicon glyphicon-minus"></i>');
         removeButton.on('click', _removeItem);
+        var directionButton = _createButton('<i class="glyphicon glyphicon-repeat"></i>');
+        directionButton.on('click', _rotateLayout);
         var menuButton = _createButton('<i class="glyphicon glyphicon-tasks"></i>');
         menuButton.on('click', _toggleSidebar);
         layoutController.setDataSource({
@@ -162,7 +172,8 @@ define(function(require) {
             title: title,
             rightItems: [
                 removeButton,
-                addButton
+                addButton,
+                directionButton
             ],
             leftItems: [
                 menuButton
@@ -243,8 +254,89 @@ define(function(require) {
         });
     }
     function _createLayoutDetailsView() {
-        return new Surface({
+        return new LayoutController({
+            layout: ListLayout,
+            layoutOptions: { itemSize: 40 },
+            dataSource: layoutDetailsRenderables
         });
+    }
+
+    function _incrementLayoutOption(option, value, input) {
+        if (Array.isArray(option.value)) {
+            var newValue = [];
+            for (var i = 0; i < option.value.length; i++) {
+                newValue.push(Math.max(Math.min(option.value[i] + value, option.max[i]), option.min[i]));
+            }
+            option.value = newValue;
+        }
+        else {
+            option.value = Math.max(Math.min(option.value + value, option.max), option.min);
+        }
+        input.setValue(JSON.stringify(option.value));
+        var layoutOptions = {};
+        layoutOptions[option.name] = option.value;
+        collectionView.setLayoutOptions(layoutOptions);
+    }
+    function _changeLayoutOption(option, event) {
+        if (Array.isArray(option.value)) {
+            var val = JSON.parse(event.currentTarget.value);
+            if (!Array.isArray(val) || (val.length !== option.value.length)) {
+                event.currentTarget.value = JSON.stringify(option.value);
+                return;
+            }
+        }
+        option.value = JSON.parse(event.currentTarget.value);
+        var layoutOptions = {};
+        layoutOptions[option.name] = option.value;
+        collectionView.setLayoutOptions(layoutOptions);
+    }
+    function _createLayoutDetailItem(option) {
+        var title = new Surface({
+            classes: ['layout-detail-item-title'],
+            content: option.name
+        });
+        var valueInput = new InputSurface({
+            classes: ['layout-detail-item-input'],
+            value: JSON.stringify(option.value)
+        });
+        valueInput.on('change', function(event) {
+            _changeLayoutOption(option, event);
+        });
+        var addButton = new Surface({
+            content: '<button type="button" class="btn btn-sm btn-default"><i class="glyphicon glyphicon-plus"></i></button>'
+        });
+        addButton.on('click', function() {
+            _incrementLayoutOption(option, 1, valueInput);
+        });
+        var subButton = new Surface({
+            content: '<button type="button" class="btn btn-sm btn-default"><i class="glyphicon glyphicon-minus"></i></button>'
+        });
+        subButton.on('click', function() {
+            _incrementLayoutOption(option, -1, valueInput);
+        });
+        return new LayoutController({
+            layout: function(context) {
+                var dock = new LayoutDockHelper(context);
+                dock.left('subButton', 40);
+                dock.right('addButton', 40);
+                dock.top('title', 17);
+                dock.fill('valueInput');
+            },
+            dataSource: {
+                title: title,
+                subButton: subButton,
+                addButton: addButton,
+                valueInput: valueInput
+            }
+        });
+    }
+    function _updateLayoutDetails(name) {
+        layoutDetailsRenderables = [];
+        var layout = _findLayout(name);
+        for (var i = 0; i < layout.options.length; i++) {
+            layoutDetailsRenderables.push(_createLayoutDetailItem(layout.options[i]));
+        }
+        layoutDetailsView.setDataSource(layoutDetailsRenderables);
     }
     function _findLayout(name) {
         for (var i =0; i < layouts.length; i++) {
@@ -255,6 +347,8 @@ define(function(require) {
         return undefined;
     }
     function _selectLayout(name) {
+
+        // Select the layout and options
         var layout = _findLayout(name);
         var layoutOptions = {};
         var i;
@@ -263,6 +357,7 @@ define(function(require) {
         }
         collectionView.setLayout(layout.layout, layoutOptions);
 
+        // Highlight the selected layout
         for (i = 0; i < layouts.length; i++) {
             layout = layouts[i];
             if (layout.name === name) {
@@ -272,6 +367,9 @@ define(function(require) {
                 layout.surface.removeClass('selected');
             }
         }
+
+        // Update detail-view
+        _updateLayoutDetails(name);
     }
     function _addLayout(name, layoutFn, options) {
         var layout = {
@@ -291,16 +389,13 @@ define(function(require) {
     function _addLayouts() {
         _addLayout('GridLayout', GridLayout, [
             {name: 'cells',      value: [3, 3], min: [1, 1], max: [50, 50]},
-            {name: 'gutter',     value: [20, 20], min: [0, 0], max: [100, 100]},
-            {name: 'direction',  value: 1, min: 0, max: 1}
+            {name: 'gutter',     value: [20, 20], min: [0, 0], max: [100, 100]}
         ]);
         _addLayout('ListLayout', ListLayout, [
-            {name: 'itemSize',   value: 50, min: 0, max: 1000},
-            {name: 'direction',  value: 1, min: 0, max: 1}
+            {name: 'itemSize',   value: 50, min: 0, max: 1000}
         ]);
         _addLayout('CollectionLayout', CollectionLayout, [
             {name: 'itemSize',   value: [100, 100], min: [0, 0], max: [1000, 1000]},
-            {name: 'direction',  value: 1, min: 0, max: 1},
             {name: 'justify',    value: 1, min: 0, max: 1},
             {name: 'gutter',     value: [10, 10], min: [0, 0], max: [100, 100]}
         ]);
