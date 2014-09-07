@@ -30,6 +30,19 @@ body {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
+.layout-detail-item-title {
+  color: #BBBBBB;
+  font-size: 13px;
+  text-align: center;
+}
+
+.layout-detail-item-input {
+  border: none;
+  color: white;
+  background: rgba(0, 0, 0, 0);
+  text-align: center;
+}
+
 .image-frame {
   background-color: #fbfbfb;
   text-align: center;
