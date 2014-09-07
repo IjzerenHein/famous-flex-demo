@@ -218,10 +218,10 @@ define(function(require) {
         for (var i = 0; i < 3; i++) {
             _addCollectionItem();
         }
-        /*return new FlowLayoutController({
+        return new FlowLayoutController({
             dataSource: collection
-        });*/
-        return new ScrollContainer({
+        });
+        /*return new ScrollContainer({
             scrollview: {
                 layout: ListLayout,
                 layoutOptions: {
@@ -229,7 +229,7 @@ define(function(require) {
                 },
                 sequence: collection
             }
-        });
+        });*/
     }
 
     /**
@@ -292,7 +292,7 @@ define(function(require) {
         _addLayout('GridLayout', GridLayout, [
             {name: 'cells',      value: [3, 3], min: [1, 1], max: [50, 50]},
             {name: 'gutter',     value: [20, 20], min: [0, 0], max: [100, 100]},
-            {name: 'direction',  value: 0, min: 0, max: 1}
+            {name: 'direction',  value: 1, min: 0, max: 1}
         ]);
         _addLayout('ListLayout', ListLayout, [
             {name: 'itemSize',   value: 50, min: 0, max: 1000},
@@ -304,9 +304,9 @@ define(function(require) {
             {name: 'justify',    value: 1, min: 0, max: 1},
             {name: 'gutter',     value: [10, 10], min: [0, 0], max: [100, 100]}
         ]);
-        _addLayout('CubeLayout', CubeLayout, [
+        /*_addLayout('CubeLayout', CubeLayout, [
             {name: 'itemSize',   value: [100, 100], min: [0, 0], max: [1000, 1000]}
-        ]);
+        ]);*/
     }
     _addLayouts();
     _selectLayout('CollectionLayout');
