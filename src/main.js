@@ -315,13 +315,12 @@ define(function(require) {
             _incrementLayoutOption(option, -1, valueInput);
         });
         return new LayoutController({
-            layout: function(context) {
-                var dock = new LayoutDockHelper(context);
-                dock.left('subButton', 40);
-                dock.right('addButton', 40);
-                dock.top('title', 17);
-                dock.fill('valueInput');
-            },
+            layout: {dock: [
+                ['left', 'subButton', 40],
+                ['right', 'addButton', 40],
+                ['top', 'title', 17],
+                ['fill', 'valueInput']
+            ]},
             dataSource: {
                 title: title,
                 subButton: subButton,
