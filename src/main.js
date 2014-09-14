@@ -30,7 +30,7 @@ define(function(require) {
     var InputSurface = require('famous/surfaces/InputSurface');
     var LayoutController = require('famous-flex/LayoutController');
     var FlowLayoutController = require('famous-flex/FlowLayoutController');
-    var ScrollContainer = require('famous-flex/ScrollContainer');
+    var ScrollView = require('famous-flex/ScrollView');
     var LayoutUtility = require('famous-flex/LayoutUtility');
     //var Dogs = require('./data/dogs/collection');
     var NewYork = require('./data/newyork/collection');
@@ -41,6 +41,7 @@ define(function(require) {
     var NavBarLayout = require('famous-flex/layouts/NavBarLayout');
     var ListLayout = require('famous-flex/layouts/ListLayout');
     var CollectionLayout = require('famous-flex/layouts/CollectionLayout');
+    var CoverLayout = require('famous-flex/layouts/CoverLayout');
     var CubeLayout = require('famous-flex/layouts/CubeLayout');
 
     // create the main context
@@ -145,8 +146,16 @@ define(function(require) {
         _hideSidebar.call(this);
         _removeCollectionItem.call(this);
     }
+    function _moveNextItem() {
+        _hideSidebar.call(this);
+        collectionView.scroll(1);
+    }
+    function _movePrevItem() {
+        _hideSidebar.call(this);
+        collectionView.scroll(-1);
+    }
     function _rotateLayout() {
-        var direction = (collectionView.getDirection() === undefined) ? 1 : collectionView.getDirection();
+        var direction = collectionView.getDirection(true);
         collectionView.setDirection((direction + 1) % 2);
     }
     function _createNavbar() {
@@ -167,12 +176,20 @@ define(function(require) {
         directionButton.on('click', _rotateLayout);
         var menuButton = _createButton('<i class="glyphicon glyphicon-tasks"></i>');
         menuButton.on('click', _toggleSidebar);
+
+        var nextButton = _createButton('<i class="glyphicon glyphicon-forward"></i>');
+        nextButton.on('click', _moveNextItem);
+        var prevButton = _createButton('<i class="glyphicon glyphicon-backward"></i>');
+        prevButton.on('click', _movePrevItem);
+
         layoutController.setDataSource({
             background: background,
             title: title,
             rightItems: [
                 removeButton,
                 addButton,
+                nextButton,
+                prevButton,
                 directionButton
             ],
             leftItems: [
@@ -229,18 +246,10 @@ define(function(require) {
         for (var i = 0; i < 3; i++) {
             _addCollectionItem();
         }
-        return new FlowLayoutController({
-            dataSource: collection
+        return new ScrollView({
+            dataSource: collection,
+            useContainer: true
         });
-        /*return new ScrollContainer({
-            scrollview: {
-                layout: ListLayout,
-                layoutOptions: {
-                    itemSize: 50
-                },
-                sequence: collection
-            }
-        });*/
     }
 
     /**
@@ -398,6 +407,17 @@ define(function(require) {
             {name: 'justify',    value: 1, min: 0, max: 1},
             {name: 'gutter',     value: [10, 10], min: [0, 0], max: [100, 100]}
         ]);
+        _addLayout('CoverLayout', CoverLayout, [
+            {name: 'itemSize',   value: [260, 200], min: [0, 0], max: [1000, 1000]}
+        ]);
+        _addLayout('FullScreen', function(context) {
+            context.set(context.next(), {
+                size: context.size,
+                align: [0.5, 0.5],
+                origin: [0.5, 0.5]
+            });
+        }, []
+        );
         /*_addLayout('CubeLayout', CubeLayout, [
             {name: 'itemSize',   value: [100, 100], min: [0, 0], max: [1000, 1000]}
         ]);*/
