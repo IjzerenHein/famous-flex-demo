@@ -246,6 +246,9 @@ define(function(require) {
         for (var i = 0; i < 3; i++) {
             _addCollectionItem();
         }
+        /*return new FlowLayoutController({
+            dataSource: collection
+        });*/
         return new ScrollView({
             dataSource: collection,
             useContainer: true
@@ -342,7 +345,9 @@ define(function(require) {
         layoutDetailsRenderables = [];
         var layout = _findLayout(name);
         for (var i = 0; i < layout.options.length; i++) {
-            layoutDetailsRenderables.push(_createLayoutDetailItem(layout.options[i]));
+            if ((layout.options.editable === undefined) || layout.options.editable) {
+                layoutDetailsRenderables.push(_createLayoutDetailItem(layout.options[i]));
+            }
         }
         layoutDetailsView.setDataSource(layoutDetailsRenderables);
     }
@@ -410,14 +415,9 @@ define(function(require) {
         _addLayout('CoverLayout', CoverLayout, [
             {name: 'itemSize',   value: [260, 200], min: [0, 0], max: [1000, 1000]}
         ]);
-        _addLayout('FullScreen', function(context) {
-            context.set(context.next(), {
-                size: context.size,
-                align: [0.5, 0.5],
-                origin: [0.5, 0.5]
-            });
-        }, []
-        );
+        _addLayout('FullScreen', ListLayout, [
+            {name: 'itemSize',   value: undefined, editable:false}
+        ]);
         /*_addLayout('CubeLayout', CubeLayout, [
             {name: 'itemSize',   value: [100, 100], min: [0, 0], max: [1000, 1000]}
         ]);*/
