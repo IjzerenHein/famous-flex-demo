@@ -22,7 +22,8 @@ define(function(require) {
     //</webpack>
 
     // Fast-click
-    //require('famous/inputs/FastClick');
+    var FastClick = require('fastclick/lib/fastclick');
+    FastClick.attach(document.body);
 
     // import dependencies
     var Engine = require('famous/core/Engine');
@@ -32,7 +33,6 @@ define(function(require) {
     var FlowLayoutController = require('famous-flex/FlowLayoutController');
     var ScrollView = require('famous-flex/ScrollView');
     var LayoutUtility = require('famous-flex/LayoutUtility');
-    //var Dogs = require('./data/dogs/collection');
     var NewYork = require('./data/newyork/collection');
     var LayoutDockHelper = require('famous-flex/helpers/LayoutDockHelper');
     var BkImageSurface = require('famous-bkimagesurface/BkImageSurface');
@@ -42,7 +42,7 @@ define(function(require) {
     var ListLayout = require('famous-flex/layouts/ListLayout');
     var CollectionLayout = require('famous-flex/layouts/CollectionLayout');
     var CoverLayout = require('famous-flex/layouts/CoverLayout');
-    var CubeLayout = require('famous-flex/layouts/CubeLayout');
+    //var CubeLayout = require('famous-flex/layouts/CubeLayout');
 
     // create the main context
     var mainContext = Engine.createContext();
@@ -104,7 +104,7 @@ define(function(require) {
                 });
                 context.set('back', {size: size});
                 if (size[0] < 300) {
-                    dock.bottom('details', 200);
+                    dock.bottom('details', 140);
                 }
                 else {
                     dock.right('details', 200);
@@ -211,7 +211,10 @@ define(function(require) {
         return new BkImageSurface({
             classes: ['image-frame'],
             content: imageUrl,
-            sizeMode: 'cover'
+            sizeMode: 'cover',
+            properties: {
+                backgroundColor: 'black'
+            }
         });
         /*return new Surface({
             classes: ['image-frame']
