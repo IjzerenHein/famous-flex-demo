@@ -36,6 +36,7 @@
     "famous": "^0.2.2",
     "famous-bkimagesurface": "^1.0.1",
     "famous-polyfills": "^0.2.2",
+    "fastclick": "^1.0.3",
     "file-loader": "^0.6.1",
     "glob": "^4.0.5",
     "grunt": "latest",
