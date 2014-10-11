@@ -33,7 +33,7 @@
     "bootstrap": "^3.2.0",
     "css-loader": "^0.7.0",
     "expose-loader": "^0.5.3",
-    "famous": "^0.2.2",
+    "famous": "^0.3.0",
     "famous-bkimagesurface": "^1.0.1",
     "famous-polyfills": "^0.2.2",
     "fastclick": "^1.0.3",

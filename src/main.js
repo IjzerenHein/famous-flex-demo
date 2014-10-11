@@ -75,17 +75,19 @@ define(function(require) {
             size: [size[0], size[1] - options.navBarHeight],
             translate: [0, options.navBarHeight, 0],
             origin: [1, 0],
+            align: [1, 0],
             rotate: options.showSideBar ? [0, (Math.PI/180) * -20, 0] : [0, 0, 0]
         });
         context.set('sidebar', {
             size: [options.sideBarWidth, size[1] - options.navBarHeight],
             translate: [0, options.navBarHeight, 100],
             origin: [0, 0],
+            align: [0, 0],
             rotate: options.showSideBar ? [0, (Math.PI/180) * 10, 0] : [0, (Math.PI/180) * 90, 0]
         });
     }
     function _createShell(renderables) {
-        return new FlowLayoutController({
+        return new LayoutController({
             layout: ShellLayout,
             layoutOptions: {
                 navBarHeight: 58,
@@ -158,6 +160,10 @@ define(function(require) {
         var direction = collectionView.getDirection(true);
         collectionView.setDirection((direction + 1) % 2);
     }
+    function _reverseLayout() {
+        var reverse = collectionView.getReverse();
+        collectionView.setReverse(!reverse);
+    }
     function _createNavbar() {
         var layoutController = new LayoutController({
             layout: NavBarLayout,
@@ -174,6 +180,8 @@ define(function(require) {
         removeButton.on('click', _removeItem);
         var directionButton = _createButton('<i class="glyphicon glyphicon-repeat"></i>');
         directionButton.on('click', _rotateLayout);
+        var reverseButton = _createButton('<i class="glyphicon glyphicon-sort-by-attributes"></i>');
+        reverseButton.on('click', _reverseLayout);
         var menuButton = _createButton('<i class="glyphicon glyphicon-tasks"></i>');
         menuButton.on('click', _toggleSidebar);
 
@@ -190,6 +198,7 @@ define(function(require) {
                 addButton,
                 nextButton,
                 prevButton,
+                reverseButton,
                 directionButton
             ],
             leftItems: [
@@ -224,14 +233,18 @@ define(function(require) {
         if (collectionView && collectionView.insert) {
             var rightItems = navbar.getSpec('rightItems');
             var insertSpec = LayoutUtility.cloneSpec(navbar.getSpec(rightItems[1]));
-            insertSpec.opacity = 0;
-            insertSpec.origin = [1, 0];
-            insertSpec.align = [1, 0];
             var pos = Math.floor(Math.random() * (Math.min(collection.length, 5) + 1));
+            var item = _createCollectionItem();
             collectionView.insert(pos, _createCollectionItem(), insertSpec);
+            if (collectionView.scrollTo) {
+                collectionView.scrollTo(item);
+            }
         }
         else {
             collection.unshift(_createCollectionItem());
+            if (collectionView) {
+                collectionView.reflowLayout();
+            }
         }
     }
     function _removeCollectionItem() {
@@ -244,9 +257,15 @@ define(function(require) {
             var pos = Math.floor(Math.random() * Math.min(collection.length, 5));
             collectionView.remove(pos, removeSpec);
         }
+        else if (collection.length) {
+            collection.splice(0, 1);
+            if (collectionView) {
+                collectionView.reflowLayout();
+            }
+        }
     }
     function _createCollectionView() {
-        for (var i = 0; i < 3; i++) {
+        for (var i = 0; i < 1; i++) {
             _addCollectionItem();
         }
         /*return new FlowLayoutController({

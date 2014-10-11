@@ -40,7 +40,8 @@ var config = {
   },
   resolve: {
     alias: {
-      'famous-flex': 'famous-flex/src'
+      'famous-flex': 'famous-flex/src',
+      'famous': 'famous/src'
     }
   },
   plugins:[
