@@ -21,12 +21,17 @@ define(function(require) {
     require('./index.html');
     //</webpack>
 
+    // please-js
+    require('pleasejs/Please');
+
     // Fast-click
     var FastClick = require('fastclick/lib/fastclick');
     FastClick.attach(document.body);
 
     // import dependencies
     var Engine = require('famous/core/Engine');
+    var Modifier = require('famous/core/Modifier');
+    var Transform = require('famous/core/Transform');
     var Surface = require('famous/core/Surface');
     var InputSurface = require('famous/surfaces/InputSurface');
     var LayoutController = require('famous-flex/LayoutController');
@@ -43,6 +48,8 @@ define(function(require) {
     var CollectionLayout = require('famous-flex/layouts/CollectionLayout');
     var CoverLayout = require('famous-flex/layouts/CoverLayout');
     //var CubeLayout = require('famous-flex/layouts/CubeLayout');
+    // lagometer
+    var Lagometer = require('famous-lagometer/Lagometer');
 
     // create the main context
     var mainContext = Engine.createContext();
@@ -157,10 +164,12 @@ define(function(require) {
         collectionView.scroll(-1);
     }
     function _rotateLayout() {
+        _hideSidebar.call(this);
         var direction = collectionView.getDirection(true);
         collectionView.setDirection((direction + 1) % 2);
     }
     function _reverseLayout() {
+        _hideSidebar.call(this);
         var reverse = collectionView.getReverse();
         collectionView.setReverse(!reverse);
     }
@@ -217,17 +226,23 @@ define(function(require) {
             classes: ['image-frame'],
             content: '<span class="image-helper"></span><img src="' + imageUrl + '" class="image-content">'
         });*/
-        return new BkImageSurface({
+        /*return new BkImageSurface({
             classes: ['image-frame'],
             content: imageUrl,
             sizeMode: 'cover',
             properties: {
                 backgroundColor: 'black'
             }
-        });
+        });*/
         /*return new Surface({
             classes: ['image-frame']
         });*/
+        return new Surface({
+            properties: {
+                backgroundColor: window.Please.make_color()
+            }
+        });
+
     }
     function _addCollectionItem() {
         if (collectionView && collectionView.insert) {
@@ -446,4 +461,18 @@ define(function(require) {
     }
     _addLayouts();
     _selectLayout('CollectionLayout');
+
+    /**
+     * Lagometer
+     */
+    var lagometerModifier = new Modifier({
+        size: [100, 100],
+        align: [1.0, 0.0],
+        origin: [1.0, 0.0],
+        transform: Transform.translate(-10, 70, 1000)
+    });
+    var lagometer = new Lagometer({
+        size: lagometerModifier.getSize()
+    });
+    //mainContext.add(lagometerModifier).add(lagometer);
 });
