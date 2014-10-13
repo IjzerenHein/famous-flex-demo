@@ -283,13 +283,13 @@ define(function(require) {
         for (var i = 0; i < 1; i++) {
             _addCollectionItem();
         }
-        /*return new FlowLayoutController({
+        return new FlowLayoutController({
             dataSource: collection
-        });*/
-        return new ScrollView({
+        });
+        /*return new ScrollView({
             dataSource: collection,
             useContainer: true
-        });
+        });*/
     }
 
     /**
