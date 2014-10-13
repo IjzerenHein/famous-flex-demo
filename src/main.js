@@ -222,19 +222,19 @@ define(function(require) {
      */
     function _createCollectionItem() {
         var imageUrl = NewYork[collection.length % NewYork.length];
-        return new BkImageSurface({
+        /*return new BkImageSurface({
             classes: ['image-frame'],
             content: imageUrl,
             sizeMode: 'cover',
             properties: {
                 backgroundColor: 'black'
             }
-        });
-        /*return new Surface({
+        });*/
+        return new Surface({
             properties: {
                 backgroundColor: window.Please.make_color()
             }
-        });*/
+        });
 
     }
     function _addCollectionItem() {
@@ -271,7 +271,7 @@ define(function(require) {
         }
     }
     function _createCollectionView() {
-        for (var i = 0; i < 1; i++) {
+        for (var i = 0; i < 5; i++) {
             _addCollectionItem();
         }
         return new FlowLayoutController({
