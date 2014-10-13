@@ -94,7 +94,7 @@ define(function(require) {
         });
     }
     function _createShell(renderables) {
-        return new LayoutController({
+        return new FlowLayoutController({
             layout: ShellLayout,
             layoutOptions: {
                 navBarHeight: 58,
@@ -205,9 +205,9 @@ define(function(require) {
             rightItems: [
                 removeButton,
                 addButton,
-                nextButton,
-                prevButton,
-                reverseButton,
+                //nextButton,
+                //prevButton,
+                //reverseButton,
                 directionButton
             ],
             leftItems: [
@@ -222,26 +222,19 @@ define(function(require) {
      */
     function _createCollectionItem() {
         var imageUrl = NewYork[collection.length % NewYork.length];
-        /*return new Surface({
-            classes: ['image-frame'],
-            content: '<span class="image-helper"></span><img src="' + imageUrl + '" class="image-content">'
-        });*/
-        /*return new BkImageSurface({
+        return new BkImageSurface({
             classes: ['image-frame'],
             content: imageUrl,
             sizeMode: 'cover',
             properties: {
                 backgroundColor: 'black'
             }
-        });*/
+        });
         /*return new Surface({
-            classes: ['image-frame']
-        });*/
-        return new Surface({
             properties: {
                 backgroundColor: window.Please.make_color()
             }
-        });
+        });*/
 
     }
     function _addCollectionItem() {
@@ -267,8 +260,6 @@ define(function(require) {
             var rightItems = navbar.getSpec('rightItems');
             var removeSpec = LayoutUtility.cloneSpec(navbar.getSpec(rightItems[0]));
             removeSpec.opacity = 0;
-            removeSpec.origin = [1, 0];
-            removeSpec.align = [1, 0];
             var pos = Math.floor(Math.random() * Math.min(collection.length, 5));
             collectionView.remove(pos, removeSpec);
         }
@@ -284,7 +275,9 @@ define(function(require) {
             _addCollectionItem();
         }
         return new FlowLayoutController({
-            dataSource: collection
+            dataSource: collection,
+            insertSpec: {opacity: 0},
+            removeSpec: {opacity: 0}
         });
         /*return new ScrollView({
             dataSource: collection,
