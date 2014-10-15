@@ -274,15 +274,16 @@ define(function(require) {
         for (var i = 0; i < 5; i++) {
             _addCollectionItem();
         }
+        /*
         return new FlowLayoutController({
             dataSource: collection,
             insertSpec: {opacity: 0},
             removeSpec: {opacity: 0}
-        });
-        /*return new ScrollView({
+        });*/
+        return new ScrollView({
             dataSource: collection,
             useContainer: true
-        });*/
+        });
     }
 
     /**
