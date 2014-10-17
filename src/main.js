@@ -50,6 +50,7 @@ define(function(require) {
     //var CubeLayout = require('famous-flex/layouts/CubeLayout');
     // lagometer
     var Lagometer = require('famous-lagometer/Lagometer');
+    var collectionItemId = 0;
 
     // create the main context
     var mainContext = Engine.createContext();
@@ -221,7 +222,7 @@ define(function(require) {
      * Collection
      */
     function _createCollectionItem() {
-        var imageUrl = NewYork[collection.length % NewYork.length];
+        //var imageUrl = NewYork[collection.length % NewYork.length];
         /*return new BkImageSurface({
             classes: ['image-frame'],
             content: imageUrl,
@@ -230,7 +231,9 @@ define(function(require) {
                 backgroundColor: 'black'
             }
         });*/
+        collectionItemId++;
         return new Surface({
+            //content: 'Item ' + collectionItemId,
             properties: {
                 backgroundColor: window.Please.make_color()
             }
@@ -274,8 +277,7 @@ define(function(require) {
         for (var i = 0; i < 5; i++) {
             _addCollectionItem();
         }
-        /*
-        return new FlowLayoutController({
+        /*return new FlowLayoutController({
             dataSource: collection,
             insertSpec: {opacity: 0},
             removeSpec: {opacity: 0}
@@ -440,7 +442,7 @@ define(function(require) {
         ]);
         _addLayout('CollectionLayout', CollectionLayout, [
             {name: 'itemSize',   value: [100, 100], min: [0, 0], max: [1000, 1000]},
-            {name: 'justify',    value: 1, min: 0, max: 1},
+            {name: 'justify',    value: [1, 1], min: [0, 0], max: [1, 1]},
             {name: 'gutter',     value: [10, 10], min: [0, 0], max: [100, 100]}
         ]);
         _addLayout('CoverLayout', CoverLayout, [
