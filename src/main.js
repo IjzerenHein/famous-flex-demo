@@ -109,17 +109,15 @@ define(function(require) {
         return new LayoutController({
             layout: function(context) {
                 var size = context.size;
-                var dock = new LayoutDockHelper(context, {
-                    translateZ: 1
-                });
+                var dock = new LayoutDockHelper(context);
                 context.set('back', {size: size});
                 if (size[0] < 300) {
-                    dock.bottom('details', 140);
+                    dock.bottom('details', 140, 1);
                 }
                 else {
-                    dock.right('details', 200);
+                    dock.right('details', 200, 1);
                 }
-                dock.fill('list');
+                dock.fill('list', 1);
             },
             dataSource: {
                 'list': _createLayoutListView(),
@@ -158,21 +156,22 @@ define(function(require) {
     }
     function _moveNextItem() {
         _hideSidebar.call(this);
-        collectionView.scroll(1);
+        collectionView.goToNextPage();
     }
     function _movePrevItem() {
         _hideSidebar.call(this);
-        collectionView.scroll(-1);
+        collectionView.goToPreviousPage();
     }
     function _rotateLayout() {
         _hideSidebar.call(this);
         var direction = collectionView.getDirection(true);
         collectionView.setDirection((direction + 1) % 2);
     }
-    function _reverseLayout() {
+    function _toggleLayoutAlignment() {
         _hideSidebar.call(this);
-        var reverse = collectionView.getReverse();
-        collectionView.setReverse(!reverse);
+        collectionView.setOptions({
+            alignment: collectionView.options.alignment ? 0 : 1
+        });
     }
     function _createNavbar() {
         var layoutController = new LayoutController({
@@ -190,8 +189,8 @@ define(function(require) {
         removeButton.on('click', _removeItem);
         var directionButton = _createButton('<i class="glyphicon glyphicon-repeat"></i>');
         directionButton.on('click', _rotateLayout);
-        var reverseButton = _createButton('<i class="glyphicon glyphicon-sort-by-attributes"></i>');
-        reverseButton.on('click', _reverseLayout);
+        var alignmentButton = _createButton('<i class="glyphicon glyphicon-sort-by-attributes"></i>');
+        alignmentButton.on('click', _toggleLayoutAlignment);
         var menuButton = _createButton('<i class="glyphicon glyphicon-tasks"></i>');
         menuButton.on('click', _toggleSidebar);
 
@@ -206,9 +205,9 @@ define(function(require) {
             rightItems: [
                 removeButton,
                 addButton,
-                //nextButton,
-                //prevButton,
-                //reverseButton,
+                nextButton,
+                prevButton,
+                alignmentButton,
                 directionButton
             ],
             leftItems: [
@@ -247,9 +246,7 @@ define(function(require) {
             var pos = Math.floor(Math.random() * (Math.min(collection.length, 5) + 1));
             var item = _createCollectionItem();
             collectionView.insert(pos, _createCollectionItem(), insertSpec);
-            if (collectionView.scrollTo) {
-                collectionView.scrollTo(item);
-            }
+            collectionView.goToRenderNode(item);
         }
         else {
             collection.unshift(_createCollectionItem());
@@ -277,14 +274,11 @@ define(function(require) {
         for (var i = 0; i < 5; i++) {
             _addCollectionItem();
         }
-        /*return new FlowLayoutController({
-            dataSource: collection,
-            insertSpec: {opacity: 0},
-            removeSpec: {opacity: 0}
-        });*/
         return new ScrollView({
             dataSource: collection,
-            useContainer: true
+            useContainer: true,
+            mouseMove: true,
+            debug: true
         });
     }
 
@@ -449,7 +443,7 @@ define(function(require) {
             {name: 'itemSize',   value: [260, 200], min: [0, 0], max: [1000, 1000]}
         ]);
         _addLayout('FullScreen', ListLayout, [
-            {name: 'itemSize',   value: undefined, editable:false}
+            {name: 'itemSize',   value: undefined, editable: false}
         ]);
         /*_addLayout('CubeLayout', CubeLayout, [
             {name: 'itemSize',   value: [100, 100], min: [0, 0], max: [1000, 1000]}
