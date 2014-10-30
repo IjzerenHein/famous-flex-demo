@@ -37,6 +37,7 @@
     "famous-bkimagesurface": "^1.0.1",
     "famous-lagometer": "0.0.2",
     "famous-polyfills": "^0.2.2",
+    "famous-flex": "latest",
     "fastclick": "^1.0.3",
     "file-loader": "^0.6.1",
     "glob": "^4.0.5",
