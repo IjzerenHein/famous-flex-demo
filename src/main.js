@@ -35,8 +35,7 @@ define(function(require) {
     var Surface = require('famous/core/Surface');
     var InputSurface = require('famous/surfaces/InputSurface');
     var LayoutController = require('famous-flex/LayoutController');
-    var FlowLayoutController = require('famous-flex/FlowLayoutController');
-    var ScrollView = require('famous-flex/ScrollView');
+    var ScrollController = require('famous-flex/ScrollView');
     var LayoutUtility = require('famous-flex/LayoutUtility');
     var NewYork = require('./data/newyork/collection');
     var LayoutDockHelper = require('famous-flex/helpers/LayoutDockHelper');
@@ -95,7 +94,7 @@ define(function(require) {
         });
     }
     function _createShell(renderables) {
-        return new FlowLayoutController({
+        return new LayoutController({
             layout: ShellLayout,
             layoutOptions: {
                 navBarHeight: 58,
@@ -274,8 +273,9 @@ define(function(require) {
         for (var i = 0; i < 5; i++) {
             _addCollectionItem();
         }
-        return new ScrollView({
+        return new ScrollController({
             dataSource: collection,
+            flow: true,
             useContainer: true,
             mouseMove: true,
             debug: true
@@ -445,6 +445,17 @@ define(function(require) {
         _addLayout('FullScreen', ListLayout, [
             {name: 'itemSize',   value: undefined, editable: false}
         ]);
+        /*_addLayout('Panda', CollectionLayout, [
+            {name: 'gutter',     value: [0, 0], editable: false},
+            {name: 'justify',    value: [0, 0], editable: false},
+            {name: 'itemSize',   value: function(renderNode, contextSize) {
+                var width = (contextSize[0] / 3);
+                return [
+                    width,
+                    width
+                ];
+            }, editable: false}
+        ]);*/
         /*_addLayout('CubeLayout', CubeLayout, [
             {name: 'itemSize',   value: [100, 100], min: [0, 0], max: [1000, 1000]}
         ]);*/
