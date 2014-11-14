@@ -429,6 +429,7 @@ define(function(require) {
     function _addLayouts() {
         _addLayout('GridLayout', GridLayout, [
             {name: 'cells',      value: [3, 3], min: [1, 1], max: [50, 50]},
+            {name: 'margins',    value: [20, 20, 20, 20], min: [0, 0, 0, 0], max: [100, 100, 100, 100]},
             {name: 'gutter',     value: [20, 20], min: [0, 0], max: [100, 100]}
         ]);
         _addLayout('ListLayout', ListLayout, [
