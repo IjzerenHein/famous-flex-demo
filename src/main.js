@@ -35,7 +35,7 @@ define(function(require) {
     var Surface = require('famous/core/Surface');
     var InputSurface = require('famous/surfaces/InputSurface');
     var LayoutController = require('famous-flex/LayoutController');
-    var ScrollController = require('famous-flex/ScrollView');
+    var FlexScrollView = require('famous-flex/FlexScrollView');
     var LayoutUtility = require('famous-flex/LayoutUtility');
     var NewYork = require('./data/newyork/collection');
     var LayoutDockHelper = require('famous-flex/helpers/LayoutDockHelper');
@@ -111,7 +111,7 @@ define(function(require) {
                 var dock = new LayoutDockHelper(context);
                 context.set('back', {size: size});
                 if (size[0] < 300) {
-                    dock.bottom('details', 140, 1);
+                    dock.bottom('details', 200, 1);
                 }
                 else {
                     dock.right('details', 200, 1);
@@ -243,6 +243,7 @@ define(function(require) {
             var rightItems = navbar.getSpec('rightItems');
             var insertSpec = LayoutUtility.cloneSpec(navbar.getSpec(rightItems[1]));
             var pos = Math.floor(Math.random() * (Math.min(collection.length, 5) + 1));
+            pos = Math.max(pos, 1);
             var item = _createCollectionItem();
             collectionView.insert(pos, _createCollectionItem(), insertSpec);
             collectionView.goToRenderNode(item);
@@ -273,12 +274,15 @@ define(function(require) {
         for (var i = 0; i < 5; i++) {
             _addCollectionItem();
         }
-        return new ScrollController({
+        return new FlexScrollView({
             dataSource: collection,
             flow: true,
             useContainer: true,
             mouseMove: true,
-            debug: true
+            nodeSpring: {
+                dampingRatio: 0.8,
+                period: 700
+            }
         });
     }
 
@@ -293,8 +297,9 @@ define(function(require) {
         });
     }
     function _createLayoutDetailsView() {
-        return new LayoutController({
-            layout: ListLayout,
+        return new FlexScrollView({
+            autoPipeEvents: true,
+            alignment: 1,
             layoutOptions: { itemSize: 40 },
             dataSource: layoutDetailsRenderables
         });
@@ -430,33 +435,27 @@ define(function(require) {
         _addLayout('GridLayout', GridLayout, [
             {name: 'cells',      value: [3, 3], min: [1, 1], max: [50, 50]},
             {name: 'margins',    value: [20, 20, 20, 20], min: [0, 0, 0, 0], max: [100, 100, 100, 100]},
-            {name: 'gutter',     value: [20, 20], min: [0, 0], max: [100, 100]}
+            {name: 'spacing',    value: [20, 20], min: [0, 0], max: [100, 100]}
         ]);
         _addLayout('ListLayout', ListLayout, [
-            {name: 'itemSize',   value: 50, min: 0, max: 1000}
+            {name: 'itemSize',   value: 50, min: 0, max: 1000},
+            {name: 'margins',    value: [5, 5, 5, 5], min: [-100, -100, -100, -100], max: [100, 100, 100, 100]},
+            {name: 'spacing',    value: 0, min: -100, max: 1000}
         ]);
         _addLayout('CollectionLayout', CollectionLayout, [
             {name: 'itemSize',   value: [100, 100], min: [0, 0], max: [1000, 1000]},
             {name: 'justify',    value: [1, 1], min: [0, 0], max: [1, 1]},
-            {name: 'gutter',     value: [10, 10], min: [0, 0], max: [100, 100]}
+            {name: 'margins',    value: [5, 5, 5, 5], min: [-100, -100, -100, -100], max: [100, 100, 100, 100]},
+            {name: 'spacing',    value: [5, 5], min: [-100, -100], max: [100, 100]}
         ]);
-        _addLayout('CoverLayout', CoverLayout, [
+        /*_addLayout('CoverLayout', CoverLayout, [
             {name: 'itemSize',   value: [260, 200], min: [0, 0], max: [1000, 1000]}
-        ]);
-        _addLayout('FullScreen', ListLayout, [
-            {name: 'itemSize',   value: undefined, editable: false}
-        ]);
-        /*_addLayout('Panda', CollectionLayout, [
-            {name: 'gutter',     value: [0, 0], editable: false},
-            {name: 'justify',    value: [0, 0], editable: false},
-            {name: 'itemSize',   value: function(renderNode, contextSize) {
-                var width = (contextSize[0] / 3);
-                return [
-                    width,
-                    width
-                ];
-            }, editable: false}
         ]);*/
+        _addLayout('FullScreen', ListLayout, [
+            {name: 'itemSize',   value: undefined, editable: false},
+            {name: 'margins',    value: [0, 0, 0, 0], min: [-100, -100, -100, -100], max: [100, 100, 100, 100]},
+            {name: 'spacing',    value: 0, min: -100, max: 1000}
+        ]);
         /*_addLayout('CubeLayout', CubeLayout, [
             {name: 'itemSize',   value: [100, 100], min: [0, 0], max: [1000, 1000]}
         ]);*/

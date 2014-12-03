@@ -78,7 +78,7 @@
 	    __webpack_require__(5);
 
 	    // Fast-click
-	    var FastClick = __webpack_require__(21);
+	    var FastClick = __webpack_require__(12);
 	    FastClick.attach(document.body);
 
 	    // import dependencies
@@ -87,18 +87,18 @@
 	    var Transform = __webpack_require__(27);
 	    var Surface = __webpack_require__(28);
 	    var InputSurface = __webpack_require__(29);
-	    var LayoutController = __webpack_require__(12);
-	    var ScrollController = __webpack_require__(13);
-	    var LayoutUtility = __webpack_require__(14);
+	    var LayoutController = __webpack_require__(13);
+	    var FlexScrollView = __webpack_require__(14);
+	    var LayoutUtility = __webpack_require__(15);
 	    var NewYork = __webpack_require__(2);
-	    var LayoutDockHelper = __webpack_require__(15);
+	    var LayoutDockHelper = __webpack_require__(16);
 	    var BkImageSurface = __webpack_require__(6);
 	    // layouts
-	    var GridLayout = __webpack_require__(16);
-	    var NavBarLayout = __webpack_require__(17);
-	    var ListLayout = __webpack_require__(18);
-	    var CollectionLayout = __webpack_require__(19);
-	    var CoverLayout = __webpack_require__(20);
+	    var GridLayout = __webpack_require__(17);
+	    var NavBarLayout = __webpack_require__(18);
+	    var ListLayout = __webpack_require__(19);
+	    var CollectionLayout = __webpack_require__(20);
+	    var CoverLayout = __webpack_require__(21);
 	    //var CubeLayout = require('famous-flex/layouts/CubeLayout');
 	    // lagometer
 	    var Lagometer = __webpack_require__(7);
@@ -164,7 +164,7 @@
 	                var dock = new LayoutDockHelper(context);
 	                context.set('back', {size: size});
 	                if (size[0] < 300) {
-	                    dock.bottom('details', 140, 1);
+	                    dock.bottom('details', 200, 1);
 	                }
 	                else {
 	                    dock.right('details', 200, 1);
@@ -296,6 +296,7 @@
 	            var rightItems = navbar.getSpec('rightItems');
 	            var insertSpec = LayoutUtility.cloneSpec(navbar.getSpec(rightItems[1]));
 	            var pos = Math.floor(Math.random() * (Math.min(collection.length, 5) + 1));
+	            pos = Math.max(pos, 1);
 	            var item = _createCollectionItem();
 	            collectionView.insert(pos, _createCollectionItem(), insertSpec);
 	            collectionView.goToRenderNode(item);
@@ -326,12 +327,15 @@
 	        for (var i = 0; i < 5; i++) {
 	            _addCollectionItem();
 	        }
-	        return new ScrollController({
+	        return new FlexScrollView({
 	            dataSource: collection,
 	            flow: true,
 	            useContainer: true,
 	            mouseMove: true,
-	            debug: true
+	            nodeSpring: {
+	                dampingRatio: 0.8,
+	                period: 700
+	            }
 	        });
 	    }
 
@@ -346,8 +350,9 @@
 	        });
 	    }
 	    function _createLayoutDetailsView() {
-	        return new LayoutController({
-	            layout: ListLayout,
+	        return new FlexScrollView({
+	            autoPipeEvents: true,
+	            alignment: 1,
 	            layoutOptions: { itemSize: 40 },
 	            dataSource: layoutDetailsRenderables
 	        });
@@ -483,33 +488,27 @@
 	        _addLayout('GridLayout', GridLayout, [
 	            {name: 'cells',      value: [3, 3], min: [1, 1], max: [50, 50]},
 	            {name: 'margins',    value: [20, 20, 20, 20], min: [0, 0, 0, 0], max: [100, 100, 100, 100]},
-	            {name: 'gutter',     value: [20, 20], min: [0, 0], max: [100, 100]}
+	            {name: 'spacing',    value: [20, 20], min: [0, 0], max: [100, 100]}
 	        ]);
 	        _addLayout('ListLayout', ListLayout, [
-	            {name: 'itemSize',   value: 50, min: 0, max: 1000}
+	            {name: 'itemSize',   value: 50, min: 0, max: 1000},
+	            {name: 'margins',    value: [5, 5, 5, 5], min: [-100, -100, -100, -100], max: [100, 100, 100, 100]},
+	            {name: 'spacing',    value: 0, min: -100, max: 1000}
 	        ]);
 	        _addLayout('CollectionLayout', CollectionLayout, [
 	            {name: 'itemSize',   value: [100, 100], min: [0, 0], max: [1000, 1000]},
 	            {name: 'justify',    value: [1, 1], min: [0, 0], max: [1, 1]},
-	            {name: 'gutter',     value: [10, 10], min: [0, 0], max: [100, 100]}
+	            {name: 'margins',    value: [5, 5, 5, 5], min: [-100, -100, -100, -100], max: [100, 100, 100, 100]},
+	            {name: 'spacing',    value: [5, 5], min: [-100, -100], max: [100, 100]}
 	        ]);
-	        _addLayout('CoverLayout', CoverLayout, [
+	        /*_addLayout('CoverLayout', CoverLayout, [
 	            {name: 'itemSize',   value: [260, 200], min: [0, 0], max: [1000, 1000]}
-	        ]);
-	        _addLayout('FullScreen', ListLayout, [
-	            {name: 'itemSize',   value: undefined, editable: false}
-	        ]);
-	        /*_addLayout('Panda', CollectionLayout, [
-	            {name: 'gutter',     value: [0, 0], editable: false},
-	            {name: 'justify',    value: [0, 0], editable: false},
-	            {name: 'itemSize',   value: function(renderNode, contextSize) {
-	                var width = (contextSize[0] / 3);
-	                return [
-	                    width,
-	                    width
-	                ];
-	            }, editable: false}
 	        ]);*/
+	        _addLayout('FullScreen', ListLayout, [
+	            {name: 'itemSize',   value: undefined, editable: false},
+	            {name: 'margins',    value: [0, 0, 0, 0], min: [-100, -100, -100, -100], max: [100, 100, 100, 100]},
+	            {name: 'spacing',    value: 0, min: -100, max: 1000}
+	        ]);
 	        /*_addLayout('CubeLayout', CubeLayout, [
 	            {name: 'itemSize',   value: [100, 100], min: [0, 0], max: [1000, 1000]}
 	        ]);*/
@@ -1667,2053 +1666,6 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * This Source Code is licensed under the MIT license. If a copy of the
-	 * MIT-license was not distributed with this file, You can obtain one at:
-	 * http://opensource.org/licenses/mit-license.html.
-	 *
-	 * @author: Hein Rutjes (IjzerenHein)
-	 * @license MIT
-	 * @copyright Gloey Apps, 2014
-	 */
-
-	/*global define*/
-	/*eslint no-use-before-define:0 */
-
-	/**
-	 * LayoutController lays out renderables according to a layout-
-	 * function and a data-source.
-	 *
-	 * @module
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-
-	    // import dependencies
-	    var Utility = __webpack_require__(55);
-	    var Entity = __webpack_require__(53);
-	    var ViewSequence = __webpack_require__(54);
-	    var OptionsManager = __webpack_require__(36);
-	    var EventHandler = __webpack_require__(37);
-	    var LayoutUtility = __webpack_require__(14);
-	    var LayoutNodeManager = __webpack_require__(38);
-	    var LayoutNode = __webpack_require__(39);
-	    var FlowLayoutNode = __webpack_require__(40);
-	    var Transform = __webpack_require__(27);
-	    __webpack_require__(15);
-
-	    /**
-	     * @class
-	     * @param {Object} options Options.
-	     * @param {Function|Object} [options.layout] Layout function or layout-literal.
-	     * @param {Object} [options.layoutOptions] Options to pass in to the layout-function.
-	     * @param {Array|ViewSequence|Object} [options.dataSource] Array, ViewSequence or Object with key/value pairs.
-	     * @param {Utility.Direction} [options.direction] Direction to layout into (e.g. Utility.Direction.Y) (when ommited the default direction of the layout is used)
-	     * @param {Bool} [options.flow] Enables flow animations when the layout changes (default: `false`).
-	     * @param {Spec} [options.insertSpec] Size, transform, opacity... to use when inserting new renderables into the scene (default: `{}`).
-	     * @param {Spec} [options.removeSpec] Size, transform, opacity... to use when removing renderables from the scene (default: `{}`).
-	     * @alias module:LayoutController
-	     */
-	    function LayoutController(options, nodeManager) {
-
-	        // Commit
-	        this.id = Entity.register(this);
-	        this._isDirty = true;
-	        this._contextSizeCache = [0, 0];
-	        this._commitOutput = {};
-
-	        // Setup input event handler
-	        this._eventInput = new EventHandler();
-	        EventHandler.setInputHandler(this, this._eventInput);
-
-	        // Setup event handlers
-	        this._eventOutput = new EventHandler();
-	        EventHandler.setOutputHandler(this, this._eventOutput);
-
-	        // Data-source
-	        //this._dataSource = undefined;
-	        //this._nodesById = undefined;
-	        //this._viewSequence = undefined;
-
-	        // Layout
-	        this._layout = {
-	            //function: undefined,
-	            //literal: undefined,
-	            //capabilities: undefined,
-	            options: Object.create({})
-	        };
-	        //this._direction = undefined;
-	        this._layout.optionsManager = new OptionsManager(this._layout.options);
-	        this._layout.optionsManager.on('change', function() {
-	            this._isDirty = true;
-	        }.bind(this));
-
-	        // Create options
-	        this.options = Object.create(LayoutController.DEFAULT_OPTIONS);
-	        this._optionsManager = new OptionsManager(this.options);
-
-	        // Create node manager that manages (Flow)LayoutNode instances
-	        if (nodeManager) {
-	            this._nodes = nodeManager;
-	        } else if (options && options.flow) {
-	            this._nodes = new LayoutNodeManager(FlowLayoutNode, _initFlowLayoutNode.bind(this));
-	        }
-	        else {
-	            this._nodes = new LayoutNodeManager(LayoutNode);
-	        }
-
-	        // Set options
-	        this.setDirection(undefined);
-	        if (options) {
-	            this.setOptions(options);
-	        }
-	    }
-
-	    LayoutController.DEFAULT_OPTIONS = {
-	        nodeSpring: {
-	            dampingRatio: 0.8,
-	            period: 300
-	        }
-	        /*insertSpec: {
-	            opacity: undefined,
-	            size: undefined,
-	            transform: undefined,
-	            origin: undefined,
-	            align: undefined
-	        },
-	        removeSpec: {
-	            opacity: undefined,
-	            size: undefined,
-	            transform: undefined,
-	            origin: undefined,
-	            align: undefined
-	        }*/
-	    };
-
-	    /**
-	     * Called whenever a layout-node is created/re-used. Initializes
-	     * the node with the `insertSpec` if it has been defined.
-	     */
-	    function _initFlowLayoutNode(node, spec) {
-	        node.setOptions({
-	            spring: this.options.nodeSpring
-	        });
-	        if (!spec && this.options.insertSpec) {
-	            node.setSpec(this.options.insertSpec);
-	        }
-	    }
-
-	    /**
-	     * Patches the LayoutController instance's options with the passed-in ones.
-	     *
-	     * @param {Options} options An object of configurable options for the LayoutController instance.
-	     * @param {Function|Object} [options.layout] Layout function or layout-literal.
-	     * @param {Object} [options.layoutOptions] Options to pass in to the layout-function.
-	     * @param {Array|ViewSequence|Object} [options.dataSource] Array, ViewSequence or Object with key/value pairs.
-	     * @param {Utility.Direction} [options.direction] Direction to layout into (e.g. Utility.Direction.Y) (when ommited the default direction of the layout is used)
-	     * @param {Spec} [options.insertSpec] Size, transform, opacity... to use when inserting new renderables into the scene (default: `{}`).
-	     * @param {Spec} [options.removeSpec] Size, transform, opacity... to use when removing renderables from the scene (default: `{}`).
-	     * @return {LayoutController} this
-	     */
-	    LayoutController.prototype.setOptions = function setOptions(options) {
-	        this._optionsManager.setOptions(options);
-	        if (options.dataSource) {
-	            this.setDataSource(options.dataSource);
-	        }
-	        if (options.layout || options.layoutOptions) {
-	            this.setLayout(options.layout, options.layoutOptions);
-	        }
-	        if (options.direction !== undefined) {
-	            this.setDirection(options.direction);
-	        }
-	        if (options.nodeSpring && this.options.flow) {
-	            this._nodes.forEach(function(node) {
-	                node.setOptions({spring: options.nodeSpring});
-	            });
-	        }
-	        return this;
-	    };
-
-	    /**
-	     * Sets the collection of renderables which are layed out according to
-	     * the layout-function.
-	     *
-	     * The data-source can be either an Array, ViewSequence or Object
-	     * with key/value pairs.
-	     *
-	     * @param {Array|Object|ViewSequence} dataSource Array, ViewSequence or Object.
-	     * @return {LayoutController} this
-	     */
-	    LayoutController.prototype.setDataSource = function(dataSource) {
-	        this._dataSource = dataSource;
-	        this._nodesById = undefined;
-	        if (dataSource instanceof Array) {
-	            this._viewSequence = new ViewSequence(dataSource);
-	        } else if (dataSource instanceof ViewSequence) {
-	            this._viewSequence = dataSource;
-	        } else if (dataSource instanceof Object){
-	            this._nodesById = dataSource;
-	        }
-	        this._isDirty = true;
-	        return this;
-	    };
-
-	    /**
-	     * Get the data-source.
-	     *
-	     * @return {Array|ViewSequence|Object} data-source
-	     */
-	    LayoutController.prototype.getDataSource = function() {
-	        return this._dataSource;
-	    };
-
-	    /**
-	     * Set the new layout.
-	     *
-	     * @param {Function|Object} layout Layout function or layout-literal
-	     * @param {Object} [options] Options to pass in to the layout-function
-	     * @return {LayoutController} this
-	     */
-	    LayoutController.prototype.setLayout = function(layout, options) {
-
-	        // Set new layout funtion
-	        if (layout instanceof Function) {
-	            this._layout.function = layout;
-	            this._layout.capabilities = layout.Capabilities;
-	            this._layout.literal = undefined;
-
-	        // If the layout is an object, treat it as a layout-literal
-	        } else if (layout instanceof Object) {
-	            this._layout.literal = layout;
-	            this._layout.capabilities = undefined; // todo - derive from literal somehow?
-	            var helperName = Object.keys(layout)[0];
-	            var Helper = LayoutUtility.getRegisteredHelper(helperName);
-	            this._layout.function = Helper ? function(context, options) {
-	                var helper = new Helper(context, options);
-	                helper.parse(layout[helperName]);
-	            } : undefined;
-	        }
-	        else {
-	            this._layout.function = undefined;
-	            this._layout.capabilities = undefined;
-	            this._layout.literal = undefined;
-	        }
-
-	        // Update options
-	        if (options) {
-	            this.setLayoutOptions(options);
-	        }
-
-	        // Update direction
-	        this.setDirection(this._configuredDirection);
-	        this._isDirty = true;
-	        return this;
-	    };
-
-	    /**
-	     * Get the current layout.
-	     *
-	     * @return {Function|Object} Layout function or layout literal
-	     */
-	    LayoutController.prototype.getLayout = function() {
-	        return this._layout.literal || this._layout.function;
-	    };
-
-	    /**
-	     * Set the options for the current layout. Use this function after
-	     * `setLayout` to update one or more options for the layout-function.
-	     *
-	     * @param {Object} [options] Options to pass in to the layout-function
-	     * @return {LayoutController} this
-	     */
-	    LayoutController.prototype.setLayoutOptions = function(options) {
-	        this._layout.optionsManager.setOptions(options);
-	        return this;
-	    };
-
-	    /**
-	     * Get the current layout options.
-	     *
-	     * @return {Object} Layout options
-	     */
-	    LayoutController.prototype.getLayoutOptions = function() {
-	        return this._layout.options;
-	    };
-
-	    /**
-	     * Calculates the actual in-use direction based on the given direction
-	     * and supported capabilities of the layout-function.
-	     */
-	    function _getActualDirection(direction) {
-
-	        // When the direction is configured in the capabilities, look it up there
-	        if (this._layout.capabilities && this._layout.capabilities.direction) {
-
-	            // Multiple directions are supported
-	            if (Array.isArray(this._layout.capabilities.direction)) {
-	                for (var i = 0; i < this._layout.capabilities.direction.length; i++) {
-	                    if (this._layout.capabilities.direction[i] === direction) {
-	                        return direction;
-	                    }
-	                }
-	                return this._layout.capabilities.direction[0];
-	            }
-
-	            // Only one direction is supported, we must use that
-	            else {
-	                return this._layout.capabilities.direction;
-	            }
-	        }
-
-	        // Use Y-direction as a fallback
-	        return (direction === undefined) ? Utility.Direction.Y : direction;
-	    }
-
-	    /**
-	     * Set the direction of the layout. When no direction is set, the default
-	     * direction of the layout function is used.
-	     *
-	     * @param {Utility.Direction} direction Direction (e.g. Utility.Direction.X)
-	     * @return {LayoutController} this
-	     */
-	    LayoutController.prototype.setDirection = function(direction) {
-	        this._configuredDirection = direction;
-	        var newDirection = _getActualDirection.call(this, direction);
-	        if (newDirection !== this._direction) {
-	            this._direction = newDirection;
-	            this._isDirty = true;
-	        }
-	    };
-
-	    /**
-	     * Get the direction (e.g. Utility.Direction.Y). By default, this function
-	     * returns the direction that was configured by setting `setDirection`. When
-	     * the direction has not been set, `undefined` is returned.
-	     *
-	     * When no direction has been set, the first direction is used that is specified
-	     * in the capabilities of the layout-function. To obtain the actual in-use direction,
-	     * use `getDirection(true)`. This method returns the actual in-use direction and
-	     * never returns undefined.
-	     *
-	     * @param {Boolean} [actual] Set to true to obtain the actual in-use direction
-	     * @return {Utility.Direction} Direction or undefined
-	     */
-	    LayoutController.prototype.getDirection = function(actual) {
-	        return actual ? this._direction : this._configuredDirection;
-	    };
-
-	    /**
-	     * Get the spec (size, transform, etc..) for the given renderable or
-	     * Id.
-	     *
-	     * @param {Renderable|String} node Renderabe or Id to look for
-	     * @return {Spec} spec or undefined
-	     */
-	    LayoutController.prototype.getSpec = function(node) {
-	        if (!node) {
-	            return undefined;
-	        }
-	        if ((node instanceof String) || (typeof node === 'string')) {
-	            if (!this._nodesById) {
-	               return undefined;
-	            }
-	            node = this._nodesById[node];
-	            if (!node) {
-	                return undefined;
-	            }
-
-	            // If the result was an array, return that instead
-	            if (node instanceof Array) {
-	                return node;
-	            }
-	        }
-	        for (var i = 0; i < this._commitOutput.target.length; i++) {
-	            var spec = this._commitOutput.target[i];
-	            if (spec.renderNode === node) {
-	                return spec;
-	            }
-	        }
-	        return undefined;
-	    };
-
-	    /**
-	     * Forces a reflow of the layout the next render cycle.
-	     *
-	     * @return {LayoutController} this
-	     */
-	    LayoutController.prototype.reflowLayout = function() {
-	        this._isDirty = true;
-	        return this;
-	    };
-
-	    /**
-	     * Inserts a renderable into the data-source.
-	     *
-	     * The optional argument `insertSpec` is only used `flow` mode is enabled.
-	     * When specified, the renderable is inserted using an animation starting with
-	     * size, origin, opacity, transform, etc... as specified in `insertSpec'.
-	     *
-	     * @param {Number|String} indexOrId Index (0 = before first, -1 at end), within dataSource array or id (String)
-	     * @param {Object} renderable Renderable to add to the data-source
-	     * @param {Spec} [insertSpec] Size, transform, etc.. to start with when inserting
-	     * @return {LayoutController} this
-	     */
-	    LayoutController.prototype.insert = function(indexOrId, renderable, insertSpec) {
-
-	        // Add the renderable in case of an id (String)
-	        if ((indexOrId instanceof String) || (typeof indexOrId === 'string')) {
-
-	            // Create data-source if neccesary
-	            if (this._dataSource === undefined) {
-	                this._dataSource = {};
-	                this._nodesById = this._dataSource;
-	            }
-
-	            // Insert renderable
-	            this._nodesById[indexOrId] = renderable;
-	        }
-
-	        // Add the renderable using an index
-	        else {
-
-	            // Create data-source if neccesary
-	            if (this._dataSource === undefined) {
-	                this._dataSource = [];
-	                this._viewSequence = new ViewSequence(this._dataSource);
-	            }
-
-	            // Insert into array
-	            if (indexOrId === -1) {
-	                if (this._viewSequence) {
-	                    this._viewSequence.push(renderable);
-	                }
-	                else {
-	                    this._dataSource.push(renderable);
-	                }
-	            }
-	            else if (indexOrId === 0) {
-	                if (this._viewSequence) {
-	                    this._viewSequence.unshift(renderable);
-	                }
-	                else {
-	                    this._dataSource.unshift(renderable);
-	                }
-	            }
-	            else {
-	                // Using insert in this way, only works when the data-source is an array
-	                if (!(this._dataSource instanceof Array)) {
-	                    LayoutUtility.error('LayoutController.insert(1..n) only works when the dataSource is an array');
-	                    return this;
-	                }
-	                this._dataSource.splice(indexOrId, 0, renderable);
-	            }
-	        }
-
-	        // When a custom insert-spec was specified, store that in the layout-node
-	        if (insertSpec) {
-	            this._nodes.insertNode(this._nodes.createNode(renderable, insertSpec));
-	        }
-
-	        // Force a reflow
-	        this._isDirty = true;
-
-	        return this;
-	    };
-
-	    /**
-	     * Removes a renderable from the data-source.
-	     *
-	     * The optional argument `removeSpec` is only used `flow` mode is enabled.
-	     * When specified, the renderable is removed using an animation ending at
-	     * the size, origin, opacity, transform, etc... as specified in `removeSpec'.
-	     *
-	     * @param {Number|String} indexOrId Index within dataSource array or id (String)
-	     * @param {Spec} [removeSpec] Size, transform, etc.. to end with when removing
-	     * @return {LayoutController} this
-	     */
-	    LayoutController.prototype.remove = function(indexOrId, removeSpec) {
-
-	        // Remove the renderable in case of an id (String)
-	        var renderNode;
-	        if (this._nodesById || (indexOrId instanceof String) || (typeof indexOrId === 'string')) {
-
-	            // Find and remove renderable from data-source
-	            renderNode = this._nodesById[indexOrId];
-	            if (renderNode) {
-	                delete this._nodesById[indexOrId];
-	            }
-	        }
-
-	        // Remove the renderable using an index
-	        else {
-
-	            // Remove from array
-	            renderNode = this._dataSource.splice(indexOrId, 1)[0];
-	        }
-
-	        // When a custom remove-spec was specified, store that in the layout-node
-	        if (renderNode && removeSpec) {
-	            var node = this._nodes.getNodeByRenderNode(renderNode);
-	            if (node) {
-	                node.remove(removeSpec || this.options.removeSpec);
-	            }
-	        }
-
-	        // Force a reflow
-	        if (renderNode) {
-	            this._isDirty = true;
-	        }
-
-	        return this;
-	    };
-
-	    /**
-	     * Return size of contained element or `undefined` when size is not defined.
-	     *
-	     * @return {Array.Number} [width, height]
-	     */
-	    LayoutController.prototype.getSize = function() {
-	        return this.options.size;
-	    };
-
-	    /**
-	     * Generate a render spec from the contents of this component.
-	     *
-	     * @private
-	     * @method render
-	     * @return {Object} Render spec for this component
-	     */
-	    LayoutController.prototype.render = function render() {
-	        return this.id;
-	    };
-
-	    /**
-	     * Apply changes from this component to the corresponding document element.
-	     * This includes changes to classes, styles, size, content, opacity, origin,
-	     * and matrix transforms.
-	     *
-	     * @private
-	     * @method commit
-	     * @param {Context} context commit context
-	     */
-	    LayoutController.prototype.commit = function commit(context) {
-	        var transform = context.transform;
-	        var origin = context.origin;
-	        var size = context.size;
-	        var opacity = context.opacity;
-
-	        // When the size or layout function has changed, reflow the layout
-	        if (size[0] !== this._contextSizeCache[0] ||
-	            size[1] !== this._contextSizeCache[1] ||
-	            this._isDirty ||
-	            this._nodes._trueSizeRequested){
-
-	            // Emit start event
-	            var eventData = {
-	                target: this,
-	                oldSize: this._contextSizeCache,
-	                size: size,
-	                dirty: this._isDirty,
-	                trueSizeRequested: this._nodes._trueSizeRequested
-	            };
-	            this._eventOutput.emit('layoutstart', eventData);
-
-	            // Update state
-	            this._contextSizeCache[0] = size[0];
-	            this._contextSizeCache[1] = size[1];
-	            this._isDirty = false;
-
-	            // Prepare for layout
-	            var layoutContext = this._nodes.prepareForLayout(
-	                this._viewSequence,     // first node to layout
-	                this._nodesById, {      // so we can do fast id lookups
-	                    size: size,
-	                    direction: this._direction
-	                }
-	            );
-
-	            // Layout objects
-	            if (this._layout.function) {
-	                this._layout.function(
-	                    layoutContext,          // context which the layout-function can use
-	                    this._layout.options    // additional layout-options
-	                );
-	            }
-
-	            // Update output and optionally emit event
-	            var result = this._nodes.buildSpecAndDestroyUnrenderedNodes();
-	            this._commitOutput.target = result.specs;
-	            this._eventOutput.emit('reflow', {
-	                target: this
-	            });
-
-	            // Emit end event
-	            this._eventOutput.emit('layoutend', eventData);
-	        }
-	        else if (this.options.flow) {
-
-	            // Update output and optionally emit event
-	            result = this._nodes.buildSpecAndDestroyUnrenderedNodes();
-	            this._commitOutput.target = result.specs;
-	            if (result.modified) {
-	                this._eventOutput.emit('reflow', {
-	                    target: this
-	                });
-	            }
-	        }
-
-	        // Render child-nodes every commit
-	        var target = this._commitOutput.target;
-	        for (var i = 0, j = target.length; i < j; i++) {
-	            target[i].target = target[i].renderNode.render();
-	        }
-
-	        // Translate dependent on origin
-	        if (origin && ((origin[0] !== 0) || (origin[1] !== 0))) {
-	            transform = Transform.moveThen([-size[0]*origin[0], -size[1]*origin[1], 0], transform);
-	        }
-	        this._commitOutput.size = size;
-	        this._commitOutput.opacity = opacity;
-	        this._commitOutput.transform = transform;
-	        return this._commitOutput;
-	    };
-
-	    module.exports = LayoutController;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * This Source Code is licensed under the MIT license. If a copy of the
-	 * MIT-license was not distributed with this file, You can obtain one at:
-	 * http://opensource.org/licenses/mit-license.html.
-	 *
-	 * @author: Hein Rutjes (IjzerenHein)
-	 * @license MIT
-	 * @copyright Gloey Apps, 2014
-	 */
-
-	/*global define, console*/
-	/*eslint no-use-before-define:0, no-console:0 */
-
-	/**
-	 * Flexible ScrollView drop-in replacement for famo.us.
-	 *
-	 * Key features:
-	 * -    Customizable layout (uses ListLayout by default)
-	 * -    Insert/remove at any position using animations
-	 * -    Support for `true` size renderables
-	 * -    Horizontal/vertical direction
-	 * -    Top/left or bottom/right alignment
-	 * -    Pagination
-	 * -    Option to embed in a ContainerSurface
-	 *
-	 * Inherited from: [ScrollController](./ScrollController.md)
-	 * @module
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-
-	    // import dependencies
-	    var LayoutUtility = __webpack_require__(14);
-	    var ScrollController = __webpack_require__(35);
-	    var ListLayout = __webpack_require__(18);
-
-	    /**
-	     * @class
-	     * @extends ScrollController
-	     * @param {Object} options Options (see ScrollController).
-	     * @alias module:ScrollView
-	     */
-	    function ScrollView(options) {
-	        ScrollController.call(this, LayoutUtility.combineOptions(ScrollView.DEFAULT_OPTIONS, options));
-	    }
-	    ScrollView.prototype = Object.create(ScrollController.prototype);
-	    ScrollView.prototype.constructor = ScrollView;
-
-	    ScrollView.DEFAULT_OPTIONS = {
-	        layout: ListLayout,         // sequential layout, uses width/height from renderable
-	        direction: undefined,       // 0 = X, 1 = Y, undefined = use default from layout
-	        paginated: false,           // pagination on/off
-	        alignment: 0,               // 0 = top/left, 1 = bottom/right
-	        flow: false,                // allow renderables to flow between layouts when not scrolling
-	        mouseMove: false,           // allow mouse to hold and move the view
-	        useContainer: false,        // embeds inside a ContainerSurface for clipping and capturing input events
-	        visibleItemThresshold: 0.5  // by default, when an item is 50% visible, it is considered visible by `getFirstVisibleItem`
-	        // see ScrollController for all other options
-	    };
-
-	    /**
-	     * Sets the data-source (alias for setDataSource).
-	     *
-	     * This function is a shim provided for compatibility with the stock famo.us ScrollView.
-	     *
-	     * @param {Array|ViewSequence} node Either an array of renderables or a Famous viewSequence.
-	     * @return {ScrollView} this
-	     */
-	    ScrollView.prototype.sequenceFrom = function(node) {
-	        return this.setDataSource(node);
-	    };
-
-	    /**
-	     * Returns the index of the first visible renderable.
-	     *
-	     * This function is a shim provided for compatibility with the stock famo.us ScrollView.
-	     *
-	     * @return {Number} The current index of the ViewSequence
-	     */
-	    ScrollView.prototype.getCurrentIndex = function getCurrentIndex() {
-	        var item = this.getFirstVisibleItem();
-	        return item ? item.viewSequence.getIndex() : -1;
-	    };
-
-	    /**
-	     * Paginates the Scrollview to an absolute page index. This function is a shim provided
-	     * for compatibility with the stock famo.us ScrollView.
-	     *
-	     * @param {Number} index view-sequence index to go to.
-	     * @return {ScrollView} this
-	     */
-	    ScrollView.prototype.goToPage = function goToPage(index) {
-	        var viewSequence = this._viewSequence;
-	        if (!viewSequence) {
-	            return this;
-	        }
-	        while (viewSequence.getIndex() < index) {
-	            viewSequence = viewSequence.getNext();
-	            if (!viewSequence) {
-	                return this;
-	            }
-	        }
-	        while (viewSequence.getIndex() > index) {
-	            viewSequence = viewSequence.getPrevious();
-	            if (!viewSequence) {
-	                return this;
-	            }
-	        }
-	        this.goToRenderNode(viewSequence.get());
-	        return this;
-	    };
-
-	    /**
-	     * Returns the offset associated with the Scrollview instance's current node
-	     * (generally the node currently at the top).
-	     *
-	     * This function is a shim provided for compatibility with the stock famo.us ScrollView.
-	     *
-	     * @return {number} The position of either the specified node, or the Scrollview's current Node,
-	     * in pixels translated.
-	     */
-	    ScrollView.prototype.getOffset = function() {
-	        return this._scrollOffsetCache;
-	    };
-
-	    /**
-	     * Returns the position associated with the Scrollview instance's current node
-	     * (generally the node currently at the top).
-	     *
-	     * This function is a shim provided for compatibility with the stock famo.us ScrollView.
-	     *
-	     * @deprecated
-	     * @method getPosition
-	     * @param {number} [node] If specified, returns the position of the node at that index in the
-	     * Scrollview instance's currently managed collection.
-	     * @return {number} The position of either the specified node, or the Scrollview's current Node,
-	     * in pixels translated.
-	     */
-	    ScrollView.prototype.getPosition = ScrollView.prototype.getOffset;
-
-	    module.exports = ScrollView;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * This Source Code is licensed under the MIT license. If a copy of the
-	 * MIT-license was not distributed with this file, You can obtain one at:
-	 * http://opensource.org/licenses/mit-license.html.
-	 *
-	 * @author: Hein Rutjes (IjzerenHein)
-	 * @license MIT
-	 * @copyright Gloey Apps, 2014
-	 */
-
-	/*global define, console*/
-	/*eslint no-console:0*/
-
-	/**
-	 * Utility class for famous-flex.
-	 *
-	 * @module
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-
-	    // import dependencies
-	    var Utility = __webpack_require__(55);
-
-	    /**
-	     * @class
-	     * @alias module:LayoutUtility
-	     */
-	    function LayoutUtility() {
-	    }
-	    LayoutUtility.registeredHelpers = {};
-
-	    var Capabilities = {
-	        SEQUENCE: 1,
-	        DIRECTION_X: 2,
-	        DIRECTION_Y: 4,
-	        SCROLLING: 8
-	    };
-	    LayoutUtility.Capabilities = Capabilities;
-
-	    /**
-	     *  Normalizes the margins argument.
-	     *
-	     *  @param {Array.Number} margins
-	     */
-	    LayoutUtility.normalizeMargins = function(margins) {
-	        if (!margins) {
-	            return [0, 0, 0, 0];
-	        } else if (!Array.isArray(margins)) {
-	            return [margins, margins, margins, margins];
-	        } else if (margins.length === 0) {
-	            return [0, 0, 0, 0];
-	        } else if (margins.length === 1) {
-	            return [margins[0], margins[0], margins[0], margins[0]];
-	        } else if (margins.length === 2) {
-	            return [margins[0], margins[1], margins[0], margins[1]];
-	        }
-	        else {
-	            return margins;
-	        }
-	    };
-
-	    /**
-	     * Makes a (shallow) copy of a spec.
-	     *
-	     * @param {Spec} spec Spec to clone
-	     * @return {Spec} cloned spec
-	     */
-	    LayoutUtility.cloneSpec = function(spec) {
-	        var clone = {};
-	        if (spec.opacity !== undefined) {
-	            clone.opacity = spec.opacity;
-	        }
-	        if (spec.size !== undefined) {
-	            clone.size = spec.size.slice(0);
-	        }
-	        if (spec.transform !== undefined) {
-	            clone.transform = spec.transform.slice(0);
-	        }
-	        if (spec.origin !== undefined) {
-	            clone.origin = spec.origin.slice(0);
-	        }
-	        if (spec.align !== undefined) {
-	            clone.align = spec.align.slice(0);
-	        }
-	        return clone;
-	    };
-
-	    /**
-	     * Compares two arrays for equality.
-	     */
-	    function _isEqualArray(a, b) {
-	        if (a === b) {
-	            return true;
-	        }
-	        if ((a === undefined) || (b === undefined)) {
-	            return false;
-	        }
-	        var i = a.length;
-	        if (i !== b.length){
-	            return false;
-	        }
-	        while (i--) {
-	            if (a[i] !== b[i]) {
-	                return false;
-	            }
-	        }
-	        return true;
-	    }
-
-	    /**
-	     * Compares two specs for equality.
-	     *
-	     * @param {Spec} spec1 Spec to compare
-	     * @param {Spec} spec2 Spec to compare
-	     * @return {Boolean} true/false
-	     */
-	    LayoutUtility.isEqualSpec = function(spec1, spec2) {
-	        if (spec1.opacity !== spec2.opacity) {
-	            return false;
-	        }
-	        if (!_isEqualArray(spec1.size, spec2.size)) {
-	            return false;
-	        }
-	        if (!_isEqualArray(spec1.transform, spec2.transform)) {
-	            return false;
-	        }
-	        if (!_isEqualArray(spec1.origin, spec2.origin)) {
-	            return false;
-	        }
-	        if (!_isEqualArray(spec1.align, spec2.align)) {
-	            return false;
-	        }
-	        return true;
-	    };
-
-	    /**
-	     * Helper function that returns a string containing the differences
-	     * between two specs.
-	     *
-	     * @param {Spec} spec1 Spec to compare
-	     * @param {Spec} spec2 Spec to compare
-	     * @return {String} text
-	     */
-	    LayoutUtility.getSpecDiffText = function(spec1, spec2) {
-	        var result = 'spec diff:';
-	        if (spec1.opacity !== spec2.opacity) {
-	            result += '\nopacity: ' + spec1.opacity + ' != ' + spec2.opacity;
-	        }
-	        if (!_isEqualArray(spec1.size, spec2.size)) {
-	            result += '\nsize: ' + JSON.stringify(spec1.size) + ' != ' + JSON.stringify(spec2.size);
-	        }
-	        if (!_isEqualArray(spec1.transform, spec2.transform)) {
-	            result += '\ntransform: ' + JSON.stringify(spec1.transform) + ' != ' + JSON.stringify(spec2.transform);
-	        }
-	        if (!_isEqualArray(spec1.origin, spec2.origin)) {
-	            result += '\norigin: ' + JSON.stringify(spec1.origin) + ' != ' + JSON.stringify(spec2.origin);
-	        }
-	        if (!_isEqualArray(spec1.align, spec2.align)) {
-	            result += '\nalign: ' + JSON.stringify(spec1.align) + ' != ' + JSON.stringify(spec2.align);
-	        }
-	        return result;
-	    };
-
-	    /**
-	     * Helper function to call whenever a critical error has occurred.
-	     *
-	     * @param {String} message error-message
-	     */
-	    LayoutUtility.error = function(message) {
-	        console.log('ERROR: ' + message);
-	        throw message;
-	    };
-
-	    /**
-	     * Helper function to call whenever a warning error has occurred.
-	     *
-	     * @param {String} message warning-message
-	     */
-	    LayoutUtility.warning = function(message) {
-	        console.log('WARNING: ' + message);
-	    };
-
-	    /**
-	     * Helper function to log 1 or more arguments. All the arguments
-	     * are concatenated to produce a single string which is logged.
-	     *
-	     * @param {String|Array|Object} args arguments to stringify and concatenate
-	     */
-	    LayoutUtility.log = function(args) {
-	        var message = '';
-	        for (var i = 0; i < arguments.length; i++) {
-	            var arg = arguments[i];
-	            if ((arg instanceof Object) || (arg instanceof Array)) {
-	                message += JSON.stringify(arg);
-	            }
-	            else {
-	                message += arg;
-	            }
-	        }
-	        console.log(message);
-	    };
-
-	    /**
-	     * Combines two sets of options into a single set.
-	     *
-	     * @param {Object} options1 base set of options
-	     * @param {Object} options2 set of options to merge into `options1`
-	     * @param {Bool} [forceClone] ensures that a clone is returned rather that one of the original options objects
-	     * @return {Object} Combined options
-	     */
-	    LayoutUtility.combineOptions = function(options1, options2, forceClone) {
-	        if (options1 && !options2 && !forceClone) {
-	            return options1;
-	        } else if (!options1 && options2 && !forceClone) {
-	            return options2;
-	        }
-	        var options = Utility.clone(options1 || {});
-	        if (options2) {
-	            for (var key in options2) {
-	                options[key] = options2[key];
-	            }
-	        }
-	        return options;
-	    };
-
-	    /**
-	     * Registers a layout-helper so it can be used as a layout-literal for
-	     * a layout-controller. The LayoutHelper instance must support the `parse`
-	     * function, which is fed the layout-literal content.
-	     *
-	     * **Example:**
-	     *
-	     * ```javascript
-	     * Layout.registerHelper('dock', LayoutDockHelper);
-	     *
-	     * var layoutController = new LayoutController({
-	     *   layout: { dock: [,
-	     *     ['top', 'header', 50],
-	     *     ['bottom', 'footer', 50],
-	     *     ['fill', 'content'],
-	     *   ]},
-	     *   dataSource: {
-	     *     header: new Surface({content: 'Header'}),
-	     *     footer: new Surface({content: 'Footer'}),
-	     *     content: new Surface({content: 'Content'}),
-	     *   }
-	     * })
-	     * ```
-	     *
-	     * @param {String} name name of the helper (e.g. 'dock')
-	     * @param {Function} Helper Helper to register (e.g. LayoutDockHelper)
-	     */
-	    LayoutUtility.registerHelper = function(name, Helper) {
-	        if (!Helper.prototype.parse) {
-	            LayoutUtility.error('The layout-helper for name "' + name + '" is required to support the "parse" method');
-	        }
-	        if (this.registeredHelpers[name] !== undefined) {
-	            LayoutUtility.warning('A layout-helper with the name "' + name + '" is already registered and will be overwritten');
-	        }
-	        this.registeredHelpers[name] = Helper;
-	    };
-
-	    /**
-	     * Unregisters a layout-helper.
-	     *
-	     * @param {String} name name of the layout-helper
-	     */
-	    LayoutUtility.unregisterHelper = function(name) {
-	        delete this.registeredHelpers[name];
-	    };
-
-	    /**
-	     * Gets a registered layout-helper by its name.
-	     *
-	     * @param {String} name name of the layout-helper
-	     * @return {Function} layout-helper or undefined
-	     */
-	    LayoutUtility.getRegisteredHelper = function(name) {
-	        return this.registeredHelpers[name];
-	    };
-
-	    // Layout function
-	    module.exports = LayoutUtility;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * This Source Code is licensed under the MIT license. If a copy of the
-	 * MIT-license was not distributed with this file, You can obtain one at:
-	 * http://opensource.org/licenses/mit-license.html.
-	 *
-	 * @author: Hein Rutjes (IjzerenHein)
-	 * @license MIT
-	 * @copyright Gloey Apps, 2014
-	 */
-
-	/*global define*/
-
-	/**
-	 * LayoutDockHelper helps positioning nodes using docking principles.
-	 *
-	 * **Example:**
-	 *
-	 * ```javascript
-	 * var LayoutDockHelper = require('famous-flex/helpers/LayoutDockHelper');
-	 *
-	 * function HeaderFooterLayout(context, options) {
-	 *   var dock = new LayoutDockHelper(context);
-	 *   dock.top('header', options.headerHeight);
-	 *   dock.bottom('footer', options.footerHeight);
-	 *   dock.fill('content');
-	 * };
-	 * ```
-	 *
-	 * You can also use layout-literals to create layouts using docking semantics:
-	 *
-	 * ```javascript
-	 * var layoutController = new LayoutController({
-	 *   layout: {dock: [
-	 *     ['top', 'header', 40],
-	 *     ['bottom', 'footer', 40, 1], // z-index +1
-	 *     ['fill', 'content']
-	 *   ]},
-	 *   dataSource: {
-	 *     header: new Surface({content: 'header'}),
-	 *     footer: new Surface({content: 'footer'}),
-	 *     content: new Surface({content: 'content'}),
-	 *   }
-	 * });
-	 * ```
-	 *
-	 * @module
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-
-	    // import dependencies
-	    var LayoutUtility = __webpack_require__(14);
-
-	    /**
-	     * @class
-	     * @param {LayoutContext} context layout-context
-	     * @param {Object} [options] additional options
-	     * @param {Object} [options.margins] margins to start out with (default: 0px)
-	     * @param {Number} [options.translateZ] z-index to use when translating objects (default: 0)
-	     * @alias module:LayoutDockHelper
-	     */
-	    function LayoutDockHelper(context, options) {
-	        var size = context.size;
-	        this._size = size;
-	        this._context = context;
-	        this._options = options;
-	        this._z = (options && options.translateZ) ? options.translateZ : 0;
-	        if (options && options.margins) {
-	            var margins = LayoutUtility.normalizeMargins(options.margins);
-	            this._left = margins[3];
-	            this._top = margins[0];
-	            this._right = size[0] - margins[1];
-	            this._bottom = size[1] - margins[2];
-	        }
-	        else {
-	            this._left = 0;
-	            this._top = 0;
-	            this._right = size[0];
-	            this._bottom = size[1];
-	        }
-	    }
-
-	    /**
-	     * Parses the layout-rules based on a JSON data object.
-	     * The object should be an array with the following syntax:
-	     * `[[rule, node, value, z], [rule, node, value, z], ...]`
-	     *
-	     * **Example:**
-	     *
-	     * ```JSON
-	     * [
-	     *   ['top', 'header', 50],
-	     *   ['bottom', 'footer', 50, 10], // z-index: 10
-	     *   ['margins', [10, 5]], // marginate remaining space: 10px top/bottom, 5px left/right
-	     *   ['fill', 'content']
-	     * ]
-	     * ```
-	     *
-	     * @param {Object} data JSON object
-	     */
-	    LayoutDockHelper.prototype.parse = function(data) {
-	        for (var i = 0; i < data.length; i++) {
-	            var rule = data[i];
-	            var value = (rule.length >= 3) ? rule[2] : undefined;
-	            if (rule[0] === 'top') {
-	                this.top(rule[1], value, (rule.length >=4) ? rule[3] : undefined);
-	            } else if (rule[0] === 'left') {
-	                this.left(rule[1], value, (rule.length >=4) ? rule[3] : undefined);
-	            } else if (rule[0] === 'right') {
-	                this.right(rule[1], value, (rule.length >=4) ? rule[3] : undefined);
-	            } else if (rule[0] === 'bottom') {
-	                this.bottom(rule[1], value, (rule.length >=4) ? rule[3] : undefined);
-	            } else if (rule[0] === 'fill') {
-	                this.fill(rule[1], (rule.length >=3) ? rule[2] : undefined);
-	            } else if (rule[0] === 'margins') {
-	                this.margins(rule[1]);
-	            }
-	        }
-	    };
-
-	    /**
-	     * Dock the node to the top.
-	     *
-	     * @param {LayoutNode|String} [node] layout-node to dock, when ommited the `height` argument argument is used for padding
-	     * @param {Number} [height] height of the layout-node, when ommited the height of the node is used
-	     * @param {Number} [z] z-index to use for the node
-	     * @return {LayoutDockHelper} this
-	     */
-	    LayoutDockHelper.prototype.top = function(node, height, z) {
-	        if (height instanceof Array) {
-	            height = height[1];
-	        }
-	        if (height === undefined) {
-	            var size = this._context.resolveSize(node, [this._right - this._left, this._bottom - this._top]);
-	            height = size[1];
-	        }
-	        this._context.set(node, {
-	            size: [this._right - this._left, height],
-	            origin: [0, 0],
-	            align: [0, 0],
-	            translate: [this._left, this._top, (z === undefined) ? this._z : z]
-	        });
-	        this._top += height;
-	        return this;
-	    };
-
-	    /**
-	     * Dock the node to the left
-	     *
-	     * @param {LayoutNode|String} [node] layout-node to dock, when ommited the `width` argument argument is used for padding
-	     * @param {Number} [width] width of the layout-node, when ommited the width of the node is used
-	     * @param {Number} [z] z-index to use for the node
-	     * @return {LayoutDockHelper} this
-	     */
-	    LayoutDockHelper.prototype.left = function(node, width, z) {
-	        if (width instanceof Array) {
-	            width = width[0];
-	        }
-	        if (width === undefined) {
-	            var size = this._context.resolveSize(node, [this._right - this._left, this._bottom - this._top]);
-	            width = size[0];
-	        }
-	        this._context.set(node, {
-	            size: [width, this._bottom - this._top],
-	            origin: [0, 0],
-	            align: [0, 0],
-	            translate: [this._left, this._top, (z === undefined) ? this._z : z]
-	        });
-	        this._left += width;
-	        return this;
-	    };
-
-	    /**
-	     * Dock the node to the bottom
-	     *
-	     * @param {LayoutNode|String} [node] layout-node to dock, when ommited the `height` argument argument is used for padding
-	     * @param {Number} [height] height of the layout-node, when ommited the height of the node is used
-	     * @param {Number} [z] z-index to use for the node
-	     * @return {LayoutDockHelper} this
-	     */
-	    LayoutDockHelper.prototype.bottom = function(node, height, z) {
-	        if (height instanceof Array) {
-	            height = height[1];
-	        }
-	        if (height === undefined) {
-	            var size = this._context.resolveSize(node, [this._right - this._left, this._bottom - this._top]);
-	            height = size[1];
-	        }
-	        this._context.set(node, {
-	            size: [this._right - this._left, height],
-	            origin: [0, 1],
-	            align: [0, 1],
-	            translate: [this._left, -(this._size[1] - this._bottom), (z === undefined) ? this._z : z]
-	        });
-	        this._bottom -= height;
-	        return this;
-	    };
-
-	    /**
-	     * Dock the node to the right.
-	     *
-	     * @param {LayoutNode|String} [node] layout-node to dock, when ommited the `width` argument argument is used for padding
-	     * @param {Number} [width] width of the layout-node, when ommited the width of the node is used
-	     * @param {Number} [z] z-index to use for the node
-	     * @return {LayoutDockHelper} this
-	     */
-	    LayoutDockHelper.prototype.right = function(node, width, z) {
-	        if (width instanceof Array) {
-	            width = width[0];
-	        }
-	        if (node) {
-	            if (width === undefined) {
-	                var size = this._context.resolveSize(node, [this._right - this._left, this._bottom - this._top]);
-	                width = size[0];
-	            }
-	            this._context.set(node, {
-	                size: [width, this._bottom - this._top],
-	                origin: [1, 0],
-	                align: [1, 0],
-	                translate: [-(this._size[0] - this._right), this._top, (z === undefined) ? this._z : z]
-	            });
-	        }
-	        if (width) {
-	            this._right -= width;
-	        }
-	        return this;
-	    };
-
-	    /**
-	     * Fills the node to the remaining content.
-	     *
-	     * @param {LayoutNode|String} node layout-node to dock
-	     * @param {Number} [z] z-index to use for the node
-	     * @return {LayoutDockHelper} this
-	     */
-	    LayoutDockHelper.prototype.fill = function(node, z) {
-	        this._context.set(node, {
-	            size: [this._right - this._left, this._bottom - this._top],
-	            translate: [this._left, this._top, (z === undefined) ? this._z : z]
-	        });
-	        return this;
-	    };
-
-	    /**
-	     * Applies indent margins to the remaining content.
-	     *
-	     * @param {Number|Array} margins margins shorthand (e.g. '5', [10, 10], [5, 10, 5, 10])
-	     * @return {LayoutDockHelper} this
-	     */
-	    LayoutDockHelper.prototype.margins = function(margins) {
-	        margins = LayoutUtility.normalizeMargins(margins);
-	        this._left += margins[3];
-	        this._top += margins[0];
-	        this._right -= margins[1];
-	        this._bottom -= margins[2];
-	        return this;
-	    };
-
-	    // Register the helper
-	    LayoutUtility.registerHelper('dock', LayoutDockHelper);
-
-	    module.exports = LayoutDockHelper;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * This Source Code is licensed under the MIT license. If a copy of the
-	 * MIT-license was not distributed with this file, You can obtain one at:
-	 * http://opensource.org/licenses/mit-license.html.
-	 *
-	 * @author: Hein Rutjes (IjzerenHein)
-	 * @license MIT
-	 * @copyright Gloey Apps, 2014
-	 */
-
-	/*global define*/
-
-	/**
-	 * Lays-out renderables from left to right, in a grid with fixed number of
-	 * columns and rows.
-	 *
-	 * |options|type|description|
-	 * |---|---|---|
-	 * |`cells`|Size|Number of cells: [columns, rows]|
-	 * |`[margins]`|Array|Margins applied to the outside (e.g. [10, 20, 10, 20])|
-	 * |`[gutter]`|Size|Gutter-space between renderables. (e.g. [10, 10]|
-	 *
-	 * Example:
-	 *
-	 * ```javascript
-	 * var GridLayout = require('famous-flex/layouts/GridLayout');
-	 *
-	 * new LayoutController({
-	 *   layout: GridLayout,
-	 *   layoutOptions: {
-	 *     cells: [10, 5],            // 10 columns, 5 rows
-	 *     margins: [20, 20, 20, 20], // margins on the outside
-	 *     gutter: [20, 20]           // gutter between cells
-	 *   },
-	 *   dataSource: [
-	 *     new Surface({content: 'item 1'}),
-	 *     new Surface({content: 'item 2'}),
-	 *     new Surface({content: 'item 3'})
-	 *   ]
-	 * })
-	 * ```
-	 * @module
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-
-	    // import dependencies
-	    var Utility = __webpack_require__(55);
-	    var LayoutUtility = __webpack_require__(14);
-
-	    // Define capabilities of this layout function
-	    var capabilities = {
-	        sequence: true,
-	        direction: [Utility.Direction.Y, Utility.Direction.X],
-	        scrolling: false
-	    };
-
-	    // Layout function
-	    function GridLayout(context, options) {
-
-	        // Do one-time stuff
-	        var size = context.size;
-	        var gutter = options.gutter || [0, 0];
-	        var margins = LayoutUtility.normalizeMargins(options.margins);
-	        var nodeSize = [
-	            (size[0] - (((options.cells[0] - 1) * gutter[0]) + margins[1] + margins[3])) / options.cells[0],
-	            (size[1] - (((options.cells[1] - 1) * gutter[1]) + margins[0] + margins[2])) / options.cells[1]
-	        ];
-
-	        // Define size and position of grid-item
-	        function _layoutNode(node, col, row) {
-	            context.set(node, {
-	                size: nodeSize,
-	                translate: [
-	                    ((nodeSize[0] + gutter[0]) * col) + margins[3],
-	                    ((nodeSize[1] + gutter[1]) * row) + margins[0],
-	                    0
-	                ]
-	            });
-	        }
-
-	        // Create rows & columns
-	        var row;
-	        var col;
-	        var node;
-	        if (context.direction === Utility.Direction.Y) {
-	            for (col = 0; col < options.cells[0]; col++) {
-	                for (row = 0; row < options.cells[1]; row++) {
-	                    node = context.next();
-	                    if (!node) {
-	                        return;
-	                    }
-	                    _layoutNode(node, col, row);
-	                }
-	            }
-	        }
-	        else {
-	            for (row = 0; row < options.cells[1]; row++) {
-	                for (col = 0; col < options.cells[0]; col++) {
-	                    node = context.next();
-	                    if (!node) {
-	                        return;
-	                    }
-	                    _layoutNode(node, col, row);
-	                }
-	            }
-	        }
-	    }
-
-	    GridLayout.Capabilities = capabilities;
-	    module.exports = GridLayout;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * This Source Code is licensed under the MIT license. If a copy of the
-	 * MIT-license was not distributed with this file, You can obtain one at:
-	 * http://opensource.org/licenses/mit-license.html.
-	 *
-	 * @author: Hein Rutjes (IjzerenHein)
-	 * @license MIT
-	 * @copyright Gloey Apps, 2014
-	 */
-
-	/*global define*/
-
-	/**
-	 * Navigation-bar layout consisting of optionally left and right items and a
-	 * title in the middle.
-	 *
-	 * When no item-width is specified, the width of the renderable itsself is used.
-	 *
-	 * |options|type|description|
-	 * |---|---|---|
-	 * |`[margins]`|Margins|Margins to use (see Margins)|
-	 * |`[itemWidth]`|Number|Width of the left & right items|
-	 * |`[leftItemWidth]`|Number|Width of the left items|
-	 * |`[rightItemWidth]`|Number|Width of the right items|
-	 * |`[itemSpacer]`|Number|Space in between items|
-	 *
-	 * Example:
-	 *
-	 * ```javascript
-	 * var NavBarLayout = require('famous-flex/layouts/NavBarLayout');
-	 *
-	 * new LayoutController({
-	 *   layout: NavBarLayout,
-	 *   layoutOptions: {
-	 *     margins: [5, 5, 5, 5], // margins to utilize
-	 *     itemSpacer: 10,        // space in between items
-	 *   },
-	 *   dataSource: {
-	 *     background: new Surface({properties: {backgroundColor: 'black'}}),
-	 *     title: new Surface({content: 'My title'}),
-	 *     leftItems:[
-	 *       new Surface({content: 'left1'})
-	 *     ],
-	 *     rightItems: [
-	 *       new Surface({content: 'right1'}),
-	 *       new Surface({content: 'right2'})
-	 *     ]
-	 *   }
-	 * })
-	 * ```
-	 * @module
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-
-	    // import dependencies
-	    var LayoutDockHelper = __webpack_require__(15);
-
-	    // Layout function
-	    module.exports = function NavBarLayout(context, options) {
-	        var dock = new LayoutDockHelper(context, {
-	            margins: options.margins,
-	            translateZ: 1
-	        });
-
-	        // Position background
-	        context.set('background', {size: context.size});
-
-	        // Position right items
-	        var node;
-	        var i;
-	        var rightItems = context.get('rightItems');
-	        if (rightItems) {
-	            for (i = 0; i < rightItems.length; i++) {
-	                // dock node
-	                node = context.get(rightItems[i]);
-	                dock.right(node, options.rightItemWidth || options.itemWidth);
-	                // spacer
-	                dock.right(undefined, options.rightItemSpacer || options.itemSpacer);
-	            }
-	        }
-
-	        // Position left item
-	        var leftItems = context.get('leftItems');
-	        if (leftItems) {
-	            for (i = 0; i < leftItems.length; i++) {
-	                // dock node
-	                node = context.get(leftItems[i]);
-	                dock.left(node, options.leftItemWidth || options.itemWidth);
-	                // spacer
-	                dock.left(undefined, options.leftItemSpacer || options.itemSpacer);
-	            }
-	        }
-
-	        // Position title
-	        dock.fill('title');
-	    };
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * This Source Code is licensed under the MIT license. If a copy of the
-	 * MIT-license was not distributed with this file, You can obtain one at:
-	 * http://opensource.org/licenses/mit-license.html.
-	 *
-	 * @author: Hein Rutjes (IjzerenHein)
-	 * @license MIT
-	 * @copyright Gloey Apps, 2014
-	 */
-
-	/*global define*/
-
-	/**
-	 * Lays out a collection of renderables from top to bottom or left to right.
-	 *
-	 * |options|type|description|
-	 * |---|---|---|
-	 * |`[itemSize]`|Number|Height or width in pixels of the list-item|
-	 *
-	 * Example:
-	 *
-	 * ```javascript
-	 * var ListLayout = require('famous-flex/layouts/ListLayout');
-	 *
-	 * var scrollController = new ScrollController({
-	 *   layout: ListLayout,
-	 *   layoutOptions: {
-	 *     itemSize: 40,         // item has height of 40 pixels
-	 *   },
-	 *   dataSource: [
-	 *     new Surface({content: 'item 1'}),
-	 *     new Surface({content: 'item 2'}),
-	 *     new Surface({content: 'item 3'})
-	 *   ]
-	 * })
-	 * ```
-	 * @module
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-
-	    // import dependencies
-	    var Utility = __webpack_require__(55);
-
-	    // Define capabilities of this layout function
-	    var capabilities = {
-	        sequence: true,
-	        direction: [Utility.Direction.Y, Utility.Direction.X],
-	        scrolling: true,
-	        trueSize: true,
-	        sequentialScrollingOptimized: true
-	    };
-
-	    // Cached data
-	    var set = {
-	        size: [0, 0],
-	        translate: [0, 0, 0]
-	    };
-
-	    // Layout function
-	    function ListLayout(context, options) {
-
-	        // Prepare
-	        var size = context.size;
-	        var direction = context.direction;
-	        var offset = context.scrollOffset;
-	        var node;
-	        var nodeSize;
-	        var itemSize;
-
-	        // Determine item-size or use true=size
-	        if ((options.itemSize === true) || !options.hasOwnProperty('itemSize')) {
-	            itemSize = true;
-	        }
-	        else {
-	            itemSize = (options.itemSize === undefined) ? size[direction] : options.itemSize;
-	        }
-
-	        // prepare set
-	        set.size[0] = size[0];
-	        set.size[1] = size[1];
-	        set.translate[0] = 0;
-	        set.translate[1] = 0;
-	        set.translate[2] = 0;
-
-	        // Process all next nodes
-	        while (offset < context.scrollEnd) {
-	            node = context.next();
-	            if (!node) {
-	                break;
-	            }
-	            nodeSize = (itemSize === true) ? context.resolveSize(node, size)[direction] : itemSize;
-	            set.size[direction] = nodeSize;
-	            set.translate[direction] = offset;
-	            set.scrollLength = nodeSize;
-	            context.set(node, set);
-	            offset += nodeSize;
-	        }
-
-	        // Process previous nodes
-	        offset = context.scrollOffset;
-	        while (offset > context.scrollStart) {
-	            node = context.prev();
-	            if (!node) {
-	                break;
-	            }
-	            nodeSize = (itemSize === true) ? context.resolveSize(node, size)[direction] : itemSize;
-	            offset -= nodeSize;
-	            set.size[direction] = nodeSize;
-	            set.translate[direction] = offset;
-	            set.scrollLength = nodeSize;
-	            context.set(node, set);
-	        }
-	    }
-
-	    ListLayout.Capabilities = capabilities;
-	    module.exports = ListLayout;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * This Source Code is licensed under the MIT license. If a copy of the
-	 * MIT-license was not distributed with this file, You can obtain one at:
-	 * http://opensource.org/licenses/mit-license.html.
-	 *
-	 * @author: Hein Rutjes (IjzerenHein)
-	 * @license MIT
-	 * @copyright Gloey Apps, 2014
-	 */
-
-	/*global define*/
-
-	/**
-	 * Lays a collection of renderables from left to right or top to bottom, and when the right/bottom edge is reached,
-	 * continues at the next column/row.
-	 *
-	 * |options|type|description|
-	 * |---|---|---|
-	 * |`itemSize`|Size/Function|Size of an item to layout or callback function which should return the size, e.g.: `function(renderNode, contextSize)`|
-	 * |`[gutter]`|Size|Gutter-space between renderables|
-	 * |`[justify]`|Bool/Array.Bool|Justify the renderables accross the width/height|
-	 *
-	 * Example:
-	 *
-	 * ```javascript
-	 * var CollectionLayout = require('famous-flex/layouts/CollectionLayout');
-	 *
-	 * new LayoutController({
-	 *   layout: CollectionLayout,
-	 *   layoutOptions: {
-	 *     itemSize: [100, 100],  // item has width and height of 100 pixels
-	 *     gutter: [5, 5],        // gutter of 5 pixels in between cells
-	 *     justify: true          // justify the items neatly across the whole width and height
-	 *   },
-	 *   dataSource: [
-	 *     new Surface({content: 'item 1'}),
-	 *     new Surface({content: 'item 2'}),
-	 *     new Surface({content: 'item 3'})
-	 *   ]
-	 * })
-	 * ```
-	 * @module
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-
-	    // import dependencies
-	    var Utility = __webpack_require__(55);
-
-	    // Define capabilities of this layout function
-	    var capabilities = {
-	        sequence: true,
-	        direction: [Utility.Direction.Y, Utility.Direction.X],
-	        scrolling: true,
-	        trueSize: true,
-	        sequentialScrollingOptimized: true
-	    };
-
-	    // Prepare
-	    var context;
-	    var size;
-	    var direction;
-	    var lineDirection;
-	    var offset;
-	    var gutter;
-	    var justify;
-	    var itemSize;
-	    var getItemSize;
-	    var lineNodes;
-	    var hasNext;
-	    var firstPrev;
-
-	    /**
-	     * Lays out the renderables in a single line. Taking into account
-	     * the following variables:
-	     * - true-size
-	     * - gutter
-	     * - justify
-	     * - center align
-	     */
-	    function _layoutLine(next, endReached) {
-	        if (!lineNodes.length) {
-	            return 0;
-	        }
-
-	        // Determine size of the line
-	        var i;
-	        var lineSize = [0, 0];
-	        var lineNode;
-	        lineSize[lineDirection] = gutter[lineDirection];
-	        for (i = 0; i < lineNodes.length; i++) {
-	            lineSize[direction] = Math.max(lineSize[direction], lineNodes[i].size[direction]);
-	            lineSize[lineDirection] += lineNodes[i].size[lineDirection] + gutter[lineDirection];
-	        }
-
-	        // Layout nodes from left to right or top to bottom
-	        var justifyOffset = justify[lineDirection] ? ((size[lineDirection] - lineSize[lineDirection]) / (lineNodes.length * 2)) : 0;
-	        var lineOffset = gutter[lineDirection] + justifyOffset;
-	        var gutterOffset = (((endReached && next) || (!next && firstPrev && !hasNext))) ? gutter[direction] : 0;
-	        for (i = 0; i < lineNodes.length; i++) {
-	            lineNode = lineNodes[i];
-	            var translate = [0, 0, 0];
-	            translate[lineDirection] = lineOffset;
-	            translate[direction] = next ? (offset + gutter[direction]) : (offset - (lineSize[direction] + gutterOffset));
-	            lineNode.set = {
-	                size: lineNode.size,
-	                translate: translate,
-	                // first renderable has scrollLength, others have 0 scrollLength
-	                scrollLength: (i === 0) ? (lineSize[direction] + gutter[direction] + gutterOffset) : 0
-	            };
-	            lineOffset += lineNode.size[lineDirection] + gutter[lineDirection] + (justifyOffset * 2);
-	        }
-
-	        // Set nodes
-	        for (i = 0; i < lineNodes.length; i++) {
-	            lineNode = next ? lineNodes[i] : lineNodes[(lineNodes.length - 1) - i];
-	            context.set(lineNode.node, lineNode.set);
-	        }
-
-	        // Prepare for next line
-	        lineNodes = [];
-	        hasNext = next;
-	        if (!next) {
-	            firstPrev = false;
-	        }
-	        return lineSize[direction] + gutter[direction] + gutterOffset;
-	    }
-
-	    /**
-	     * Helper function to resolving the size of a node.
-	     */
-	    function _resolveNodeSize(node) {
-	        var localItemSize = itemSize;
-	        if (getItemSize) {
-	            localItemSize = getItemSize(node.renderNode, size);
-	        }
-	        if ((localItemSize[0] === true) || (localItemSize[1] === true)) {
-	            var result = context.resolveSize(node, size);
-	            if (localItemSize[0] !== true) {
-	                result[0] = itemSize[0];
-	            }
-	            if (localItemSize[1] !== true) {
-	                result[1] = itemSize[1];
-	            }
-	            return result;
-	        }
-	        else {
-	            return localItemSize;
-	        }
-	    }
-
-	    /**
-	     * Collection-layout
-	     */
-	    function CollectionLayout(context_, options) {
-
-	        // Prepare
-	        context = context_;
-	        size = context.size;
-	        direction = context.direction;
-	        lineDirection = (direction + 1) % 2;
-	        offset = context.scrollOffset;
-	        gutter = options.gutter || [0, 0];
-	        justify = Array.isArray(options.justify) ? options.justify : (options.justify ? [true, true] : [false, false]);
-	        lineNodes = [];
-	        hasNext = false;
-	        firstPrev = true;
-	        var node;
-	        var nodeSize;
-	        var lineLength;
-
-	        // Prepare item-size
-	        if (!options.itemSize) {
-	            itemSize = [true, true]; // when no item-size specified, use size from renderables
-	        } else if (options.itemSize instanceof Function) {
-	            getItemSize = options.itemSize;
-	        } else if ((options.itemSize[0] === undefined) || (options.itemSize[0] === undefined)){
-	            // resolve 'undefined' into a fixed size
-	            itemSize = [
-	                (options.itemSize[0] === undefined) ? size[0] : options.itemSize[0],
-	                (options.itemSize[1] === undefined) ? size[1] : options.itemSize[1]
-	            ];
-	        }
-	        else {
-	            itemSize = options.itemSize;
-	        }
-
-	        //
-	        // Process all next nodes
-	        //
-	        lineLength = gutter[lineDirection];
-	        while (offset < context.scrollEnd) {
-	            node = context.next();
-	            if (!node) {
-	                _layoutLine(true, true);
-	                break;
-	            }
-	            nodeSize = _resolveNodeSize(node);
-	            lineLength += nodeSize[lineDirection] + gutter[lineDirection];
-	            if (lineLength > size[lineDirection]) {
-	                offset += _layoutLine(true, !node);
-	                lineLength = gutter[lineDirection] + nodeSize[lineDirection] + gutter[lineDirection];
-	            }
-	            lineNodes.push({node: node, size: nodeSize});
-	        }
-	        lineNodes = [];
-
-	        //
-	        // Process previous nodes
-	        //
-	        offset = context.scrollOffset;
-	        lineLength = gutter[lineDirection];
-	        while (offset > context.scrollStart) {
-	            node = context.prev();
-	            if (!node) {
-	                _layoutLine(false, true);
-	                break;
-	            }
-	            nodeSize = _resolveNodeSize(node);
-	            lineLength += nodeSize[lineDirection] + gutter[lineDirection];
-	            if (lineLength > size[lineDirection]) {
-	                offset -= _layoutLine(false, !node);
-	                lineLength = gutter[lineDirection] + nodeSize[lineDirection] + gutter[lineDirection];
-	            }
-	            lineNodes.unshift({node: node, size: nodeSize});
-	        }
-	    }
-
-	    CollectionLayout.Capabilities = capabilities;
-	    module.exports = CollectionLayout;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * This Source Code is licensed under the MIT license. If a copy of the
-	 * MIT-license was not distributed with this file, You can obtain one at:
-	 * http://opensource.org/licenses/mit-license.html.
-	 *
-	 * @author: Hein Rutjes (IjzerenHein)
-	 * @license MIT
-	 * @copyright Gloey Apps, 2014
-	 */
-
-	/*global define*/
-
-	/**
-	 * Lays a collection of renderables from left to right, and when the right edge is reached,
-	 * continues at the left of the next line.
-	 *
-	 * |options|type|description|
-	 * |---|---|---|
-	 * |`itemSize`|Size|Size of an item to layout|
-	 * |`[gutter]`|Size|Gutter-space between renderables|
-	 *
-	 * Example:
-	 *
-	 * ```javascript
-	 * var CoverLayout = require('famous-flex/layouts/CoverLayout');
-	 *
-	 * new LayoutController({
-	 *   layout: CoverLayout,
-	 *   layoutOptions: {
-	 *     itemSize: [100, 100],  // item has width and height of 100 pixels
-	 *     gutter: [5, 5],        // gutter of 5 pixels in between cells
-	 *     justify: true          // justify the items neatly across the whole width and height
-	 *   },
-	 *   dataSource: [
-	 *     new Surface({content: 'item 1'}),
-	 *     new Surface({content: 'item 2'}),
-	 *     new Surface({content: 'item 3'})
-	 *   ]
-	 * })
-	 * ```
-	 * @module
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-
-	    // import dependencies
-	    var Utility = __webpack_require__(55);
-
-	    // Define capabilities of this layout function
-	    var capabilities = {
-	        sequence: true,
-	        direction: [Utility.Direction.X, Utility.Direction.Y],
-	        scrolling: true
-	    };
-
-	    function CoverLayout(context, options) {
-
-	        // Get first renderable
-	        var node = context.next();
-	        if (!node) {
-	            return;
-	        }
-
-	        // Prepare
-	        var size = context.size;
-	        var direction = context.direction;
-	        var itemSize = options.itemSize;
-	        var opacityStep = 0.2;
-	        var scaleStep = 0.1;
-	        var translateStep = 30;
-	        var zStart = 100;
-
-	        // Layout the first renderable in the center
-	        context.set(node, {
-	            size: itemSize,
-	            origin: [0.5, 0.5],
-	            align: [0.5, 0.5],
-	            translate: [0, 0, zStart],
-	            scrollLength: itemSize[direction]
-	        });
-
-	        // Layout renderables
-	        var translate = itemSize[0] / 2;
-	        var opacity = 1 - opacityStep;
-	        var zIndex = zStart - 1;
-	        var scale = 1 - scaleStep;
-	        var prev = false;
-	        var endReached = false;
-	        node = context.next();
-	        if (!node) {
-	            node = context.prev();
-	            prev = true;
-	        }
-	        while (node) {
-
-	            // Layout next node
-	            context.set(node, {
-	                size: itemSize,
-	                origin: [0.5, 0.5],
-	                align: [0.5, 0.5],
-	                translate: direction ? [0, prev ? -translate : translate, zIndex] : [prev ? -translate : translate, 0, zIndex],
-	                scale: [scale, scale, 1],
-	                opacity: opacity,
-	                scrollLength: itemSize[direction]
-	            });
-	            opacity -= opacityStep;
-	            scale -= scaleStep;
-	            translate += translateStep;
-	            zIndex--;
-
-	            // Check if the end is reached
-	            if (translate >= (size[direction]/2)) {
-	                endReached = true;
-	            }
-	            else {
-	                node = prev ? context.prev() : context.next();
-	                endReached = !node;
-	            }
-
-	            // When end is reached for next, start processing prev
-	            if (endReached) {
-	                if (prev) {
-	                    break;
-	                }
-	                endReached = false;
-	                prev = true;
-	                node = context.prev();
-	                if (node) {
-	                    translate = (itemSize[direction] / 2);
-	                    opacity = 1 - opacityStep;
-	                    zIndex = zStart - 1;
-	                    scale = 1 - scaleStep;
-	                }
-	            }
-	        }
-	    }
-
-	    CoverLayout.Capabilities = capabilities;
-	    module.exports = CoverLayout;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
 	 * @preserve FastClick: polyfill to remove click delays on browsers with touch UIs.
 	 *
 	 * @version 1.0.3
@@ -4537,6 +2489,2787 @@
 
 
 /***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * This Source Code is licensed under the MIT license. If a copy of the
+	 * MIT-license was not distributed with this file, You can obtain one at:
+	 * http://opensource.org/licenses/mit-license.html.
+	 *
+	 * @author: Hein Rutjes (IjzerenHein)
+	 * @license MIT
+	 * @copyright Gloey Apps, 2014
+	 */
+
+	/*global define*/
+	/*eslint no-use-before-define:0 */
+
+	/**
+	 * LayoutController lays out renderables according to a layout-
+	 * function and a data-source.
+	 *
+	 * @module
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
+
+	    // import dependencies
+	    var Utility = __webpack_require__(55);
+	    var Entity = __webpack_require__(53);
+	    var ViewSequence = __webpack_require__(54);
+	    var OptionsManager = __webpack_require__(35);
+	    var EventHandler = __webpack_require__(36);
+	    var LayoutUtility = __webpack_require__(15);
+	    var LayoutNodeManager = __webpack_require__(37);
+	    var LayoutNode = __webpack_require__(38);
+	    var FlowLayoutNode = __webpack_require__(39);
+	    var Transform = __webpack_require__(27);
+	    __webpack_require__(16);
+
+	    /**
+	     * @class
+	     * @param {Object} options Options.
+	     * @param {Function|Object} [options.layout] Layout function or layout-literal.
+	     * @param {Object} [options.layoutOptions] Options to pass in to the layout-function.
+	     * @param {Array|ViewSequence|Object} [options.dataSource] Array, ViewSequence or Object with key/value pairs.
+	     * @param {Utility.Direction} [options.direction] Direction to layout into (e.g. Utility.Direction.Y) (when ommited the default direction of the layout is used)
+	     * @param {Bool} [options.flow] Enables flow animations when the layout changes (default: `false`).
+	     * @param {Spec} [options.insertSpec] Size, transform, opacity... to use when inserting new renderables into the scene (default: `{}`).
+	     * @param {Spec} [options.removeSpec] Size, transform, opacity... to use when removing renderables from the scene (default: `{}`).
+	     * @param {Bool} [options.alwaysLayout] When set to true, always calls the layout function on every render-cycle (default: `false`).
+	     * @param {Bool} [options.autoPipeEvents] When set to true, automatically calls .pipe on all renderables when inserted (default: `false`).
+	     * @alias module:LayoutController
+	     */
+	    function LayoutController(options, nodeManager) {
+
+	        // Commit
+	        this.id = Entity.register(this);
+	        this._isDirty = true;
+	        this._contextSizeCache = [0, 0];
+	        this._commitOutput = {};
+
+	        // Setup input event handler
+	        this._eventInput = new EventHandler();
+	        EventHandler.setInputHandler(this, this._eventInput);
+
+	        // Setup event handlers
+	        this._eventOutput = new EventHandler();
+	        EventHandler.setOutputHandler(this, this._eventOutput);
+
+	        // Data-source
+	        //this._dataSource = undefined;
+	        //this._nodesById = undefined;
+	        //this._viewSequence = undefined;
+
+	        // Layout
+	        this._layout = {
+	            //function: undefined,
+	            //literal: undefined,
+	            //capabilities: undefined,
+	            options: Object.create({})
+	        };
+	        //this._direction = undefined;
+	        this._layout.optionsManager = new OptionsManager(this._layout.options);
+	        this._layout.optionsManager.on('change', function() {
+	            this._isDirty = true;
+	        }.bind(this));
+
+	        // Create options
+	        this.options = Object.create(LayoutController.DEFAULT_OPTIONS);
+	        this._optionsManager = new OptionsManager(this.options);
+
+	        // Create node manager that manages (Flow)LayoutNode instances
+	        if (nodeManager) {
+	            this._nodes = nodeManager;
+	        } else if (options && options.flow) {
+	            this._nodes = new LayoutNodeManager(FlowLayoutNode, _initFlowLayoutNode.bind(this));
+	        }
+	        else {
+	            this._nodes = new LayoutNodeManager(LayoutNode);
+	        }
+
+	        // Set options
+	        this.setDirection(undefined);
+	        if (options) {
+	            this.setOptions(options);
+	        }
+	    }
+
+	    LayoutController.DEFAULT_OPTIONS = {
+	        nodeSpring: {
+	            dampingRatio: 0.8,
+	            period: 300
+	        },
+	        alwaysLayout: false    // set to true to always call the layout function
+	        /*insertSpec: {
+	            opacity: undefined,
+	            size: undefined,
+	            transform: undefined,
+	            origin: undefined,
+	            align: undefined
+	        },
+	        removeSpec: {
+	            opacity: undefined,
+	            size: undefined,
+	            transform: undefined,
+	            origin: undefined,
+	            align: undefined
+	        }*/
+	    };
+
+	    /**
+	     * Called whenever a layout-node is created/re-used. Initializes
+	     * the node with the `insertSpec` if it has been defined.
+	     */
+	    function _initFlowLayoutNode(node, spec) {
+	        if (!spec && this.options.insertSpec) {
+	            node.setSpec(this.options.insertSpec);
+	        }
+	    }
+
+	    /**
+	     * Patches the LayoutController instance's options with the passed-in ones.
+	     *
+	     * @param {Options} options An object of configurable options for the LayoutController instance.
+	     * @param {Function|Object} [options.layout] Layout function or layout-literal.
+	     * @param {Object} [options.layoutOptions] Options to pass in to the layout-function.
+	     * @param {Array|ViewSequence|Object} [options.dataSource] Array, ViewSequence or Object with key/value pairs.
+	     * @param {Utility.Direction} [options.direction] Direction to layout into (e.g. Utility.Direction.Y) (when ommited the default direction of the layout is used)
+	     * @param {Spec} [options.insertSpec] Size, transform, opacity... to use when inserting new renderables into the scene (default: `{}`).
+	     * @param {Spec} [options.removeSpec] Size, transform, opacity... to use when removing renderables from the scene (default: `{}`).
+	     * @param {Bool} [options.alwaysLayout] When set to true, always calls the layout function on every render-cycle (default: `false`).
+	     * @param {Bool} [options.autoPipeEvents] When set to true, automatically calls .pipe on all renderables when inserted (default: `false`).
+	     * @return {LayoutController} this
+	     */
+	    LayoutController.prototype.setOptions = function setOptions(options) {
+	        this._optionsManager.setOptions(options);
+	        if (options.dataSource) {
+	            this.setDataSource(options.dataSource);
+	        }
+	        if (options.layout || options.layoutOptions) {
+	            this.setLayout(options.layout, options.layoutOptions);
+	        }
+	        if (options.direction !== undefined) {
+	            this.setDirection(options.direction);
+	        }
+	        if (options.nodeSpring && this.options.flow) {
+	            this._nodes.setNodeOptions({
+	                spring: options.nodeSpring
+	            });
+	        }
+	        return this;
+	    };
+
+	    /**
+	     * Helper function to enumerate all the renderables in the datasource
+	     */
+	    function _forEachRenderable(callback) {
+	        var dataSource = this._dataSource;
+	        if (dataSource instanceof Array) {
+	            for (var i = 0, j = dataSource.length; i < j; i++) {
+	                callback(dataSource[i]);
+	            }
+	        } else if (dataSource instanceof ViewSequence) {
+	            var renderable;
+	            while (dataSource) {
+	                renderable = dataSource.get();
+	                if (!renderable) {
+	                    break;
+	                }
+	                callback(renderable);
+	                dataSource = dataSource.getNext();
+	            }
+	        }
+	        else {
+	            for (var key in dataSource) {
+	                callback(dataSource[key]);
+	            }
+	        }
+	    }
+
+	    /**
+	     * Sets the collection of renderables which are layed out according to
+	     * the layout-function.
+	     *
+	     * The data-source can be either an Array, ViewSequence or Object
+	     * with key/value pairs.
+	     *
+	     * @param {Array|Object|ViewSequence} dataSource Array, ViewSequence or Object.
+	     * @return {LayoutController} this
+	     */
+	    LayoutController.prototype.setDataSource = function(dataSource) {
+	        this._dataSource = dataSource;
+	        this._nodesById = undefined;
+	        if (dataSource instanceof Array) {
+	            this._viewSequence = new ViewSequence(dataSource);
+	        } else if (dataSource instanceof ViewSequence) {
+	            this._viewSequence = dataSource;
+	        } else if (dataSource instanceof Object){
+	            this._nodesById = dataSource;
+	        }
+	        if (this.options.autoPipeEvents) {
+	            _forEachRenderable.call(this, function(renderable) {
+	                renderable.pipe(this);
+	            }.bind(this));
+	        }
+	        this._isDirty = true;
+	        return this;
+	    };
+
+	    /**
+	     * Get the data-source.
+	     *
+	     * @return {Array|ViewSequence|Object} data-source
+	     */
+	    LayoutController.prototype.getDataSource = function() {
+	        return this._dataSource;
+	    };
+
+	    /**
+	     * Set the new layout.
+	     *
+	     * @param {Function|Object} layout Layout function or layout-literal
+	     * @param {Object} [options] Options to pass in to the layout-function
+	     * @return {LayoutController} this
+	     */
+	    LayoutController.prototype.setLayout = function(layout, options) {
+
+	        // Set new layout funtion
+	        if (layout instanceof Function) {
+	            this._layout.function = layout;
+	            this._layout.capabilities = layout.Capabilities;
+	            this._layout.literal = undefined;
+
+	        // If the layout is an object, treat it as a layout-literal
+	        } else if (layout instanceof Object) {
+	            this._layout.literal = layout;
+	            this._layout.capabilities = undefined; // todo - derive from literal somehow?
+	            var helperName = Object.keys(layout)[0];
+	            var Helper = LayoutUtility.getRegisteredHelper(helperName);
+	            this._layout.function = Helper ? function(context, options) {
+	                var helper = new Helper(context, options);
+	                helper.parse(layout[helperName]);
+	            } : undefined;
+	        }
+	        else {
+	            this._layout.function = undefined;
+	            this._layout.capabilities = undefined;
+	            this._layout.literal = undefined;
+	        }
+
+	        // Update options
+	        if (options) {
+	            this.setLayoutOptions(options);
+	        }
+
+	        // Update direction
+	        this.setDirection(this._configuredDirection);
+	        this._isDirty = true;
+	        return this;
+	    };
+
+	    /**
+	     * Get the current layout.
+	     *
+	     * @return {Function|Object} Layout function or layout literal
+	     */
+	    LayoutController.prototype.getLayout = function() {
+	        return this._layout.literal || this._layout.function;
+	    };
+
+	    /**
+	     * Set the options for the current layout. Use this function after
+	     * `setLayout` to update one or more options for the layout-function.
+	     *
+	     * @param {Object} [options] Options to pass in to the layout-function
+	     * @return {LayoutController} this
+	     */
+	    LayoutController.prototype.setLayoutOptions = function(options) {
+	        this._layout.optionsManager.setOptions(options);
+	        return this;
+	    };
+
+	    /**
+	     * Get the current layout options.
+	     *
+	     * @return {Object} Layout options
+	     */
+	    LayoutController.prototype.getLayoutOptions = function() {
+	        return this._layout.options;
+	    };
+
+	    /**
+	     * Calculates the actual in-use direction based on the given direction
+	     * and supported capabilities of the layout-function.
+	     */
+	    function _getActualDirection(direction) {
+
+	        // When the direction is configured in the capabilities, look it up there
+	        if (this._layout.capabilities && this._layout.capabilities.direction) {
+
+	            // Multiple directions are supported
+	            if (Array.isArray(this._layout.capabilities.direction)) {
+	                for (var i = 0; i < this._layout.capabilities.direction.length; i++) {
+	                    if (this._layout.capabilities.direction[i] === direction) {
+	                        return direction;
+	                    }
+	                }
+	                return this._layout.capabilities.direction[0];
+	            }
+
+	            // Only one direction is supported, we must use that
+	            else {
+	                return this._layout.capabilities.direction;
+	            }
+	        }
+
+	        // Use Y-direction as a fallback
+	        return (direction === undefined) ? Utility.Direction.Y : direction;
+	    }
+
+	    /**
+	     * Set the direction of the layout. When no direction is set, the default
+	     * direction of the layout function is used.
+	     *
+	     * @param {Utility.Direction} direction Direction (e.g. Utility.Direction.X)
+	     * @return {LayoutController} this
+	     */
+	    LayoutController.prototype.setDirection = function(direction) {
+	        this._configuredDirection = direction;
+	        var newDirection = _getActualDirection.call(this, direction);
+	        if (newDirection !== this._direction) {
+	            this._direction = newDirection;
+	            this._isDirty = true;
+	        }
+	    };
+
+	    /**
+	     * Get the direction (e.g. Utility.Direction.Y). By default, this function
+	     * returns the direction that was configured by setting `setDirection`. When
+	     * the direction has not been set, `undefined` is returned.
+	     *
+	     * When no direction has been set, the first direction is used that is specified
+	     * in the capabilities of the layout-function. To obtain the actual in-use direction,
+	     * use `getDirection(true)`. This method returns the actual in-use direction and
+	     * never returns undefined.
+	     *
+	     * @param {Boolean} [actual] Set to true to obtain the actual in-use direction
+	     * @return {Utility.Direction} Direction or undefined
+	     */
+	    LayoutController.prototype.getDirection = function(actual) {
+	        return actual ? this._direction : this._configuredDirection;
+	    };
+
+	    /**
+	     * Get the spec (size, transform, etc..) for the given renderable or
+	     * Id.
+	     *
+	     * @param {Renderable|String} node Renderabe or Id to look for
+	     * @return {Spec} spec or undefined
+	     */
+	    LayoutController.prototype.getSpec = function(node) {
+	        if (!node) {
+	            return undefined;
+	        }
+	        if ((node instanceof String) || (typeof node === 'string')) {
+	            if (!this._nodesById) {
+	               return undefined;
+	            }
+	            node = this._nodesById[node];
+	            if (!node) {
+	                return undefined;
+	            }
+
+	            // If the result was an array, return that instead
+	            if (node instanceof Array) {
+	                return node;
+	            }
+	        }
+	        for (var i = 0; i < this._commitOutput.target.length; i++) {
+	            var spec = this._commitOutput.target[i];
+	            if (spec.renderNode === node) {
+	                return spec;
+	            }
+	        }
+	        return undefined;
+	    };
+
+	    /**
+	     * Forces a reflow of the layout the next render cycle.
+	     *
+	     * @return {LayoutController} this
+	     */
+	    LayoutController.prototype.reflowLayout = function() {
+	        this._isDirty = true;
+	        return this;
+	    };
+
+	    /**
+	     * Inserts a renderable into the data-source.
+	     *
+	     * The optional argument `insertSpec` is only used `flow` mode is enabled.
+	     * When specified, the renderable is inserted using an animation starting with
+	     * size, origin, opacity, transform, etc... as specified in `insertSpec'.
+	     *
+	     * @param {Number|String} indexOrId Index (0 = before first, -1 at end), within dataSource array or id (String)
+	     * @param {Object} renderable Renderable to add to the data-source
+	     * @param {Spec} [insertSpec] Size, transform, etc.. to start with when inserting
+	     * @return {LayoutController} this
+	     */
+	    LayoutController.prototype.insert = function(indexOrId, renderable, insertSpec) {
+
+	        // Add the renderable in case of an id (String)
+	        if ((indexOrId instanceof String) || (typeof indexOrId === 'string')) {
+
+	            // Create data-source if neccesary
+	            if (this._dataSource === undefined) {
+	                this._dataSource = {};
+	                this._nodesById = this._dataSource;
+	            }
+
+	            // Insert renderable
+	            this._nodesById[indexOrId] = renderable;
+	        }
+
+	        // Add the renderable using an index
+	        else {
+
+	            // Create data-source if neccesary
+	            if (this._dataSource === undefined) {
+	                this._dataSource = [];
+	                this._viewSequence = new ViewSequence(this._dataSource);
+	            }
+
+	            // Insert into array
+	            var dataSource = this._viewSequence || this._dataSource;
+	            if (indexOrId === -1) {
+	                dataSource.push(renderable);
+	            }
+	            else if (indexOrId === 0) {
+	                dataSource.splice(0, 0, renderable);
+	            }
+	            else {
+	                dataSource.splice(indexOrId, 0, renderable);
+	            }
+	        }
+
+	        // When a custom insert-spec was specified, store that in the layout-node
+	        if (insertSpec) {
+	            this._nodes.insertNode(this._nodes.createNode(renderable, insertSpec));
+	        }
+
+	        // Auto pipe events
+	        if (this.options.autoPipeEvents) {
+	            renderable.pipe(this);
+	        }
+
+	        // Force a reflow
+	        this._isDirty = true;
+
+	        return this;
+	    };
+
+	    /**
+	     * Adds a renderable to the end of a sequential data-source.
+	     *
+	     * The optional argument `insertSpec` is only used `flow` mode is enabled.
+	     * When specified, the renderable is inserted using an animation starting with
+	     * size, origin, opacity, transform, etc... as specified in `insertSpec'.
+	     *
+	     * @param {Object} renderable Renderable to add to the data-source
+	     * @param {Spec} [insertSpec] Size, transform, etc.. to start with when inserting
+	     * @return {LayoutController} this
+	     */
+	    LayoutController.prototype.push = function(renderable, insertSpec) {
+	        return this.insert(-1, renderable, insertSpec);
+	    };
+
+	    /**
+	     * Removes a renderable from the data-source.
+	     *
+	     * The optional argument `removeSpec` is only used `flow` mode is enabled.
+	     * When specified, the renderable is removed using an animation ending at
+	     * the size, origin, opacity, transform, etc... as specified in `removeSpec'.
+	     *
+	     * @param {Number|String} indexOrId Index within dataSource array or id (String)
+	     * @param {Spec} [removeSpec] Size, transform, etc.. to end with when removing
+	     * @return {LayoutController} this
+	     */
+	    LayoutController.prototype.remove = function(indexOrId, removeSpec) {
+
+	        // Remove the renderable in case of an id (String)
+	        var renderNode;
+	        if (this._nodesById || (indexOrId instanceof String) || (typeof indexOrId === 'string')) {
+
+	            // Find and remove renderable from data-source
+	            renderNode = this._nodesById[indexOrId];
+	            if (renderNode) {
+	                delete this._nodesById[indexOrId];
+	            }
+	        }
+
+	        // Remove the renderable using an index
+	        else {
+
+	            // Remove from array
+	            renderNode = this._dataSource.splice(indexOrId, 1)[0];
+	        }
+
+	        // When a custom remove-spec was specified, store that in the layout-node
+	        if (renderNode && removeSpec) {
+	            var node = this._nodes.getNodeByRenderNode(renderNode);
+	            if (node) {
+	                node.remove(removeSpec || this.options.removeSpec);
+	            }
+	        }
+
+	        // Force a reflow
+	        if (renderNode) {
+	            this._isDirty = true;
+	        }
+
+	        return this;
+	    };
+
+	    /**
+	     * Removes all renderables from the data-source.
+	     *
+	     * @return {LayoutController} this
+	     */
+	    LayoutController.prototype.removeAll = function() {
+	        if (this._nodesById) {
+	            var dirty = false;
+	            for (var key in this._nodesById) {
+	                delete this._nodesById[key];
+	                dirty = true;
+	            }
+	            if (dirty) {
+	                this._isDirty = true;
+	            }
+	        } else if (this._dataSource){
+	          this.setDataSource([]);
+	        }
+	        return this;
+	    };
+
+	    /**
+	     * Return size of contained element or `undefined` when size is not defined.
+	     *
+	     * @return {Array.Number} [width, height]
+	     */
+	    LayoutController.prototype.getSize = function() {
+	        return this.options.size;
+	    };
+
+	    /**
+	     * Generate a render spec from the contents of this component.
+	     *
+	     * @private
+	     * @method render
+	     * @return {Object} Render spec for this component
+	     */
+	    LayoutController.prototype.render = function render() {
+	        return this.id;
+	    };
+
+	    /**
+	     * Apply changes from this component to the corresponding document element.
+	     * This includes changes to classes, styles, size, content, opacity, origin,
+	     * and matrix transforms.
+	     *
+	     * @private
+	     * @method commit
+	     * @param {Context} context commit context
+	     */
+	    LayoutController.prototype.commit = function commit(context) {
+	        var transform = context.transform;
+	        var origin = context.origin;
+	        var size = context.size;
+	        var opacity = context.opacity;
+
+	        // When the size or layout function has changed, reflow the layout
+	        if (size[0] !== this._contextSizeCache[0] ||
+	            size[1] !== this._contextSizeCache[1] ||
+	            this._isDirty ||
+	            this._nodes._trueSizeRequested ||
+	            this.options.alwaysLayout){
+
+	            // Emit start event
+	            var eventData = {
+	                target: this,
+	                oldSize: this._contextSizeCache,
+	                size: size,
+	                dirty: this._isDirty,
+	                trueSizeRequested: this._nodes._trueSizeRequested
+	            };
+	            this._eventOutput.emit('layoutstart', eventData);
+
+	            // Update state
+	            this._contextSizeCache[0] = size[0];
+	            this._contextSizeCache[1] = size[1];
+	            this._isDirty = false;
+
+	            // Prepare for layout
+	            var layoutContext = this._nodes.prepareForLayout(
+	                this._viewSequence,     // first node to layout
+	                this._nodesById, {      // so we can do fast id lookups
+	                    size: size,
+	                    direction: this._direction
+	                }
+	            );
+
+	            // Layout objects
+	            if (this._layout.function) {
+	                this._layout.function(
+	                    layoutContext,          // context which the layout-function can use
+	                    this._layout.options    // additional layout-options
+	                );
+	            }
+
+	            // Update output and optionally emit event
+	            var result = this._nodes.buildSpecAndDestroyUnrenderedNodes();
+	            this._commitOutput.target = result.specs;
+	            this._eventOutput.emit('reflow', {
+	                target: this
+	            });
+
+	            // Emit end event
+	            this._eventOutput.emit('layoutend', eventData);
+	        }
+	        else if (this.options.flow) {
+
+	            // Update output and optionally emit event
+	            result = this._nodes.buildSpecAndDestroyUnrenderedNodes();
+	            this._commitOutput.target = result.specs;
+	            if (result.modified) {
+	                this._eventOutput.emit('reflow', {
+	                    target: this
+	                });
+	            }
+	        }
+
+	        // Render child-nodes every commit
+	        var target = this._commitOutput.target;
+	        for (var i = 0, j = target.length; i < j; i++) {
+	            target[i].target = target[i].renderNode.render();
+	        }
+
+	        // Translate dependent on origin
+	        if (origin && ((origin[0] !== 0) || (origin[1] !== 0))) {
+	            transform = Transform.moveThen([-size[0]*origin[0], -size[1]*origin[1], 0], transform);
+	        }
+	        this._commitOutput.size = size;
+	        this._commitOutput.opacity = opacity;
+	        this._commitOutput.transform = transform;
+	        return this._commitOutput;
+	    };
+
+	    module.exports = LayoutController;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * This Source Code is licensed under the MIT license. If a copy of the
+	 * MIT-license was not distributed with this file, You can obtain one at:
+	 * http://opensource.org/licenses/mit-license.html.
+	 *
+	 * @author: Hein Rutjes (IjzerenHein)
+	 * @license MIT
+	 * @copyright Gloey Apps, 2014
+	 */
+
+	/*global define, console*/
+	/*eslint no-use-before-define:0, no-console:0 */
+
+	/**
+	 * Flexible FlexScrollView for famo.us.
+	 *
+	 * Key features:
+	 * -    Customizable layout (uses ListLayout by default)
+	 * -    Insert/remove at any position using animations
+	 * -    Support for `true` size renderables
+	 * -    Pull to refresh (header & footer)
+	 * -    Horizontal/vertical direction
+	 * -    Top/left or bottom/right alignment
+	 * -    Pagination
+	 * -    Option to embed in a ContainerSurface
+	 * -    FlexScrollView linking
+	 *
+	 * Inherited from: [ScrollController](./ScrollController.md)
+	 * @module
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
+
+	    // import dependencies
+	    var LayoutUtility = __webpack_require__(15);
+	    var ScrollController = __webpack_require__(40);
+	    var ListLayout = __webpack_require__(19);
+
+	    //
+	    // Pull to refresh states
+	    //
+	    var PullToRefreshState = {
+	        HIDDEN: 0,
+	        PULLING: 1,
+	        ACTIVE: 2,
+	        COMPLETED: 3,
+	        HIDDING: 4
+	    };
+
+	    /**
+	     * @class
+	     * @extends ScrollController
+	     * @param {Object} options Configurable options (see ScrollController for all inherited options).
+	     * @param {Renderable} [options.pullToRefreshHeader] Pull to refresh renderable that is displayed when pulling down from the top.
+	     * @param {Renderable} [options.pullToRefreshFooter] Pull to refresh renderable that is displayed when pulling up from the bottom.
+	     * @param {FlexScrollView} [options.leadingScrollView] Leading scrollview into which input events are piped (see Tutorial)
+	     * @param {FlexScrollView} [options.trailingScrollView] Trailing scrollview into which input events are piped (see Tutorial)
+	     * @alias module:FlexScrollView
+	     */
+	    function FlexScrollView(options) {
+	        ScrollController.call(this, LayoutUtility.combineOptions(FlexScrollView.DEFAULT_OPTIONS, options));
+	        this._thisScrollViewDelta = 0;
+	        this._leadingScrollViewDelta = 0;
+	        this._trailingScrollViewDelta = 0;
+	    }
+	    FlexScrollView.prototype = Object.create(ScrollController.prototype);
+	    FlexScrollView.prototype.constructor = FlexScrollView;
+	    FlexScrollView.PullToRefrehState = PullToRefreshState;
+
+	    FlexScrollView.DEFAULT_OPTIONS = {
+	        layout: ListLayout,         // sequential layout, uses width/height from renderable
+	        direction: undefined,       // 0 = X, 1 = Y, undefined = use default from layout
+	        paginated: false,           // pagination on/off
+	        alignment: 0,               // 0 = top/left, 1 = bottom/right
+	        flow: false,                // allow renderables to flow between layouts when not scrolling
+	        mouseMove: false,           // allow mouse to hold and move the view
+	        useContainer: false,        // embeds inside a ContainerSurface for clipping and capturing input events
+	        visibleItemThresshold: 0.5, // by default, when an item is 50% visible, it is considered visible by `getFirstVisibleItem`
+	        pullToRefreshHeader: undefined, // assign pull-to-refresh renderable here (renderable must have a size)
+	        pullToRefreshFooter: undefined, // assign pull-to-refresh renderable here (renderable must have a size)
+	        leadingScrollView: undefined,
+	        trailingScrollView: undefined
+	        // see ScrollController for all other options
+	    };
+
+	    /**
+	     * Patches the FlexScrollView instance's options with the passed-in ones.
+	     *
+	     * @param {Object} options Configurable options (see ScrollController for all inherited options).
+	     * @param {Renderable} [options.pullToRefreshHeader] Pull to refresh renderable that is displayed when pulling down from the top.
+	     * @param {Renderable} [options.pullToRefreshFooter] Pull to refresh renderable that is displayed when pulling up from the bottom.
+	     * @param {FlexScrollView} [options.leadingScrollView] Leading scrollview into which input events are piped (see Tutorial).
+	     * @param {FlexScrollView} [options.trailingScrollView] Trailing scrollview into which input events are piped (see Tutorial).
+	     * @return {FlexScrollView} this
+	     */
+	    FlexScrollView.prototype.setOptions = function(options) {
+	        ScrollController.prototype.setOptions.call(this, options);
+
+	        // Update pull to refresh renderables
+	        if (options.pullToRefreshHeader || options.pullToRefreshFooter || this._pullToRefresh) {
+	            if (options.pullToRefreshHeader) {
+	                this._pullToRefresh = this._pullToRefresh || [undefined, undefined];
+	                if (!this._pullToRefresh[0]) {
+	                    this._pullToRefresh[0] = {
+	                        state: PullToRefreshState.HIDDEN,
+	                        prevState: PullToRefreshState.HIDDEN,
+	                        footer: false
+	                    };
+	                }
+	                this._pullToRefresh[0].node = options.pullToRefreshHeader;
+	            }
+	            else if (!this.options.pullToRefreshHeader && this._pullToRefresh) {
+	                this._pullToRefresh[0] = undefined;
+	            }
+	            if (options.pullToRefreshFooter) {
+	                this._pullToRefresh = this._pullToRefresh || [undefined, undefined];
+	                if (!this._pullToRefresh[1]) {
+	                    this._pullToRefresh[1] = {
+	                        state: PullToRefreshState.HIDDEN,
+	                        prevState: PullToRefreshState.HIDDEN,
+	                        footer: true
+	                    };
+	                }
+	                this._pullToRefresh[1].node = options.pullToRefreshFooter;
+	            }
+	            else if (!this.options.pullToRefreshFooter && this._pullToRefresh) {
+	                this._pullToRefresh[1] = undefined;
+	            }
+	            if (this._pullToRefresh && !this._pullToRefresh[0] && !this._pullToRefresh[1]) {
+	                this._pullToRefresh = undefined;
+	            }
+	        }
+	        return this;
+	    };
+
+	    /**
+	     * Sets the data-source (alias for setDataSource).
+	     *
+	     * This function is a shim provided for compatibility with the stock famo.us Scrollview.
+	     *
+	     * @param {Array|ViewSequence} node Either an array of renderables or a Famous viewSequence.
+	     * @return {FlexScrollView} this
+	     */
+	    FlexScrollView.prototype.sequenceFrom = function(node) {
+	        return this.setDataSource(node);
+	    };
+
+	    /**
+	     * Returns the index of the first visible renderable.
+	     *
+	     * This function is a shim provided for compatibility with the stock famo.us Scrollview.
+	     *
+	     * @return {Number} The current index of the ViewSequence
+	     */
+	    FlexScrollView.prototype.getCurrentIndex = function getCurrentIndex() {
+	        var item = this.getFirstVisibleItem();
+	        return item ? item.viewSequence.getIndex() : -1;
+	    };
+
+	    /**
+	     * Paginates the Scrollview to an absolute page index. This function is a shim provided
+	     * for compatibility with the stock famo.us Scrollview.
+	     *
+	     * @param {Number} index view-sequence index to go to.
+	     * @return {FlexScrollView} this
+	     */
+	    FlexScrollView.prototype.goToPage = function goToPage(index) {
+	        var viewSequence = this._viewSequence;
+	        if (!viewSequence) {
+	            return this;
+	        }
+	        while (viewSequence.getIndex() < index) {
+	            viewSequence = viewSequence.getNext();
+	            if (!viewSequence) {
+	                return this;
+	            }
+	        }
+	        while (viewSequence.getIndex() > index) {
+	            viewSequence = viewSequence.getPrevious();
+	            if (!viewSequence) {
+	                return this;
+	            }
+	        }
+	        this.goToRenderNode(viewSequence.get());
+	        return this;
+	    };
+
+	    /**
+	     * Returns the offset associated with the Scrollview instance's current node
+	     * (generally the node currently at the top).
+	     *
+	     * This function is a shim provided for compatibility with the stock famo.us Scrollview.
+	     *
+	     * @return {number} The position of either the specified node, or the Scrollview's current Node,
+	     * in pixels translated.
+	     */
+	    FlexScrollView.prototype.getOffset = function() {
+	        return this._scrollOffsetCache;
+	    };
+
+	    /**
+	     * Returns the position associated with the Scrollview instance's current node
+	     * (generally the node currently at the top).
+	     *
+	     * This function is a shim provided for compatibility with the stock famo.us Scrollview.
+	     *
+	     * @deprecated
+	     * @param {number} [node] If specified, returns the position of the node at that index in the
+	     * Scrollview instance's currently managed collection.
+	     * @return {number} The position of either the specified node, or the Scrollview's current Node,
+	     * in pixels translated.
+	     */
+	    FlexScrollView.prototype.getPosition = FlexScrollView.prototype.getOffset;
+
+	    /**
+	     * Helper function for setting the pull-to-refresh status.
+	     */
+	    function _setPullToRefreshState(pullToRefresh, state) {
+	        if (pullToRefresh.state !== state) {
+	            pullToRefresh.state = state;
+	            if (pullToRefresh.node && pullToRefresh.node.setPullToRefreshStatus) {
+	                pullToRefresh.node.setPullToRefreshStatus(state);
+	            }
+	        }
+	    }
+
+	    /**
+	     * Helper function for getting the pull-to-refresh data.
+	     */
+	    function _getPullToRefresh(footer) {
+	        return this._pullToRefresh ? this._pullToRefresh[footer ? 1 : 0] : undefined;
+	    }
+
+	    /**
+	     * Post-layout function that adds the pull-to-refresh renderables.
+	     * @private
+	     */
+	    FlexScrollView.prototype._postLayout = function(size, scrollOffset) {
+
+	        // Exit immediately when pull to refresh is not configured
+	        if (!this._pullToRefresh) {
+	            return;
+	        }
+
+	        // Adjust scroll-offset for alignment
+	        if (this.options.alignment) {
+	            scrollOffset += size[this._direction];
+	        }
+
+	        // Prepare
+	        var prevHeight;
+	        var nextHeight;
+	        var totalHeight;
+
+	        // Show/activate pull to refresh renderables
+	        for (var i = 0; i < 2 ; i++) {
+	            var pullToRefresh = this._pullToRefresh[i];
+	            if (pullToRefresh) {
+
+	                // Calculate offset
+	                var length = pullToRefresh.node.getSize()[this._direction];
+	                var pullLength = pullToRefresh.node.getPullToRefreshSize ? pullToRefresh.node.getPullToRefreshSize()[this._direction] : length;
+	                var offset;
+	                if (!pullToRefresh.footer) {
+	                    // header
+	                    prevHeight = this._calcScrollHeight(false);
+	                    prevHeight = (prevHeight === undefined) ? -1 : prevHeight;
+	                    offset = (prevHeight >= 0) ? (scrollOffset - prevHeight) : prevHeight;
+	                    if (this.options.alignment) {
+	                        nextHeight = this._calcScrollHeight(true);
+	                        nextHeight = (nextHeight === undefined) ? -1 : nextHeight;
+	                        totalHeight = ((prevHeight >= 0) && (nextHeight >= 0)) ? (prevHeight + nextHeight) : -1;
+	                        if ((totalHeight >= 0) && (totalHeight < size[this._direction])) {
+	                            offset = Math.round((scrollOffset - size[this._direction]) + nextHeight);
+	                        }
+	                    }
+	                }
+	                else {
+	                    // footer
+	                    nextHeight = (nextHeight === undefined) ? nextHeight = this._calcScrollHeight(true) : nextHeight;
+	                    nextHeight = (nextHeight === undefined) ? -1 : nextHeight;
+	                    offset = (nextHeight >= 0) ? (scrollOffset + nextHeight) : (size[this._direction] + 1);
+	                    if (!this.options.alignment) {
+	                        prevHeight = (prevHeight === undefined) ? this._calcScrollHeight(false) : prevHeight;
+	                        prevHeight = (prevHeight === undefined) ? -1 : prevHeight;
+	                        totalHeight = ((prevHeight >= 0) && (nextHeight >= 0)) ? (prevHeight + nextHeight) : -1;
+	                        if ((totalHeight >= 0) && (totalHeight < size[this._direction])) {
+	                            offset = Math.round((scrollOffset - prevHeight) + size[this._direction]);
+	                        }
+	                    }
+	                    offset = -(offset - size[this._direction]);
+	                }
+
+	                // Determine current state
+	                var visiblePerc = Math.max(Math.min(offset / pullLength, 1), 0);
+	                switch (pullToRefresh.state) {
+	                    case PullToRefreshState.HIDDEN:
+	                        if (this._scroll.scrollForceCount) {
+	                            if (visiblePerc >= 1) {
+	                                _setPullToRefreshState(pullToRefresh, PullToRefreshState.ACTIVE);
+	                            }
+	                            else if (offset >= 0.2) {
+	                                _setPullToRefreshState(pullToRefresh, PullToRefreshState.PULLING);
+	                            }
+	                        }
+	                        break;
+	                    case PullToRefreshState.PULLING:
+	                        if (this._scroll.scrollForceCount && (visiblePerc >= 1)) {
+	                            _setPullToRefreshState(pullToRefresh, PullToRefreshState.ACTIVE);
+	                        }
+	                        else if (offset < 0.2) {
+	                            _setPullToRefreshState(pullToRefresh, PullToRefreshState.HIDDEN);
+	                        }
+	                        break;
+	                    case PullToRefreshState.ACTIVE:
+	                        // nothing to do, wait for completed
+	                        break;
+	                    case PullToRefreshState.COMPLETED:
+	                        if (!this._scroll.scrollForceCount) {
+	                            if (offset >= 0.2) {
+	                                _setPullToRefreshState(pullToRefresh, PullToRefreshState.HIDDING);
+	                            }
+	                            else {
+	                                _setPullToRefreshState(pullToRefresh, PullToRefreshState.HIDDEN);
+	                            }
+	                        }
+	                        break;
+	                    case PullToRefreshState.HIDDING:
+	                        if (offset < 0.2) {
+	                            _setPullToRefreshState(pullToRefresh, PullToRefreshState.HIDDEN);
+	                        }
+	                        break;
+	                }
+
+	                // Show pull to refresh node
+	                if (pullToRefresh.state !== PullToRefreshState.HIDDEN) {
+	                    var contextNode = {
+	                        renderNode: pullToRefresh.node,
+	                        prev: !pullToRefresh.footer,
+	                        next: pullToRefresh.footer,
+	                        index: !pullToRefresh.footer ? --this._nodes._contextState.prevGetIndex : ++this._nodes._contextState.nextGetIndex
+	                    };
+	                    var scrollLength;
+	                    if (pullToRefresh.state === PullToRefreshState.ACTIVE) {
+	                        scrollLength = length;
+	                    } else if (this._scroll.scrollForceCount) {
+	                        scrollLength = Math.min(offset, length);
+	                    }
+	                    var set = {
+	                        size: [size[0], size[1]],
+	                        translate: [0, 0, -1e-3], // transform.behind
+	                        scrollLength: scrollLength
+	                    };
+	                    set.size[this._direction] = Math.max(Math.min(offset, pullLength), 0);
+	                    set.translate[this._direction] = pullToRefresh.footer ? (size[this._direction] - length) : 0;
+	                    this._nodes._context.set(contextNode, set);
+	                }
+	            }
+	        }
+	    };
+
+	    /**
+	     * Shows the pulls-to-refresh renderable indicating that a refresh is in progress.
+	     *
+	     * @param {Bool} [footer] set to true to show pull-to-refresh at the footer (default: false).
+	     * @return {FlexScrollView} this
+	     */
+	    FlexScrollView.prototype.showPullToRefresh = function(footer) {
+	        var pullToRefresh = _getPullToRefresh.call(this, footer);
+	        if (pullToRefresh) {
+	            _setPullToRefreshState(PullToRefreshState.SHOWN, pullToRefresh);
+	            this._scroll.scrollDirty = true;
+	        }
+	    };
+
+	    /**
+	     * Hides the pull-to-refresh renderable in case it was visible.
+	     *
+	     * @param {Bool} [footer] set to true to hide the pull-to-refresh at the footer (default: false).
+	     * @return {FlexScrollView} this
+	     */
+	    FlexScrollView.prototype.hidePullToRefresh = function(footer) {
+	        var pullToRefresh = _getPullToRefresh.call(this, footer);
+	        if (pullToRefresh && (pullToRefresh.state === PullToRefreshState.ACTIVE)) {
+	            _setPullToRefreshState(pullToRefresh, PullToRefreshState.COMPLETED);
+	            this._scroll.scrollDirty = true;
+	        }
+	        return this;
+	    };
+
+	    /**
+	     * Get the visible state of the pull-to-refresh renderable.
+	     *
+	     * @param {Bool} [footer] set to true to get the state of the pull-to-refresh footer (default: false).
+	     */
+	    FlexScrollView.prototype.isPullToRefreshVisible = function(footer) {
+	        var pullToRefresh = _getPullToRefresh.call(this, footer);
+	        return pullToRefresh ? (pullToRefresh.state === PullToRefreshState.ACTIVE) : false;
+	    };
+
+	    /**
+	     * Delegates any scroll force to leading/trailing scrollviews.
+	     * @private
+	     */
+	    FlexScrollView.prototype.applyScrollForce = function(delta) {
+	        var leadingScrollView = this.options.leadingScrollView;
+	        var trailingScrollView = this.options.trailingScrollView;
+	        if (!leadingScrollView && !trailingScrollView) {
+	            return ScrollController.prototype.applyScrollForce.call(this, delta);
+	        }
+	        var partialDelta;
+	        if (delta < 0) {
+	            if (leadingScrollView) {
+	                partialDelta = leadingScrollView.canScroll(delta);
+	                this._leadingScrollViewDelta += partialDelta;
+	                leadingScrollView.applyScrollForce(partialDelta);
+	                delta -= partialDelta;
+	            }
+	            if (trailingScrollView) {
+	                partialDelta = this.canScroll(delta);
+	                ScrollController.prototype.applyScrollForce.call(this, partialDelta);
+	                this._thisScrollViewDelta += partialDelta;
+	                delta -= partialDelta;
+	                trailingScrollView.applyScrollForce(delta);
+	                this._trailingScrollViewDelta += delta;
+	            }
+	            else {
+	                ScrollController.prototype.applyScrollForce.call(this, delta);
+	                this._thisScrollViewDelta += delta;
+	            }
+	        }
+	        else {
+	            if (trailingScrollView) {
+	                partialDelta = trailingScrollView.canScroll(delta);
+	                trailingScrollView.applyScrollForce(partialDelta);
+	                this._trailingScrollViewDelta += partialDelta;
+	                delta -= partialDelta;
+	            }
+	            if (leadingScrollView) {
+	                partialDelta = this.canScroll(delta);
+	                ScrollController.prototype.applyScrollForce.call(this, partialDelta);
+	                this._thisScrollViewDelta += partialDelta;
+	                delta -= partialDelta;
+	                leadingScrollView.applyScrollForce(delta);
+	                this._leadingScrollViewDelta += delta;
+	            }
+	            else {
+	                ScrollController.prototype.applyScrollForce.call(this, delta);
+	                this._thisScrollViewDelta += delta;
+	            }
+	        }
+	        return this;
+	    };
+
+	    /**
+	     * Delegates any scroll force to leading/trailing scrollviews.
+	     * @private
+	     */
+	    FlexScrollView.prototype.updateScrollForce = function(prevDelta, newDelta) {
+	        var leadingScrollView = this.options.leadingScrollView;
+	        var trailingScrollView = this.options.trailingScrollView;
+	        if (!leadingScrollView && !trailingScrollView) {
+	            return ScrollController.prototype.updateScrollForce.call(this, prevDelta, newDelta);
+	        }
+	        var partialDelta;
+	        var delta = newDelta - prevDelta;
+	        if (delta < 0) {
+	            if (leadingScrollView) {
+	                partialDelta = leadingScrollView.canScroll(delta);
+	                leadingScrollView.updateScrollForce(this._leadingScrollViewDelta, this._leadingScrollViewDelta + partialDelta);
+	                this._leadingScrollViewDelta += partialDelta;
+	                delta -= partialDelta;
+	            }
+	            if (trailingScrollView && delta) {
+	                partialDelta = this.canScroll(delta);
+	                ScrollController.prototype.updateScrollForce.call(this, this._thisScrollViewDelta, this._thisScrollViewDelta + partialDelta);
+	                this._thisScrollViewDelta += partialDelta;
+	                delta -= partialDelta;
+	                this._trailingScrollViewDelta += delta;
+	                trailingScrollView.updateScrollForce(this._trailingScrollViewDelta, this._trailingScrollViewDelta + delta);
+	            }
+	            else if (delta) {
+	                ScrollController.prototype.updateScrollForce.call(this, this._thisScrollViewDelta, this._thisScrollViewDelta + delta);
+	                this._thisScrollViewDelta += delta;
+	            }
+	        }
+	        else {
+	            if (trailingScrollView) {
+	                partialDelta = trailingScrollView.canScroll(delta);
+	                trailingScrollView.updateScrollForce(this._trailingScrollViewDelta, this._trailingScrollViewDelta + partialDelta);
+	                this._trailingScrollViewDelta += partialDelta;
+	                delta -= partialDelta;
+	            }
+	            if (leadingScrollView) {
+	                partialDelta = this.canScroll(delta);
+	                ScrollController.prototype.updateScrollForce.call(this, this._thisScrollViewDelta, this._thisScrollViewDelta + partialDelta);
+	                this._thisScrollViewDelta += partialDelta;
+	                delta -= partialDelta;
+	                leadingScrollView.updateScrollForce(this._leadingScrollViewDelta, this._leadingScrollViewDelta + delta);
+	                this._leadingScrollViewDelta += delta;
+	            }
+	            else {
+	                ScrollController.prototype.updateScrollForce.call(this, this._thisScrollViewDelta, this._thisScrollViewDelta + delta);
+	                this._thisScrollViewDelta += delta;
+	            }
+	        }
+	        return this;
+	    };
+
+	    /**
+	     * Delegates any scroll force to leading/trailing scrollviews.
+	     * @private
+	     */
+	    FlexScrollView.prototype.releaseScrollForce = function(delta, velocity) {
+	        var leadingScrollView = this.options.leadingScrollView;
+	        var trailingScrollView = this.options.trailingScrollView;
+	        if (!leadingScrollView && !trailingScrollView) {
+	            return ScrollController.prototype.releaseScrollForce.call(this, delta, velocity);
+	        }
+	        var partialDelta;
+	        if (delta < 0) {
+	            if (leadingScrollView) {
+	                partialDelta = Math.max(this._leadingScrollViewDelta, delta);
+	                this._leadingScrollViewDelta -= partialDelta;
+	                delta -= partialDelta;
+	                leadingScrollView.releaseScrollForce(this._leadingScrollViewDelta, delta ? 0 : velocity);
+	            }
+	            if (trailingScrollView) {
+	                partialDelta = Math.max(this._thisScrollViewDelta, delta);
+	                this._thisScrollViewDelta -= partialDelta;
+	                delta -= partialDelta;
+	                ScrollController.prototype.releaseScrollForce.call(this, this._thisScrollViewDelta, delta ? 0 : velocity);
+	                this._trailingScrollViewDelta -= delta;
+	                trailingScrollView.releaseScrollForce(this._trailingScrollViewDelta, delta ? velocity : 0);
+	            }
+	            else {
+	                this._thisScrollViewDelta -= delta;
+	                ScrollController.prototype.releaseScrollForce.call(this, this._thisScrollViewDelta, delta ? velocity : 0);
+	            }
+	        }
+	        else {
+	            if (trailingScrollView) {
+	                partialDelta = Math.min(this._trailingScrollViewDelta, delta);
+	                this._trailingScrollViewDelta -= partialDelta;
+	                delta -= partialDelta;
+	                trailingScrollView.releaseScrollForce(this._trailingScrollViewDelta, delta ? 0 : velocity);
+	            }
+	            if (leadingScrollView) {
+	                partialDelta = Math.min(this._thisScrollViewDelta, delta);
+	                this._thisScrollViewDelta -= partialDelta;
+	                delta -= partialDelta;
+	                ScrollController.prototype.releaseScrollForce.call(this, this._thisScrollViewDelta, delta ? 0 : velocity);
+	                this._leadingScrollViewDelta -= delta;
+	                leadingScrollView.releaseScrollForce(this._leadingScrollViewDelta, delta ? velocity : 0);
+	            }
+	            else {
+	                this._thisScrollViewDelta -= delta;
+	                ScrollController.prototype.updateScrollForce.call(this, this._thisScrollViewDelta, delta ? velocity : 0);
+	            }
+	        }
+	        return this;
+	    };
+
+	    /**
+	     * Overriden commit, in order to emit pull-to-refresh event after
+	     * all the rendering has been done.
+	     * @private
+	     */
+	    FlexScrollView.prototype.commit = function(context) {
+
+	        // Call base class
+	        var result = ScrollController.prototype.commit.call(this, context);
+
+	        // Emit pull to refresh events after the whole commit call has been executed
+	        // so that when the refresh event is received, the FlexScrollView is in a valid state
+	        // and can be queried.
+	        if (this._pullToRefresh) {
+	            for (var i = 0; i < 2; i++) {
+	                var pullToRefresh = this._pullToRefresh[i];
+	                if (pullToRefresh) {
+	                    if ((pullToRefresh.state === PullToRefreshState.ACTIVE) &&
+	                        (pullToRefresh.prevState !== PullToRefreshState.ACTIVE)) {
+	                        this._eventOutput.emit('refresh', {
+	                            target: this,
+	                            footer: pullToRefresh.footer
+	                        });
+	                    }
+	                    pullToRefresh.prevState = pullToRefresh.state;
+	                }
+	            }
+	        }
+	        return result;
+	    };
+
+	    module.exports = FlexScrollView;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * This Source Code is licensed under the MIT license. If a copy of the
+	 * MIT-license was not distributed with this file, You can obtain one at:
+	 * http://opensource.org/licenses/mit-license.html.
+	 *
+	 * @author: Hein Rutjes (IjzerenHein)
+	 * @license MIT
+	 * @copyright Gloey Apps, 2014
+	 */
+
+	/*global define, console*/
+	/*eslint no-console:0*/
+
+	/**
+	 * Utility class for famous-flex.
+	 *
+	 * @module
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
+
+	    // import dependencies
+	    var Utility = __webpack_require__(55);
+
+	    /**
+	     * @class
+	     * @alias module:LayoutUtility
+	     */
+	    function LayoutUtility() {
+	    }
+	    LayoutUtility.registeredHelpers = {};
+
+	    var Capabilities = {
+	        SEQUENCE: 1,
+	        DIRECTION_X: 2,
+	        DIRECTION_Y: 4,
+	        SCROLLING: 8
+	    };
+	    LayoutUtility.Capabilities = Capabilities;
+
+	    /**
+	     *  Normalizes the margins argument.
+	     *
+	     *  @param {Array.Number} margins
+	     */
+	    LayoutUtility.normalizeMargins = function(margins) {
+	        if (!margins) {
+	            return [0, 0, 0, 0];
+	        } else if (!Array.isArray(margins)) {
+	            return [margins, margins, margins, margins];
+	        } else if (margins.length === 0) {
+	            return [0, 0, 0, 0];
+	        } else if (margins.length === 1) {
+	            return [margins[0], margins[0], margins[0], margins[0]];
+	        } else if (margins.length === 2) {
+	            return [margins[0], margins[1], margins[0], margins[1]];
+	        }
+	        else {
+	            return margins;
+	        }
+	    };
+
+	    /**
+	     * Makes a (shallow) copy of a spec.
+	     *
+	     * @param {Spec} spec Spec to clone
+	     * @return {Spec} cloned spec
+	     */
+	    LayoutUtility.cloneSpec = function(spec) {
+	        var clone = {};
+	        if (spec.opacity !== undefined) {
+	            clone.opacity = spec.opacity;
+	        }
+	        if (spec.size !== undefined) {
+	            clone.size = spec.size.slice(0);
+	        }
+	        if (spec.transform !== undefined) {
+	            clone.transform = spec.transform.slice(0);
+	        }
+	        if (spec.origin !== undefined) {
+	            clone.origin = spec.origin.slice(0);
+	        }
+	        if (spec.align !== undefined) {
+	            clone.align = spec.align.slice(0);
+	        }
+	        return clone;
+	    };
+
+	    /**
+	     * Compares two arrays for equality.
+	     */
+	    function _isEqualArray(a, b) {
+	        if (a === b) {
+	            return true;
+	        }
+	        if ((a === undefined) || (b === undefined)) {
+	            return false;
+	        }
+	        var i = a.length;
+	        if (i !== b.length){
+	            return false;
+	        }
+	        while (i--) {
+	            if (a[i] !== b[i]) {
+	                return false;
+	            }
+	        }
+	        return true;
+	    }
+
+	    /**
+	     * Compares two specs for equality.
+	     *
+	     * @param {Spec} spec1 Spec to compare
+	     * @param {Spec} spec2 Spec to compare
+	     * @return {Boolean} true/false
+	     */
+	    LayoutUtility.isEqualSpec = function(spec1, spec2) {
+	        if (spec1.opacity !== spec2.opacity) {
+	            return false;
+	        }
+	        if (!_isEqualArray(spec1.size, spec2.size)) {
+	            return false;
+	        }
+	        if (!_isEqualArray(spec1.transform, spec2.transform)) {
+	            return false;
+	        }
+	        if (!_isEqualArray(spec1.origin, spec2.origin)) {
+	            return false;
+	        }
+	        if (!_isEqualArray(spec1.align, spec2.align)) {
+	            return false;
+	        }
+	        return true;
+	    };
+
+	    /**
+	     * Helper function that returns a string containing the differences
+	     * between two specs.
+	     *
+	     * @param {Spec} spec1 Spec to compare
+	     * @param {Spec} spec2 Spec to compare
+	     * @return {String} text
+	     */
+	    LayoutUtility.getSpecDiffText = function(spec1, spec2) {
+	        var result = 'spec diff:';
+	        if (spec1.opacity !== spec2.opacity) {
+	            result += '\nopacity: ' + spec1.opacity + ' != ' + spec2.opacity;
+	        }
+	        if (!_isEqualArray(spec1.size, spec2.size)) {
+	            result += '\nsize: ' + JSON.stringify(spec1.size) + ' != ' + JSON.stringify(spec2.size);
+	        }
+	        if (!_isEqualArray(spec1.transform, spec2.transform)) {
+	            result += '\ntransform: ' + JSON.stringify(spec1.transform) + ' != ' + JSON.stringify(spec2.transform);
+	        }
+	        if (!_isEqualArray(spec1.origin, spec2.origin)) {
+	            result += '\norigin: ' + JSON.stringify(spec1.origin) + ' != ' + JSON.stringify(spec2.origin);
+	        }
+	        if (!_isEqualArray(spec1.align, spec2.align)) {
+	            result += '\nalign: ' + JSON.stringify(spec1.align) + ' != ' + JSON.stringify(spec2.align);
+	        }
+	        return result;
+	    };
+
+	    /**
+	     * Helper function to call whenever a critical error has occurred.
+	     *
+	     * @param {String} message error-message
+	     */
+	    LayoutUtility.error = function(message) {
+	        console.log('ERROR: ' + message);
+	        throw message;
+	    };
+
+	    /**
+	     * Helper function to call whenever a warning error has occurred.
+	     *
+	     * @param {String} message warning-message
+	     */
+	    LayoutUtility.warning = function(message) {
+	        console.log('WARNING: ' + message);
+	    };
+
+	    /**
+	     * Helper function to log 1 or more arguments. All the arguments
+	     * are concatenated to produce a single string which is logged.
+	     *
+	     * @param {String|Array|Object} args arguments to stringify and concatenate
+	     */
+	    LayoutUtility.log = function(args) {
+	        var message = '';
+	        for (var i = 0; i < arguments.length; i++) {
+	            var arg = arguments[i];
+	            if ((arg instanceof Object) || (arg instanceof Array)) {
+	                message += JSON.stringify(arg);
+	            }
+	            else {
+	                message += arg;
+	            }
+	        }
+	        console.log(message);
+	    };
+
+	    /**
+	     * Combines two sets of options into a single set.
+	     *
+	     * @param {Object} options1 base set of options
+	     * @param {Object} options2 set of options to merge into `options1`
+	     * @param {Bool} [forceClone] ensures that a clone is returned rather that one of the original options objects
+	     * @return {Object} Combined options
+	     */
+	    LayoutUtility.combineOptions = function(options1, options2, forceClone) {
+	        if (options1 && !options2 && !forceClone) {
+	            return options1;
+	        } else if (!options1 && options2 && !forceClone) {
+	            return options2;
+	        }
+	        var options = Utility.clone(options1 || {});
+	        if (options2) {
+	            for (var key in options2) {
+	                options[key] = options2[key];
+	            }
+	        }
+	        return options;
+	    };
+
+	    /**
+	     * Registers a layout-helper so it can be used as a layout-literal for
+	     * a layout-controller. The LayoutHelper instance must support the `parse`
+	     * function, which is fed the layout-literal content.
+	     *
+	     * **Example:**
+	     *
+	     * ```javascript
+	     * Layout.registerHelper('dock', LayoutDockHelper);
+	     *
+	     * var layoutController = new LayoutController({
+	     *   layout: { dock: [,
+	     *     ['top', 'header', 50],
+	     *     ['bottom', 'footer', 50],
+	     *     ['fill', 'content'],
+	     *   ]},
+	     *   dataSource: {
+	     *     header: new Surface({content: 'Header'}),
+	     *     footer: new Surface({content: 'Footer'}),
+	     *     content: new Surface({content: 'Content'}),
+	     *   }
+	     * })
+	     * ```
+	     *
+	     * @param {String} name name of the helper (e.g. 'dock')
+	     * @param {Function} Helper Helper to register (e.g. LayoutDockHelper)
+	     */
+	    LayoutUtility.registerHelper = function(name, Helper) {
+	        if (!Helper.prototype.parse) {
+	            LayoutUtility.error('The layout-helper for name "' + name + '" is required to support the "parse" method');
+	        }
+	        if (this.registeredHelpers[name] !== undefined) {
+	            LayoutUtility.warning('A layout-helper with the name "' + name + '" is already registered and will be overwritten');
+	        }
+	        this.registeredHelpers[name] = Helper;
+	    };
+
+	    /**
+	     * Unregisters a layout-helper.
+	     *
+	     * @param {String} name name of the layout-helper
+	     */
+	    LayoutUtility.unregisterHelper = function(name) {
+	        delete this.registeredHelpers[name];
+	    };
+
+	    /**
+	     * Gets a registered layout-helper by its name.
+	     *
+	     * @param {String} name name of the layout-helper
+	     * @return {Function} layout-helper or undefined
+	     */
+	    LayoutUtility.getRegisteredHelper = function(name) {
+	        return this.registeredHelpers[name];
+	    };
+
+	    // Layout function
+	    module.exports = LayoutUtility;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * This Source Code is licensed under the MIT license. If a copy of the
+	 * MIT-license was not distributed with this file, You can obtain one at:
+	 * http://opensource.org/licenses/mit-license.html.
+	 *
+	 * @author: Hein Rutjes (IjzerenHein)
+	 * @license MIT
+	 * @copyright Gloey Apps, 2014
+	 */
+
+	/*global define*/
+
+	/**
+	 * LayoutDockHelper helps positioning nodes using docking principles.
+	 *
+	 * **Example:**
+	 *
+	 * ```javascript
+	 * var LayoutDockHelper = require('famous-flex/helpers/LayoutDockHelper');
+	 *
+	 * function HeaderFooterLayout(context, options) {
+	 *   var dock = new LayoutDockHelper(context);
+	 *   dock.top('header', options.headerHeight);
+	 *   dock.bottom('footer', options.footerHeight);
+	 *   dock.fill('content');
+	 * };
+	 * ```
+	 *
+	 * You can also use layout-literals to create layouts using docking semantics:
+	 *
+	 * ```javascript
+	 * var layoutController = new LayoutController({
+	 *   layout: {dock: [
+	 *     ['top', 'header', 40],
+	 *     ['bottom', 'footer', 40, 1], // z-index +1
+	 *     ['fill', 'content']
+	 *   ]},
+	 *   dataSource: {
+	 *     header: new Surface({content: 'header'}),
+	 *     footer: new Surface({content: 'footer'}),
+	 *     content: new Surface({content: 'content'}),
+	 *   }
+	 * });
+	 * ```
+	 *
+	 * @module
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
+
+	    // import dependencies
+	    var LayoutUtility = __webpack_require__(15);
+
+	    /**
+	     * @class
+	     * @param {LayoutContext} context layout-context
+	     * @param {Object} [options] additional options
+	     * @param {Object} [options.margins] margins to start out with (default: 0px)
+	     * @param {Number} [options.translateZ] z-index to use when translating objects (default: 0)
+	     * @alias module:LayoutDockHelper
+	     */
+	    function LayoutDockHelper(context, options) {
+	        var size = context.size;
+	        this._size = size;
+	        this._context = context;
+	        this._options = options;
+	        this._z = (options && options.translateZ) ? options.translateZ : 0;
+	        if (options && options.margins) {
+	            var margins = LayoutUtility.normalizeMargins(options.margins);
+	            this._left = margins[3];
+	            this._top = margins[0];
+	            this._right = size[0] - margins[1];
+	            this._bottom = size[1] - margins[2];
+	        }
+	        else {
+	            this._left = 0;
+	            this._top = 0;
+	            this._right = size[0];
+	            this._bottom = size[1];
+	        }
+	    }
+
+	    /**
+	     * Parses the layout-rules based on a JSON data object.
+	     * The object should be an array with the following syntax:
+	     * `[[rule, node, value, z], [rule, node, value, z], ...]`
+	     *
+	     * **Example:**
+	     *
+	     * ```JSON
+	     * [
+	     *   ['top', 'header', 50],
+	     *   ['bottom', 'footer', 50, 10], // z-index: 10
+	     *   ['margins', [10, 5]], // marginate remaining space: 10px top/bottom, 5px left/right
+	     *   ['fill', 'content']
+	     * ]
+	     * ```
+	     *
+	     * @param {Object} data JSON object
+	     */
+	    LayoutDockHelper.prototype.parse = function(data) {
+	        for (var i = 0; i < data.length; i++) {
+	            var rule = data[i];
+	            var value = (rule.length >= 3) ? rule[2] : undefined;
+	            if (rule[0] === 'top') {
+	                this.top(rule[1], value, (rule.length >=4) ? rule[3] : undefined);
+	            } else if (rule[0] === 'left') {
+	                this.left(rule[1], value, (rule.length >=4) ? rule[3] : undefined);
+	            } else if (rule[0] === 'right') {
+	                this.right(rule[1], value, (rule.length >=4) ? rule[3] : undefined);
+	            } else if (rule[0] === 'bottom') {
+	                this.bottom(rule[1], value, (rule.length >=4) ? rule[3] : undefined);
+	            } else if (rule[0] === 'fill') {
+	                this.fill(rule[1], (rule.length >=3) ? rule[2] : undefined);
+	            } else if (rule[0] === 'margins') {
+	                this.margins(rule[1]);
+	            }
+	        }
+	    };
+
+	    /**
+	     * Dock the node to the top.
+	     *
+	     * @param {LayoutNode|String} [node] layout-node to dock, when ommited the `height` argument argument is used for padding
+	     * @param {Number} [height] height of the layout-node, when ommited the height of the node is used
+	     * @param {Number} [z] z-index to use for the node
+	     * @return {LayoutDockHelper} this
+	     */
+	    LayoutDockHelper.prototype.top = function(node, height, z) {
+	        if (height instanceof Array) {
+	            height = height[1];
+	        }
+	        if (height === undefined) {
+	            var size = this._context.resolveSize(node, [this._right - this._left, this._bottom - this._top]);
+	            height = size[1];
+	        }
+	        this._context.set(node, {
+	            size: [this._right - this._left, height],
+	            origin: [0, 0],
+	            align: [0, 0],
+	            translate: [this._left, this._top, (z === undefined) ? this._z : z]
+	        });
+	        this._top += height;
+	        return this;
+	    };
+
+	    /**
+	     * Dock the node to the left
+	     *
+	     * @param {LayoutNode|String} [node] layout-node to dock, when ommited the `width` argument argument is used for padding
+	     * @param {Number} [width] width of the layout-node, when ommited the width of the node is used
+	     * @param {Number} [z] z-index to use for the node
+	     * @return {LayoutDockHelper} this
+	     */
+	    LayoutDockHelper.prototype.left = function(node, width, z) {
+	        if (width instanceof Array) {
+	            width = width[0];
+	        }
+	        if (width === undefined) {
+	            var size = this._context.resolveSize(node, [this._right - this._left, this._bottom - this._top]);
+	            width = size[0];
+	        }
+	        this._context.set(node, {
+	            size: [width, this._bottom - this._top],
+	            origin: [0, 0],
+	            align: [0, 0],
+	            translate: [this._left, this._top, (z === undefined) ? this._z : z]
+	        });
+	        this._left += width;
+	        return this;
+	    };
+
+	    /**
+	     * Dock the node to the bottom
+	     *
+	     * @param {LayoutNode|String} [node] layout-node to dock, when ommited the `height` argument argument is used for padding
+	     * @param {Number} [height] height of the layout-node, when ommited the height of the node is used
+	     * @param {Number} [z] z-index to use for the node
+	     * @return {LayoutDockHelper} this
+	     */
+	    LayoutDockHelper.prototype.bottom = function(node, height, z) {
+	        if (height instanceof Array) {
+	            height = height[1];
+	        }
+	        if (height === undefined) {
+	            var size = this._context.resolveSize(node, [this._right - this._left, this._bottom - this._top]);
+	            height = size[1];
+	        }
+	        this._context.set(node, {
+	            size: [this._right - this._left, height],
+	            origin: [0, 1],
+	            align: [0, 1],
+	            translate: [this._left, -(this._size[1] - this._bottom), (z === undefined) ? this._z : z]
+	        });
+	        this._bottom -= height;
+	        return this;
+	    };
+
+	    /**
+	     * Dock the node to the right.
+	     *
+	     * @param {LayoutNode|String} [node] layout-node to dock, when ommited the `width` argument argument is used for padding
+	     * @param {Number} [width] width of the layout-node, when ommited the width of the node is used
+	     * @param {Number} [z] z-index to use for the node
+	     * @return {LayoutDockHelper} this
+	     */
+	    LayoutDockHelper.prototype.right = function(node, width, z) {
+	        if (width instanceof Array) {
+	            width = width[0];
+	        }
+	        if (node) {
+	            if (width === undefined) {
+	                var size = this._context.resolveSize(node, [this._right - this._left, this._bottom - this._top]);
+	                width = size[0];
+	            }
+	            this._context.set(node, {
+	                size: [width, this._bottom - this._top],
+	                origin: [1, 0],
+	                align: [1, 0],
+	                translate: [-(this._size[0] - this._right), this._top, (z === undefined) ? this._z : z]
+	            });
+	        }
+	        if (width) {
+	            this._right -= width;
+	        }
+	        return this;
+	    };
+
+	    /**
+	     * Fills the node to the remaining content.
+	     *
+	     * @param {LayoutNode|String} node layout-node to dock
+	     * @param {Number} [z] z-index to use for the node
+	     * @return {LayoutDockHelper} this
+	     */
+	    LayoutDockHelper.prototype.fill = function(node, z) {
+	        this._context.set(node, {
+	            size: [this._right - this._left, this._bottom - this._top],
+	            translate: [this._left, this._top, (z === undefined) ? this._z : z]
+	        });
+	        return this;
+	    };
+
+	    /**
+	     * Applies indent margins to the remaining content.
+	     *
+	     * @param {Number|Array} margins margins shorthand (e.g. '5', [10, 10], [5, 10, 5, 10])
+	     * @return {LayoutDockHelper} this
+	     */
+	    LayoutDockHelper.prototype.margins = function(margins) {
+	        margins = LayoutUtility.normalizeMargins(margins);
+	        this._left += margins[3];
+	        this._top += margins[0];
+	        this._right -= margins[1];
+	        this._bottom -= margins[2];
+	        return this;
+	    };
+
+	    // Register the helper
+	    LayoutUtility.registerHelper('dock', LayoutDockHelper);
+
+	    module.exports = LayoutDockHelper;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * This Source Code is licensed under the MIT license. If a copy of the
+	 * MIT-license was not distributed with this file, You can obtain one at:
+	 * http://opensource.org/licenses/mit-license.html.
+	 *
+	 * @author: Hein Rutjes (IjzerenHein)
+	 * @license MIT
+	 * @copyright Gloey Apps, 2014
+	 */
+
+	/*global define, console*/
+	/*eslint no-console: 0*/
+
+	/**
+	 * Lays-out renderables from left to right, in a grid with fixed number of
+	 * columns and rows.
+	 *
+	 * |options|type|description|
+	 * |---|---|---|
+	 * |`cells`|Size|Number of cells: [columns, rows]|
+	 * |`[margins]`|Number/Array|Margins shorthand (e.g. 5, [10, 20], [2, 5, 2, 10])|
+	 * |`[spacing]`|Size|Spacing between renderables. (e.g. [10, 10]|
+	 *
+	 * Example:
+	 *
+	 * ```javascript
+	 * var GridLayout = require('famous-flex/layouts/GridLayout');
+	 *
+	 * var layoutController = new LayoutController({
+	 *   layout: GridLayout,
+	 *   layoutOptions: {
+	 *     cells: [10, 5],            // 10 columns, 5 rows
+	 *     margins: [20, 20, 20, 20], // margins on the outside
+	 *     spacing: [10, 10]          // spacing between cells
+	 *   },
+	 *   dataSource: [
+	 *     new Surface({content: 'item 1'}),
+	 *     new Surface({content: 'item 2'}),
+	 *     new Surface({content: 'item 3'})
+	 *   ]
+	 * });
+	 * ```
+	 * @module
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
+
+	    // import dependencies
+	    var Utility = __webpack_require__(55);
+	    var LayoutUtility = __webpack_require__(15);
+
+	    // Define capabilities of this layout function
+	    var capabilities = {
+	        sequence: true,
+	        direction: [Utility.Direction.Y, Utility.Direction.X],
+	        scrolling: false
+	    };
+
+	    // Layout function
+	    function GridLayout(context, options) {
+
+	        // Do one-time stuff
+	        var size = context.size;
+	        if ((options.gutter !== undefined) && console.warn) {
+	            console.warn('gutter has been deprecated for GridLayout, use margins & spacing instead');
+	        }
+	        var spacing;
+	        if (options.gutter && !options.spacing) {
+	            spacing = options.gutter || 0;
+	        }
+	        else {
+	            spacing = options.spacing || 0;
+	        }
+	        spacing = Array.isArray(spacing) ? spacing : [spacing, spacing];
+	        var margins = LayoutUtility.normalizeMargins(options.margins);
+	        var nodeSize = [
+	            (size[0] - (((options.cells[0] - 1) * spacing[0]) + margins[1] + margins[3])) / options.cells[0],
+	            (size[1] - (((options.cells[1] - 1) * spacing[1]) + margins[0] + margins[2])) / options.cells[1]
+	        ];
+
+	        // Define size and position of grid-item
+	        function _layoutNode(node, col, row) {
+	            context.set(node, {
+	                size: nodeSize,
+	                translate: [
+	                    ((nodeSize[0] + spacing[0]) * col) + margins[3],
+	                    ((nodeSize[1] + spacing[1]) * row) + margins[0],
+	                    0
+	                ]
+	            });
+	        }
+
+	        // Create rows & columns
+	        var row;
+	        var col;
+	        var node;
+	        if (context.direction === Utility.Direction.Y) {
+	            for (col = 0; col < options.cells[0]; col++) {
+	                for (row = 0; row < options.cells[1]; row++) {
+	                    node = context.next();
+	                    if (!node) {
+	                        return;
+	                    }
+	                    _layoutNode(node, col, row);
+	                }
+	            }
+	        }
+	        else {
+	            for (row = 0; row < options.cells[1]; row++) {
+	                for (col = 0; col < options.cells[0]; col++) {
+	                    node = context.next();
+	                    if (!node) {
+	                        return;
+	                    }
+	                    _layoutNode(node, col, row);
+	                }
+	            }
+	        }
+	    }
+
+	    GridLayout.Capabilities = capabilities;
+	    module.exports = GridLayout;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * This Source Code is licensed under the MIT license. If a copy of the
+	 * MIT-license was not distributed with this file, You can obtain one at:
+	 * http://opensource.org/licenses/mit-license.html.
+	 *
+	 * @author: Hein Rutjes (IjzerenHein)
+	 * @license MIT
+	 * @copyright Gloey Apps, 2014
+	 */
+
+	/*global define*/
+
+	/**
+	 * Navigation-bar layout consisting of optionally left and right items and a
+	 * title in the middle.
+	 *
+	 * When no item-width is specified, the width of the renderable itsself is used.
+	 *
+	 * |options|type|description|
+	 * |---|---|---|
+	 * |`[margins]`|Number/Array|Margins shorthand (e.g. 5, [10, 20], [2, 5, 2, 10])|
+	 * |`[itemWidth]`|Number|Width of the left & right items|
+	 * |`[leftItemWidth]`|Number|Width of the left items|
+	 * |`[rightItemWidth]`|Number|Width of the right items|
+	 * |`[itemSpacer]`|Number|Space in between items|
+	 *
+	 * Example:
+	 *
+	 * ```javascript
+	 * var NavBarLayout = require('famous-flex/layouts/NavBarLayout');
+	 *
+	 * var layout = new LayoutController({
+	 *   layout: NavBarLayout,
+	 *   layoutOptions: {
+	 *     margins: [5, 5, 5, 5], // margins to utilize
+	 *     itemSpacer: 10,        // space in between items
+	 *   },
+	 *   dataSource: {
+	 *     background: new Surface({properties: {backgroundColor: 'black'}}),
+	 *     title: new Surface({content: 'My title'}),
+	 *     leftItems:[
+	 *       new Surface({content: 'left1'})
+	 *     ],
+	 *     rightItems: [
+	 *       new Surface({content: 'right1'}),
+	 *       new Surface({content: 'right2'})
+	 *     ]
+	 *   }
+	 * });
+	 * ```
+	 * @module
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
+
+	    // import dependencies
+	    var LayoutDockHelper = __webpack_require__(16);
+
+	    // Layout function
+	    module.exports = function NavBarLayout(context, options) {
+	        var dock = new LayoutDockHelper(context, {
+	            margins: options.margins,
+	            translateZ: 1
+	        });
+
+	        // Position background
+	        context.set('background', {size: context.size});
+
+	        // Position right items
+	        var node;
+	        var i;
+	        var rightItems = context.get('rightItems');
+	        if (rightItems) {
+	            for (i = 0; i < rightItems.length; i++) {
+	                // dock node
+	                node = context.get(rightItems[i]);
+	                dock.right(node, options.rightItemWidth || options.itemWidth);
+	                // spacer
+	                dock.right(undefined, options.rightItemSpacer || options.itemSpacer);
+	            }
+	        }
+
+	        // Position left item
+	        var leftItems = context.get('leftItems');
+	        if (leftItems) {
+	            for (i = 0; i < leftItems.length; i++) {
+	                // dock node
+	                node = context.get(leftItems[i]);
+	                dock.left(node, options.leftItemWidth || options.itemWidth);
+	                // spacer
+	                dock.left(undefined, options.leftItemSpacer || options.itemSpacer);
+	            }
+	        }
+
+	        // Position title
+	        dock.fill('title');
+	    };
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * This Source Code is licensed under the MIT license. If a copy of the
+	 * MIT-license was not distributed with this file, You can obtain one at:
+	 * http://opensource.org/licenses/mit-license.html.
+	 *
+	 * @author: Hein Rutjes (IjzerenHein)
+	 * @license MIT
+	 * @copyright Gloey Apps, 2014
+	 */
+
+	/*global define*/
+
+	/**
+	 * Lays out items and optionally sticky sections from top to bottom or left to right.
+	 *
+	 * |options|type|description|
+	 * |---|---|---|
+	 * |`[itemSize]`|Number/Function|Height or width in pixels of an item (used when renderNode has no size)|
+	 * |`[margins]`|Number/Array|Margins shorthand (e.g. 5, [10, 20], [2, 5, 2, 10])|
+	 * |`[spacing]`|Number|Spacing between items|
+	 * |`[isSectionCallback]`|Function|Callback that is called in order to check if a render-node is a section rather than a cell.|
+	 *
+	 * Example:
+	 *
+	 * ```javascript
+	 * var FlexScrollView = require('famous-flex/FlexScrollView');
+	 * var ListLayout = require('famous-flex/layouts/ListLayout');
+	 *
+	 * var scrollView = new FlexScrollView({
+	 *   layout: ListLayout,
+	 *   layoutOptions: {
+	 *     margins: [20, 10, 20, 10],
+	 *     spacing: 1,
+	 *     isSectionCallback: function(renderNode) {
+	 *       return renderNode.isSection;
+	 *     },
+	 *   },
+	 *   dataSource: [
+	 *     // first section
+	 *     _createSection(),
+	 *     _createCell(),
+	 *     _createCell(),
+	 *     // second section
+	 *     _createSection(),
+	 *     _createCell(),
+	 *   ]
+	 * });
+	 * this.add(scrollView);
+	 *
+	 * function _createCell() {
+	 *   return new Surface({
+	 *     size: [undefined, 50],
+	 *     content: 'my cell'
+	 *   });
+	 * }
+	 *
+	 * function _createSection() {
+	 *   var section = new Surface({
+	 *     size: [undefined, 30],
+	 *     content: 'my sticky section'
+	 *   });
+	 *   section.isSection = true; // mark renderNode as section
+	 *   return section;
+	 * }
+	 * ```
+	 * @module
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
+
+	    // import dependencies
+	    var Utility = __webpack_require__(55);
+	    var LayoutUtility = __webpack_require__(15);
+
+	    // Define capabilities of this layout function
+	    var capabilities = {
+	        sequence: true,
+	        direction: [Utility.Direction.Y, Utility.Direction.X],
+	        scrolling: true,
+	        trueSize: true,
+	        sequentialScrollingOptimized: true
+	    };
+
+	    // Data
+	    var set = {
+	        size: [0, 0],
+	        translate: [0, 0, 0],
+	        scrollLength: undefined
+	    };
+	    var margin = [0, 0];
+
+	    // Layout function
+	    function ListLayout(context, options) {
+
+	        // Local data
+	        var size = context.size;
+	        var direction = context.direction;
+	        var alignment = context.alignment;
+	        var revDirection = direction ? 0 : 1;
+	        var offset;
+	        var margins = LayoutUtility.normalizeMargins(options.margins);
+	        var spacing = options.spacing || 0;
+	        var node;
+	        var nodeSize;
+	        var itemSize;
+	        var getItemSize;
+	        var lastSectionBeforeVisibleCell;
+	        var lastSectionBeforeVisibleCellOffset;
+	        var lastSectionBeforeVisibleCellLength;
+	        var lastSectionBeforeVisibleCellScrollLength;
+	        var firstVisibleCell;
+	        var lastNode;
+	        var lastCellOffsetInFirstVisibleSection;
+	        var isSectionCallback = options.isSectionCallback;
+	        var bound;
+
+	        //
+	        // reset size & translation
+	        //
+	        set.size[0] = size[0];
+	        set.size[1] = size[1];
+	        set.size[revDirection] -= (margins[1 - revDirection] + margins[3 - revDirection]);
+	        set.translate[0] = 0;
+	        set.translate[1] = 0;
+	        set.translate[2] = 0;
+	        set.translate[revDirection] = margins[direction ? 3 : 0];
+
+	        //
+	        // Determine item-size or use true=size
+	        //
+	        if ((options.itemSize === true) || !options.hasOwnProperty('itemSize')) {
+	            itemSize = true;
+	        } else if (options.itemSize instanceof Function) {
+	            getItemSize = options.itemSize;
+	        }
+	        else {
+	            itemSize = (options.itemSize === undefined) ? size[direction] : options.itemSize;
+	        }
+
+	        //
+	        // Determine leading/trailing margins
+	        //
+	        margin[0] = margins[direction ? 0 : 3];
+	        margin[1] = -margins[direction ? 2 : 1];
+
+	        //
+	        // Process all next nodes
+	        //
+	        offset = context.scrollOffset + margin[alignment];
+	        bound = context.scrollEnd + margin[alignment];
+	        while (offset < bound) {
+	            lastNode = node;
+	            node = context.next();
+	            if (!node) {
+	                if (lastNode && !alignment) {
+	                    set.scrollLength = nodeSize + margin[0] + -margin[1];
+	                    context.set(lastNode, set);
+	                }
+	                break;
+	            }
+
+	            //
+	            // Get node size
+	            //
+	            nodeSize = getItemSize ? getItemSize(node.renderNode) : itemSize;
+	            nodeSize = (nodeSize === true) ? context.resolveSize(node, size)[direction] : nodeSize;
+
+	            //
+	            // Position node
+	            //
+	            set.size[direction] = nodeSize;
+	            set.translate[direction] = offset + (alignment ? spacing : 0);
+	            set.scrollLength = nodeSize + spacing;
+	            context.set(node, set);
+	            offset += set.scrollLength;
+
+	            //
+	            // Keep track of the last section before the first visible cell
+	            //
+	            if (isSectionCallback && isSectionCallback(node.renderNode)) {
+	                set.translate[direction] = Math.max(margin[0], set.translate[direction]);
+	                context.set(node, set);
+	                if (!firstVisibleCell) {
+	                    lastSectionBeforeVisibleCell = node;
+	                    lastSectionBeforeVisibleCellOffset = offset - nodeSize;
+	                    lastSectionBeforeVisibleCellLength = nodeSize;
+	                    lastSectionBeforeVisibleCellScrollLength = nodeSize;
+	                } else if (lastCellOffsetInFirstVisibleSection === undefined) {
+	                    lastCellOffsetInFirstVisibleSection = offset - nodeSize;
+	                }
+	            } else if (!firstVisibleCell && (offset >= 0)) {
+	                firstVisibleCell = node;
+	            }
+	        }
+
+	        //
+	        // Process previous nodes
+	        //
+	        node = undefined;
+	        offset = context.scrollOffset + margin[alignment];
+	        bound = context.scrollStart + margin[alignment];
+	        while (offset > bound) {
+	            lastNode = node;
+	            node = context.prev();
+	            if (!node) {
+	                if (lastNode && alignment) {
+	                    set.scrollLength = nodeSize + margin[0] + -margin[1];
+	                    context.set(lastNode, set);
+	                    if (lastSectionBeforeVisibleCell === lastNode) {
+	                        lastSectionBeforeVisibleCellScrollLength = set.scrollLength;
+	                    }
+	                }
+	                break;
+	            }
+
+	            //
+	            // Get node size
+	            //
+	            nodeSize = getItemSize ? getItemSize(node.renderNode) : itemSize;
+	            nodeSize = (nodeSize === true) ? context.resolveSize(node, size)[direction] : nodeSize;
+
+	            //
+	            // Position node
+	            //
+	            set.scrollLength = nodeSize + spacing;
+	            offset -= set.scrollLength;
+	            set.size[direction] = nodeSize;
+	            set.translate[direction] = offset + (alignment ? spacing : 0);
+	            context.set(node, set);
+
+	            //
+	            // Keep track of the last section before the first visible cell
+	            //
+	            if (isSectionCallback && isSectionCallback(node.renderNode)) {
+	                set.translate[direction] = Math.max(margin[0], set.translate[direction]);
+	                context.set(node, set);
+	                if (!lastSectionBeforeVisibleCell) {
+	                    lastSectionBeforeVisibleCell = node;
+	                    lastSectionBeforeVisibleCellOffset = offset;
+	                    lastSectionBeforeVisibleCellLength = nodeSize;
+	                    lastSectionBeforeVisibleCellScrollLength = set.scrollLength;
+	                }
+	            } else if ((offset + nodeSize) >= 0) {
+	                firstVisibleCell = node;
+	                if (lastSectionBeforeVisibleCell) {
+	                    lastCellOffsetInFirstVisibleSection = offset + nodeSize;
+	                }
+	                lastSectionBeforeVisibleCell = undefined;
+	            }
+	        }
+
+	        //
+	        // When no first section is in the scrollable range, then
+	        // look back further in search for that section
+	        //
+	        if (isSectionCallback && !lastSectionBeforeVisibleCell) {
+	            node = context.prev();
+	            while (node) {
+	                if (isSectionCallback(node.renderNode)) {
+	                    lastSectionBeforeVisibleCell = node;
+	                    nodeSize = options.itemSize || context.resolveSize(node, size)[direction];
+	                    lastSectionBeforeVisibleCellOffset = offset - nodeSize;
+	                    lastSectionBeforeVisibleCellLength = nodeSize;
+	                    lastSectionBeforeVisibleCellScrollLength = undefined;
+	                    break;
+	                }
+	                else {
+	                    node = context.prev();
+	                }
+	            }
+	        }
+
+	        //
+	        // Reposition "last section before first visible cell" to the top of the layout
+	        //
+	        if (lastSectionBeforeVisibleCell) {
+	            var correctedOffset = Math.max(margin[0], lastSectionBeforeVisibleCellOffset);
+	            if ((lastCellOffsetInFirstVisibleSection !== undefined) &&
+	                (lastSectionBeforeVisibleCellLength > (lastCellOffsetInFirstVisibleSection - margin[0]))) {
+	                correctedOffset = ((lastCellOffsetInFirstVisibleSection - lastSectionBeforeVisibleCellLength));
+	            }
+	            set.size[direction] = lastSectionBeforeVisibleCellLength;
+	            set.translate[direction] = correctedOffset;
+	            set.scrollLength = lastSectionBeforeVisibleCellScrollLength;
+	            context.set(lastSectionBeforeVisibleCell, set);
+	        }
+	    }
+
+	    ListLayout.Capabilities = capabilities;
+	    ListLayout.Name = 'ListLayout';
+	    ListLayout.Description = 'List-layout with margins, spacing and sticky headers';
+	    module.exports = ListLayout;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * This Source Code is licensed under the MIT license. If a copy of the
+	 * MIT-license was not distributed with this file, You can obtain one at:
+	 * http://opensource.org/licenses/mit-license.html.
+	 *
+	 * @author: Hein Rutjes (IjzerenHein)
+	 * @license MIT
+	 * @copyright Gloey Apps, 2014
+	 */
+
+	/*global define, console*/
+	/*eslint no-console: 0*/
+
+	/**
+	 * Lays a collection of renderables from left to right or top to bottom, and when the right/bottom edge is reached,
+	 * continues at the next column/row.
+	 *
+	 * |options|type|description|
+	 * |---|---|---|
+	 * |`itemSize`|Size/Function|Size of an item to layout or callback function which should return the size, e.g.: `function(renderNode, contextSize)`|
+	 * |`[margins]`|Number/Array|Margins shorthand (e.g. 5, [10, 20], [2, 5, 2, 10])|
+	 * |`[spacing]`|Number/Array|Spacing between items (e.g. 5, [10, 10])|
+	 * |`[justify]`|Bool/Array.Bool|Justify the renderables accross the width/height|
+	 *
+	 * Example:
+	 *
+	 * ```javascript
+	 * var FlexScrollView = require('famous-flex/FlexScrollView');
+	 * var CollectionLayout = require('famous-flex/layouts/CollectionLayout');
+	 *
+	 * var scrollView = new FlexScrollView({
+	 *   layout: CollectionLayout,
+	 *   layoutOptions: {
+	 *     itemSize: [100, 100],    // item has width and height of 100 pixels
+	 *     margins: [10, 5, 10, 5], // outer margins
+	 *     spacing: [10, 10]        // spacing between items
+	 *   },
+	 *   dataSource: [
+	 *     new Surface({content: 'item 1'}),
+	 *     new Surface({content: 'item 2'}),
+	 *     new Surface({content: 'item 3'})
+	 *   ]
+	 * });
+	 * ```
+	 * @module
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
+
+	    // import dependencies
+	    var Utility = __webpack_require__(55);
+	    var LayoutUtility = __webpack_require__(15);
+
+	    // Define capabilities of this layout function
+	    var capabilities = {
+	        sequence: true,
+	        direction: [Utility.Direction.Y, Utility.Direction.X],
+	        scrolling: true,
+	        trueSize: true,
+	        sequentialScrollingOptimized: true
+	    };
+
+	    // Prepare
+	    var context;
+	    var size;
+	    var direction;
+	    var alignment;
+	    var lineDirection;
+	    var lineLength;
+	    var offset;
+	    var margins;
+	    var margin = [0, 0];
+	    var spacing;
+	    var justify;
+	    var itemSize;
+	    var getItemSize;
+	    var lineNodes;
+
+	    /**
+	     * Lays out the renderables in a single line. Taking into account
+	     * the following variables:
+	     * - true-size
+	     * - margins
+	     * - spacing
+	     * - justify
+	     * - center align
+	     */
+	    function _layoutLine(next, endReached) {
+	        if (!lineNodes.length) {
+	            return 0;
+	        }
+
+	        // Determine size of the line
+	        var i;
+	        var lineSize = [0, 0];
+	        var lineNode;
+	        for (i = 0; i < lineNodes.length; i++) {
+	            lineSize[direction] = Math.max(lineSize[direction], lineNodes[i].size[direction]);
+	            lineSize[lineDirection] += ((i > 0) ? spacing[lineDirection] : 0) + lineNodes[i].size[lineDirection];
+	        }
+
+	        // Layout nodes from left to right or top to bottom
+	        var justifyOffset = justify[lineDirection] ? ((lineLength - lineSize[lineDirection]) / (lineNodes.length * 2)) : 0;
+	        var lineOffset = (direction ? margins[3] : margins[0]) + justifyOffset;
+	        var scrollLength;
+	        for (i = 0; i < lineNodes.length; i++) {
+	            lineNode = lineNodes[i];
+	            var translate = [0, 0, 0];
+	            translate[lineDirection] = lineOffset;
+	            translate[direction] = next ? offset : (offset - (lineSize[direction]));
+	            scrollLength = 0;
+	            if (i === 0) {
+	                scrollLength = lineSize[direction];
+	                if (endReached && ((next && !alignment) || (!next && alignment))) {
+	                    scrollLength += direction ? (margins[0] + margins[2]) : (margins[3] + margins[1]);
+	                }
+	                else {
+	                    scrollLength += spacing[direction];
+	                }
+	            }
+	            lineNode.set = {
+	                size: lineNode.size,
+	                translate: translate,
+	                scrollLength: scrollLength
+	            };
+	            lineOffset += lineNode.size[lineDirection] + spacing[lineDirection] + (justifyOffset * 2);
+	        }
+
+	        // Set nodes
+	        for (i = 0; i < lineNodes.length; i++) {
+	            lineNode = next ? lineNodes[i] : lineNodes[(lineNodes.length - 1) - i];
+	            context.set(lineNode.node, lineNode.set);
+	        }
+
+	        // Prepare for next line
+	        lineNodes = [];
+	        return lineSize[direction] + spacing[direction];
+	    }
+
+	    /**
+	     * Helper function to resolving the size of a node.
+	     */
+	    function _resolveNodeSize(node) {
+	        var localItemSize = itemSize;
+	        if (getItemSize) {
+	            localItemSize = getItemSize(node.renderNode, size);
+	        }
+	        if ((localItemSize[0] === true) || (localItemSize[1] === true)) {
+	            var result = context.resolveSize(node, size);
+	            if (localItemSize[0] !== true) {
+	                result[0] = itemSize[0];
+	            }
+	            if (localItemSize[1] !== true) {
+	                result[1] = itemSize[1];
+	            }
+	            return result;
+	        }
+	        else {
+	            return localItemSize;
+	        }
+	    }
+
+	    /**
+	     * Collection-layout
+	     */
+	    function CollectionLayout(context_, options) {
+
+	        // Prepare
+	        context = context_;
+	        size = context.size;
+	        direction = context.direction;
+	        alignment = context.alignment;
+	        lineDirection = (direction + 1) % 2;
+	        if ((options.gutter !== undefined) && console.warn) {
+	            console.warn('gutter has been deprecated for CollectionLayout, use margins & spacing instead');
+	        }
+	        if (options.gutter && !options.margins && !options.spacing) {
+	            var gutter = Array.isArray(options.gutter) ? options.gutter : [options.gutter, options.gutter];
+	            margins = [gutter[1], gutter[0], gutter[1], gutter[0]];
+	            spacing = gutter;
+	        }
+	        else {
+	            margins = LayoutUtility.normalizeMargins(options.margins);
+	            spacing = options.spacing || 0;
+	            spacing = Array.isArray(spacing) ? spacing : [spacing, spacing];
+	        }
+	        margin[0] = margins[direction ? 0 : 3];
+	        margin[1] = -margins[direction ? 2 : 1];
+	        justify = Array.isArray(options.justify) ? options.justify : (options.justify ? [true, true] : [false, false]);
+	        lineLength = size[lineDirection] - (direction ? (margins[3] + margins[1]) : (margins[0] + margins[2]));
+	        var node;
+	        var nodeSize;
+	        var lineOffset;
+	        var bound;
+
+	        //
+	        // Prepare item-size
+	        //
+	        if (!options.itemSize) {
+	            itemSize = [true, true]; // when no item-size specified, use size from renderables
+	        } else if (options.itemSize instanceof Function) {
+	            getItemSize = options.itemSize;
+	        } else if ((options.itemSize[0] === undefined) || (options.itemSize[0] === undefined)){
+	            // resolve 'undefined' into a fixed size
+	            itemSize = [
+	                (options.itemSize[0] === undefined) ? size[0] : options.itemSize[0],
+	                (options.itemSize[1] === undefined) ? size[1] : options.itemSize[1]
+	            ];
+	        }
+	        else {
+	            itemSize = options.itemSize;
+	        }
+
+	        //
+	        // Process all next nodes
+	        //
+	        offset = context.scrollOffset + margin[alignment];
+	        bound = context.scrollEnd + margin[alignment];
+	        lineOffset = 0;
+	        lineNodes = [];
+	        while (offset < bound) {
+	            node = context.next();
+	            if (!node) {
+	                _layoutLine(true, true);
+	                break;
+	            }
+	            nodeSize = _resolveNodeSize(node);
+	            lineOffset += (lineNodes.length ? spacing[lineDirection] : 0) + nodeSize[lineDirection];
+	            if (lineOffset > lineLength) {
+	                offset += _layoutLine(true, !node);
+	                lineOffset = nodeSize[lineDirection];
+	            }
+	            lineNodes.push({node: node, size: nodeSize});
+	        }
+
+	        //
+	        // Process previous nodes
+	        //
+	        offset = context.scrollOffset + margin[alignment];
+	        bound = context.scrollStart + margin[alignment];
+	        lineOffset = 0;
+	        lineNodes = [];
+	        while (offset > bound) {
+	            node = context.prev();
+	            if (!node) {
+	                _layoutLine(false, true);
+	                break;
+	            }
+	            nodeSize = _resolveNodeSize(node);
+	            lineOffset += (lineNodes.length ? spacing[lineDirection] : 0) + nodeSize[lineDirection];
+	            if (lineOffset > lineLength) {
+	                offset -= _layoutLine(false, !node);
+	                lineOffset = nodeSize[lineDirection];
+	            }
+	            lineNodes.unshift({node: node, size: nodeSize});
+	        }
+	    }
+
+	    CollectionLayout.Capabilities = capabilities;
+	    CollectionLayout.Name = 'CollectionLayout';
+	    CollectionLayout.Description = 'Multi-cell collection-layout with margins & spacing';
+	    module.exports = CollectionLayout;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * This Source Code is licensed under the MIT license. If a copy of the
+	 * MIT-license was not distributed with this file, You can obtain one at:
+	 * http://opensource.org/licenses/mit-license.html.
+	 *
+	 * @author: Hein Rutjes (IjzerenHein)
+	 * @license MIT
+	 * @copyright Gloey Apps, 2014
+	 */
+
+	/*global define*/
+
+	/**
+	 * Lays a collection of renderables from left to right, and when the right edge is reached,
+	 * continues at the left of the next line.
+	 *
+	 * |options|type|description|
+	 * |---|---|---|
+	 * |`itemSize`|Size|Size of an item to layout|
+	 * |`[gutter]`|Size|Gutter-space between renderables|
+	 *
+	 * Example:
+	 *
+	 * ```javascript
+	 * var CoverLayout = require('famous-flex/layouts/CoverLayout');
+	 *
+	 * new LayoutController({
+	 *   layout: CoverLayout,
+	 *   layoutOptions: {
+	 *     itemSize: [100, 100],  // item has width and height of 100 pixels
+	 *     gutter: [5, 5],        // gutter of 5 pixels in between cells
+	 *     justify: true          // justify the items neatly across the whole width and height
+	 *   },
+	 *   dataSource: [
+	 *     new Surface({content: 'item 1'}),
+	 *     new Surface({content: 'item 2'}),
+	 *     new Surface({content: 'item 3'})
+	 *   ]
+	 * })
+	 * ```
+	 * @module
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
+
+	    // import dependencies
+	    var Utility = __webpack_require__(55);
+
+	    // Define capabilities of this layout function
+	    var capabilities = {
+	        sequence: true,
+	        direction: [Utility.Direction.X, Utility.Direction.Y],
+	        scrolling: true
+	    };
+
+	    function CoverLayout(context, options) {
+
+	        // Get first renderable
+	        var node = context.next();
+	        if (!node) {
+	            return;
+	        }
+
+	        // Prepare
+	        var size = context.size;
+	        var direction = context.direction;
+	        var itemSize = options.itemSize;
+	        var opacityStep = 0.2;
+	        var scaleStep = 0.1;
+	        var translateStep = 30;
+	        var zStart = 100;
+
+	        // Layout the first renderable in the center
+	        context.set(node, {
+	            size: itemSize,
+	            origin: [0.5, 0.5],
+	            align: [0.5, 0.5],
+	            translate: [0, 0, zStart],
+	            scrollLength: itemSize[direction]
+	        });
+
+	        // Layout renderables
+	        var translate = itemSize[0] / 2;
+	        var opacity = 1 - opacityStep;
+	        var zIndex = zStart - 1;
+	        var scale = 1 - scaleStep;
+	        var prev = false;
+	        var endReached = false;
+	        node = context.next();
+	        if (!node) {
+	            node = context.prev();
+	            prev = true;
+	        }
+	        while (node) {
+
+	            // Layout next node
+	            context.set(node, {
+	                size: itemSize,
+	                origin: [0.5, 0.5],
+	                align: [0.5, 0.5],
+	                translate: direction ? [0, prev ? -translate : translate, zIndex] : [prev ? -translate : translate, 0, zIndex],
+	                scale: [scale, scale, 1],
+	                opacity: opacity,
+	                scrollLength: itemSize[direction]
+	            });
+	            opacity -= opacityStep;
+	            scale -= scaleStep;
+	            translate += translateStep;
+	            zIndex--;
+
+	            // Check if the end is reached
+	            if (translate >= (size[direction]/2)) {
+	                endReached = true;
+	            }
+	            else {
+	                node = prev ? context.prev() : context.next();
+	                endReached = !node;
+	            }
+
+	            // When end is reached for next, start processing prev
+	            if (endReached) {
+	                if (prev) {
+	                    break;
+	                }
+	                endReached = false;
+	                prev = true;
+	                node = context.prev();
+	                if (node) {
+	                    translate = (itemSize[direction] / 2);
+	                    opacity = 1 - opacityStep;
+	                    zIndex = zStart - 1;
+	                    scale = 1 - scaleStep;
+	                }
+	            }
+	        }
+	    }
+
+	    CoverLayout.Capabilities = capabilities;
+	    module.exports = CoverLayout;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
 /* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -4615,8 +5348,8 @@
 	     * @class Engine
 	     */
 	    var Context = __webpack_require__(51);
-	    var EventHandler = __webpack_require__(37);
-	    var OptionsManager = __webpack_require__(36);
+	    var EventHandler = __webpack_require__(36);
+	    var OptionsManager = __webpack_require__(35);
 
 	    var Engine = {};
 
@@ -7091,8 +7824,8 @@
 	 */
 
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-	    var EventHandler = __webpack_require__(37);
-	    var OptionsManager = __webpack_require__(36);
+	    var EventHandler = __webpack_require__(36);
+	    var OptionsManager = __webpack_require__(35);
 	    var RenderNode = __webpack_require__(62);
 	    var Utility = __webpack_require__(55);
 
@@ -7197,6 +7930,1857 @@
 /* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var __WEBPACK_AMD_DEFINE_RESULT__;/* This Source Code Form is subject to the terms of the Mozilla Public
+	 * License, v. 2.0. If a copy of the MPL was not distributed with this
+	 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+	 *
+	 * Owner: mark@famo.us
+	 * @license MPL 2.0
+	 * @copyright Famous Industries, Inc. 2014
+	 */
+
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
+	    var EventHandler = __webpack_require__(36);
+
+	    /**
+	     *  A collection of methods for setting options which can be extended
+	     *  onto other classes.
+	     *
+	     *
+	     *  **** WARNING ****
+	     *  You can only pass through objects that will compile into valid JSON.
+	     *
+	     *  Valid options:
+	     *      Strings,
+	     *      Arrays,
+	     *      Objects,
+	     *      Numbers,
+	     *      Nested Objects,
+	     *      Nested Arrays.
+	     *
+	     *    This excludes:
+	     *        Document Fragments,
+	     *        Functions
+	     * @class OptionsManager
+	     * @constructor
+	     * @param {Object} value options dictionary
+	     */
+	    function OptionsManager(value) {
+	        this._value = value;
+	        this.eventOutput = null;
+	    }
+
+	    /**
+	     * Create options manager from source dictionary with arguments overriden by patch dictionary.
+	     *
+	     * @static
+	     * @method OptionsManager.patch
+	     *
+	     * @param {Object} source source arguments
+	     * @param {...Object} data argument additions and overwrites
+	     * @return {Object} source object
+	     */
+	    OptionsManager.patch = function patchObject(source, data) {
+	        var manager = new OptionsManager(source);
+	        for (var i = 1; i < arguments.length; i++) manager.patch(arguments[i]);
+	        return source;
+	    };
+
+	    function _createEventOutput() {
+	        this.eventOutput = new EventHandler();
+	        this.eventOutput.bindThis(this);
+	        EventHandler.setOutputHandler(this, this.eventOutput);
+	    }
+
+	    /**
+	     * Create OptionsManager from source with arguments overriden by patches.
+	     *   Triggers 'change' event on this object's event handler if the state of
+	     *   the OptionsManager changes as a result.
+	     *
+	     * @method patch
+	     *
+	     * @param {...Object} arguments list of patch objects
+	     * @return {OptionsManager} this
+	     */
+	    OptionsManager.prototype.patch = function patch() {
+	        var myState = this._value;
+	        for (var i = 0; i < arguments.length; i++) {
+	            var data = arguments[i];
+	            for (var k in data) {
+	                if ((k in myState) && (data[k] && data[k].constructor === Object) && (myState[k] && myState[k].constructor === Object)) {
+	                    if (!myState.hasOwnProperty(k)) myState[k] = Object.create(myState[k]);
+	                    this.key(k).patch(data[k]);
+	                    if (this.eventOutput) this.eventOutput.emit('change', {id: k, value: this.key(k).value()});
+	                }
+	                else this.set(k, data[k]);
+	            }
+	        }
+	        return this;
+	    };
+
+	    /**
+	     * Alias for patch
+	     *
+	     * @method setOptions
+	     *
+	     */
+	    OptionsManager.prototype.setOptions = OptionsManager.prototype.patch;
+
+	    /**
+	     * Return OptionsManager based on sub-object retrieved by key
+	     *
+	     * @method key
+	     *
+	     * @param {string} identifier key
+	     * @return {OptionsManager} new options manager with the value
+	     */
+	    OptionsManager.prototype.key = function key(identifier) {
+	        var result = new OptionsManager(this._value[identifier]);
+	        if (!(result._value instanceof Object) || result._value instanceof Array) result._value = {};
+	        return result;
+	    };
+
+	    /**
+	     * Look up value by key or get the full options hash
+	     * @method get
+	     *
+	     * @param {string} key key
+	     * @return {Object} associated object or full options hash
+	     */
+	    OptionsManager.prototype.get = function get(key) {
+	        return key ? this._value[key] : this._value;
+	    };
+
+	    /**
+	     * Alias for get
+	     * @method getOptions
+	     */
+	    OptionsManager.prototype.getOptions = OptionsManager.prototype.get;
+
+	    /**
+	     * Set key to value.  Outputs 'change' event if a value is overwritten.
+	     *
+	     * @method set
+	     *
+	     * @param {string} key key string
+	     * @param {Object} value value object
+	     * @return {OptionsManager} new options manager based on the value object
+	     */
+	    OptionsManager.prototype.set = function set(key, value) {
+	        var originalValue = this.get(key);
+	        this._value[key] = value;
+	        if (this.eventOutput && value !== originalValue) this.eventOutput.emit('change', {id: key, value: value});
+	        return this;
+	    };
+
+	    /**
+	     * Bind a callback function to an event type handled by this object.
+	     *
+	     * @method "on"
+	     *
+	     * @param {string} type event type key (for example, 'change')
+	     * @param {function(string, Object)} handler callback
+	     * @return {EventHandler} this
+	     */
+	    OptionsManager.prototype.on = function on() {
+	        _createEventOutput.call(this);
+	        return this.on.apply(this, arguments);
+	    };
+
+	    /**
+	     * Unbind an event by type and handler.
+	     *   This undoes the work of "on".
+	     *
+	     * @method removeListener
+	     *
+	     * @param {string} type event type key (for example, 'change')
+	     * @param {function} handler function object to remove
+	     * @return {EventHandler} internal event handler object (for chaining)
+	     */
+	    OptionsManager.prototype.removeListener = function removeListener() {
+	        _createEventOutput.call(this);
+	        return this.removeListener.apply(this, arguments);
+	    };
+
+	    /**
+	     * Add event handler object to set of downstream handlers.
+	     *
+	     * @method pipe
+	     *
+	     * @param {EventHandler} target event handler target object
+	     * @return {EventHandler} passed event handler
+	     */
+	    OptionsManager.prototype.pipe = function pipe() {
+	        _createEventOutput.call(this);
+	        return this.pipe.apply(this, arguments);
+	    };
+
+	    /**
+	     * Remove handler object from set of downstream handlers.
+	     * Undoes work of "pipe"
+	     *
+	     * @method unpipe
+	     *
+	     * @param {EventHandler} target target handler object
+	     * @return {EventHandler} provided target
+	     */
+	    OptionsManager.prototype.unpipe = function unpipe() {
+	        _createEventOutput.call(this);
+	        return this.unpipe.apply(this, arguments);
+	    };
+
+	    module.exports = OptionsManager;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/* This Source Code Form is subject to the terms of the Mozilla Public
+	 * License, v. 2.0. If a copy of the MPL was not distributed with this
+	 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+	 *
+	 * Owner: mark@famo.us
+	 * @license MPL 2.0
+	 * @copyright Famous Industries, Inc. 2014
+	 */
+
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
+	    var EventEmitter = __webpack_require__(63);
+
+	    /**
+	     * EventHandler forwards received events to a set of provided callback functions.
+	     * It allows events to be captured, processed, and optionally piped through to other event handlers.
+	     *
+	     * @class EventHandler
+	     * @extends EventEmitter
+	     * @constructor
+	     */
+	    function EventHandler() {
+	        EventEmitter.apply(this, arguments);
+
+	        this.downstream = []; // downstream event handlers
+	        this.downstreamFn = []; // downstream functions
+
+	        this.upstream = []; // upstream event handlers
+	        this.upstreamListeners = {}; // upstream listeners
+	    }
+	    EventHandler.prototype = Object.create(EventEmitter.prototype);
+	    EventHandler.prototype.constructor = EventHandler;
+
+	    /**
+	     * Assign an event handler to receive an object's input events.
+	     *
+	     * @method setInputHandler
+	     * @static
+	     *
+	     * @param {Object} object object to mix trigger, subscribe, and unsubscribe functions into
+	     * @param {EventHandler} handler assigned event handler
+	     */
+	    EventHandler.setInputHandler = function setInputHandler(object, handler) {
+	        object.trigger = handler.trigger.bind(handler);
+	        if (handler.subscribe && handler.unsubscribe) {
+	            object.subscribe = handler.subscribe.bind(handler);
+	            object.unsubscribe = handler.unsubscribe.bind(handler);
+	        }
+	    };
+
+	    /**
+	     * Assign an event handler to receive an object's output events.
+	     *
+	     * @method setOutputHandler
+	     * @static
+	     *
+	     * @param {Object} object object to mix pipe, unpipe, on, addListener, and removeListener functions into
+	     * @param {EventHandler} handler assigned event handler
+	     */
+	    EventHandler.setOutputHandler = function setOutputHandler(object, handler) {
+	        if (handler instanceof EventHandler) handler.bindThis(object);
+	        object.pipe = handler.pipe.bind(handler);
+	        object.unpipe = handler.unpipe.bind(handler);
+	        object.on = handler.on.bind(handler);
+	        object.addListener = object.on;
+	        object.removeListener = handler.removeListener.bind(handler);
+	    };
+
+	    /**
+	     * Trigger an event, sending to all downstream handlers
+	     *   listening for provided 'type' key.
+	     *
+	     * @method emit
+	     *
+	     * @param {string} type event type key (for example, 'click')
+	     * @param {Object} event event data
+	     * @return {EventHandler} this
+	     */
+	    EventHandler.prototype.emit = function emit(type, event) {
+	        EventEmitter.prototype.emit.apply(this, arguments);
+	        var i = 0;
+	        for (i = 0; i < this.downstream.length; i++) {
+	            if (this.downstream[i].trigger) this.downstream[i].trigger(type, event);
+	        }
+	        for (i = 0; i < this.downstreamFn.length; i++) {
+	            this.downstreamFn[i](type, event);
+	        }
+	        return this;
+	    };
+
+	    /**
+	     * Alias for emit
+	     * @method addListener
+	     */
+	    EventHandler.prototype.trigger = EventHandler.prototype.emit;
+
+	    /**
+	     * Add event handler object to set of downstream handlers.
+	     *
+	     * @method pipe
+	     *
+	     * @param {EventHandler} target event handler target object
+	     * @return {EventHandler} passed event handler
+	     */
+	    EventHandler.prototype.pipe = function pipe(target) {
+	        if (target.subscribe instanceof Function) return target.subscribe(this);
+
+	        var downstreamCtx = (target instanceof Function) ? this.downstreamFn : this.downstream;
+	        var index = downstreamCtx.indexOf(target);
+	        if (index < 0) downstreamCtx.push(target);
+
+	        if (target instanceof Function) target('pipe', null);
+	        else if (target.trigger) target.trigger('pipe', null);
+
+	        return target;
+	    };
+
+	    /**
+	     * Remove handler object from set of downstream handlers.
+	     *   Undoes work of "pipe".
+	     *
+	     * @method unpipe
+	     *
+	     * @param {EventHandler} target target handler object
+	     * @return {EventHandler} provided target
+	     */
+	    EventHandler.prototype.unpipe = function unpipe(target) {
+	        if (target.unsubscribe instanceof Function) return target.unsubscribe(this);
+
+	        var downstreamCtx = (target instanceof Function) ? this.downstreamFn : this.downstream;
+	        var index = downstreamCtx.indexOf(target);
+	        if (index >= 0) {
+	            downstreamCtx.splice(index, 1);
+	            if (target instanceof Function) target('unpipe', null);
+	            else if (target.trigger) target.trigger('unpipe', null);
+	            return target;
+	        }
+	        else return false;
+	    };
+
+	    /**
+	     * Bind a callback function to an event type handled by this object.
+	     *
+	     * @method "on"
+	     *
+	     * @param {string} type event type key (for example, 'click')
+	     * @param {function(string, Object)} handler callback
+	     * @return {EventHandler} this
+	     */
+	    EventHandler.prototype.on = function on(type, handler) {
+	        EventEmitter.prototype.on.apply(this, arguments);
+	        if (!(type in this.upstreamListeners)) {
+	            var upstreamListener = this.trigger.bind(this, type);
+	            this.upstreamListeners[type] = upstreamListener;
+	            for (var i = 0; i < this.upstream.length; i++) {
+	                this.upstream[i].on(type, upstreamListener);
+	            }
+	        }
+	        return this;
+	    };
+
+	    /**
+	     * Alias for "on"
+	     * @method addListener
+	     */
+	    EventHandler.prototype.addListener = EventHandler.prototype.on;
+
+	    /**
+	     * Listen for events from an upstream event handler.
+	     *
+	     * @method subscribe
+	     *
+	     * @param {EventEmitter} source source emitter object
+	     * @return {EventHandler} this
+	     */
+	    EventHandler.prototype.subscribe = function subscribe(source) {
+	        var index = this.upstream.indexOf(source);
+	        if (index < 0) {
+	            this.upstream.push(source);
+	            for (var type in this.upstreamListeners) {
+	                source.on(type, this.upstreamListeners[type]);
+	            }
+	        }
+	        return this;
+	    };
+
+	    /**
+	     * Stop listening to events from an upstream event handler.
+	     *
+	     * @method unsubscribe
+	     *
+	     * @param {EventEmitter} source source emitter object
+	     * @return {EventHandler} this
+	     */
+	    EventHandler.prototype.unsubscribe = function unsubscribe(source) {
+	        var index = this.upstream.indexOf(source);
+	        if (index >= 0) {
+	            this.upstream.splice(index, 1);
+	            for (var type in this.upstreamListeners) {
+	                source.removeListener(type, this.upstreamListeners[type]);
+	            }
+	        }
+	        return this;
+	    };
+
+	    module.exports = EventHandler;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * This Source Code is licensed under the MIT license. If a copy of the
+	 * MIT-license was not distributed with this file, You can obtain one at:
+	 * http://opensource.org/licenses/mit-license.html.
+	 *
+	 * @author: Hein Rutjes (IjzerenHein)
+	 * @license MIT
+	 * @copyright Gloey Apps, 2014
+	 */
+
+	/*global define*/
+	/*eslint no-use-before-define:0 */
+
+	/**
+	 * LayoutNodeManager is a private class used internally by LayoutController, ScrollController
+	 * and ScrollView. It manages the layout-nodes that are rendered and exposes the layout-context
+	 * which is passed along to the layout-function.
+	 *
+	 * LayoutNodeManager keeps track of every rendered node through an ordered double-linked
+	 * list. The first time the layout-function is called, the linked list is created.
+	 * After that, the linked list is updated to reflect the output of the layout-function.
+	 * When the layout is unchanged, then the linked-list exactly matches the order of the
+	 * accessed nodes in the layout-function, and no layout-nodes need to be created or
+	 * re-ordered.
+	 *
+	 * @module
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
+
+	    // import dependencies
+	    var LayoutContext = __webpack_require__(64);
+	    var LayoutUtility = __webpack_require__(15);
+
+	    var MAX_POOL_SIZE = 100;
+
+	    /**
+	     * @class
+	     * @param {LayoutNode} LayoutNode Layout-nodes to create
+	     * @param {Function} initLayoutNodeFn function to use when initializing new nodes
+	     * @alias module:LayoutNodeManager
+	     */
+	    function LayoutNodeManager(LayoutNode, initLayoutNodeFn) {
+	        this.LayoutNode = LayoutNode;
+	        this._initLayoutNodeFn = initLayoutNodeFn;
+	        this._layoutCount = 0;
+	        this._context = new LayoutContext({
+	            next: _contextNext.bind(this),
+	            prev: _contextPrev.bind(this),
+	            get: _contextGet.bind(this),
+	            set: _contextSet.bind(this),
+	            resolveSize: _contextResolveSize.bind(this),
+	            size: [0, 0]
+	            //,cycle: 0
+	        });
+	        this._contextState = {
+	            // enumation state for the context
+	            //nextSequence: undefined,
+	            //prevSequence: undefined,
+	            //next: undefined
+	            //prev: undefined
+	            //start: undefined
+	        };
+	        this._pool = {
+	            layoutNodes: {
+	                size: 0
+	                //first: undefined
+	            },
+	            resolveSize: [0, 0]
+	        };
+	        //this._first = undefined; // first item in the linked list
+	        //this._nodesById = undefined;
+	        //this._trueSizeRequested = false;
+	    }
+
+	    /**
+	     * Prepares the manager for a new layout iteration, after which it returns the
+	     * context which can be used by the layout-function.
+	     *
+	     * @param {ViewSequence} viewSequence first node to layout
+	     * @param {Object} [nodesById] dictionary to use when looking up nodes by id
+	     * @return {LayoutContext} context which can be passed to the layout-function
+	     */
+	    LayoutNodeManager.prototype.prepareForLayout = function(viewSequence, nodesById, contextData) {
+
+	        // Reset all nodes
+	        var node = this._first;
+	        while (node) {
+	            node.reset();
+	            node = node._next;
+	        }
+
+	        // Prepare data
+	        var context = this._context;
+	        this._layoutCount++;
+	        this._nodesById = nodesById;
+	        this._trueSizeRequested = false;
+	        this._reevalTrueSize =
+	            contextData.reevalTrueSize ||
+	            !context.size ||
+	            (context.size[0] !== contextData.size[0]) ||
+	            (context.size[1] !== contextData.size[1]);
+
+	        // Prepare context for enumation
+	        var contextState = this._contextState;
+	        contextState.nextSequence = viewSequence;
+	        contextState.prevSequence = viewSequence;
+	        contextState.next = undefined;
+	        contextState.prev = undefined;
+	        contextState.nextGetIndex = 0;
+	        contextState.prevGetIndex = 0;
+	        contextState.nextSetIndex = 0;
+	        contextState.prevSetIndex = 0;
+	        contextState.addCount = 0;
+	        contextState.removeCount = 0;
+
+	        // Prepare content
+	        context.size[0] = contextData.size[0];
+	        context.size[1] = contextData.size[1];
+	        context.direction = contextData.direction;
+	        context.reverse = contextData.reverse;
+	        context.alignment = contextData.reverse ? 1 : 0;
+	        context.scrollOffset = contextData.scrollOffset || 0;
+	        context.scrollStart = contextData.scrollStart || 0;
+	        context.scrollEnd = contextData.scrollEnd || context.size[context.direction];
+	        //context.cycle++;
+	        return context;
+	    };
+
+	    /**
+	     * When the layout-function no longer lays-out the node, then it is not longer
+	     * being invalidated. In this case the destination is set to the removeSpec
+	     * after which the node is animated towards the remove-spec.
+	     *
+	     * @param {Spec} [removeSpec] spec towards which the no longer layed-out nodes are animated
+	     */
+	    LayoutNodeManager.prototype.removeNonInvalidatedNodes = function(removeSpec) {
+	        var node = this._first;
+	        while (node) {
+
+	            // If a node existed, but it is no longer being layed out,
+	            // then set it to the '_removing' state.
+	            if (!node._invalidated && !node._removing) {
+	                node.remove(removeSpec);
+	            }
+
+	            // Move to next node
+	            node = node._next;
+	        }
+	    };
+
+	    /**
+	     * Builds the render-spec and destroy any layout-nodes that no longer
+	     * return a render-spec.
+	     *
+	     * @return {Array.Spec} array of Specs
+	     */
+	    LayoutNodeManager.prototype.buildSpecAndDestroyUnrenderedNodes = function(translate) {
+	        var specs = [];
+	        var result = {
+	            specs: specs,
+	            modified: false
+	        };
+	        var node = this._first;
+	        while (node) {
+	            var modified = node._specModified;
+	            var spec = node.getSpec();
+	            //if (spec.removed && (!this._contextState.addCount || (this._contextState.removeCount > 5))) {
+	            if (spec.removed) {
+
+	                // Destroy node
+	                var destroyNode = node;
+	                node = node._next;
+	                _destroyNode.call(this, destroyNode);
+
+	                // Mark as modified
+	                result.modified = true;
+	            }
+	            else {
+
+	                // Update stats
+	                if (modified) {
+	                    if (spec.transform && translate) {
+	                        spec.transform[12] += translate[0];
+	                        spec.transform[13] += translate[1];
+	                        spec.transform[14] += translate[2];
+	                    }
+	                    result.modified = true;
+	                }
+
+	                // Add node to result output
+	                specs.push(spec);
+	                node = node._next;
+	            }
+	        }
+	        this._contextState.addCount = 0;
+	        this._contextState.removeCount = 0;
+	        return result;
+	    };
+
+	    /**
+	     * Get the layout-node by its renderable.
+	     *
+	     * @param {Object} renderable renderable
+	     * @return {LayoutNode} layout-node or undefined
+	     */
+	    LayoutNodeManager.prototype.getNodeByRenderNode = function(renderable) {
+	        var node = this._first;
+	        while (node) {
+	            if (node.renderNode === renderable) {
+	                return node;
+	            }
+	            node = node._next;
+	        }
+	        return undefined;
+	    };
+
+	    /**
+	     * Inserts a layout-node into the linked-list.
+	     *
+	     * @param {LayoutNode} node layout-node to insert
+	     */
+	    LayoutNodeManager.prototype.insertNode = function(node) {
+	        node._next = this._first;
+	        if (this._first) {
+	            this._first._prev = node;
+	        }
+	        this._first = node;
+	    };
+
+	    /**
+	     * Sets the options for all nodes.
+	     *
+	     * @param {Object} options node options
+	     */
+	    LayoutNodeManager.prototype.setNodeOptions = function(options) {
+	        this._nodeOptions = options;
+	        var node = this._first;
+	        while (node) {
+	            node.setOptions(options);
+	            node = node._next;
+	        }
+	        node = this._pool.layoutNodes.first;
+	        while (node) {
+	            node.setOptions(options);
+	            node = node._next;
+	        }
+	    };
+
+	    /**
+	     * Creates a layout-node
+	     *
+	     * @param {Object} renderNode render-node for whom to create a layout-node for
+	     * @return {LayoutNode} layout-node
+	     */
+	    LayoutNodeManager.prototype.createNode = function(renderNode, spec) {
+	        var node;
+	        if (this._pool.layoutNodes.first) {
+	            node = this._pool.layoutNodes.first;
+	            this._pool.layoutNodes.first = node._next;
+	            this._pool.layoutNodes.size--;
+	            node.constructor.apply(node, arguments);
+	        }
+	        else {
+	            node = new this.LayoutNode(renderNode, spec);
+	            if (this._nodeOptions) {
+	                node.setOptions(this._nodeOptions);
+	            }
+	        }
+	        node._prev = undefined;
+	        node._next = undefined;
+	        node._viewSequence = undefined;
+	        node._layoutCount = 0;
+	        if (this._initLayoutNodeFn) {
+	            this._initLayoutNodeFn.call(this, node, spec);
+	        }
+	        return node;
+	    };
+
+	    /**
+	     * Destroys a layout-node
+	     */
+	    function _destroyNode(node) {
+
+	        // Remove node from linked-list
+	        if (node._next) {
+	            node._next._prev = node._prev;
+	        }
+	        if (node._prev) {
+	            node._prev._next = node._next;
+	        }
+	        else {
+	            this._first = node._next;
+	        }
+
+	        // Destroy the node
+	        node.destroy();
+
+	        // Add node to pool
+	        if (this._pool.layoutNodes.size < MAX_POOL_SIZE) {
+	            this._pool.layoutNodes.size++;
+	            node._prev = undefined;
+	            node._next = this._pool.layoutNodes.first;
+	            this._pool.layoutNodes.first = node;
+	        }
+	    }
+
+	    /**
+	     * Gets start layout-node for enumeration.
+	     *
+	     * @param {Bool} [next] undefined = all, true = all next, false = all previous
+	     * @return {LayoutNode} layout-node or undefined
+	     */
+	    LayoutNodeManager.prototype.getStartEnumNode = function(next) {
+	        if (next === undefined) {
+	            return this._first;
+	        } else if (next === true) {
+	            return (this._contextState.start && this._contextState.startPrev) ? this._contextState.start._next : this._contextState.start;
+	        } else if (next === false) {
+	            return (this._contextState.start && !this._contextState.startPrev) ? this._contextState.start._prev : this._contextState.start;
+	        }
+	    };
+
+	    /**
+	     * Checks the integrity of the linked-list.
+	     */
+	    /*function _checkIntegrity() {
+	        var node = this._first;
+	        var count = 0;
+	        var prevNode;
+	        while (node) {
+	            if (!node._prev && (node !== this._first)) {
+	                throw 'No prev but not first';
+	            }
+	            if (node._prev !== prevNode) {
+	                throw 'Bork';
+	            }
+	            prevNode = node;
+	            node = node._next;
+	            count++;
+	        }
+	    }*/
+
+	    /**
+	     * Creates or gets a layout node.
+	     */
+	    function _contextGetCreateAndOrderNodes(renderNode, prev) {
+
+	        // The first time this function is called, the current
+	        // prev/next position is obtained.
+	        var node;
+	        if (!this._contextState.prev && !this._contextState.next) {
+	            node = this._first;
+	            while (node) {
+	                if (node.renderNode === renderNode) {
+	                    break;
+	                }
+	                node = node._next;
+	            }
+	            if (!node) {
+	                node = this.createNode(renderNode);
+	                node._next = this._first;
+	                if (this._first) {
+	                    this._first._prev = node;
+	                }
+	                this._first = node;
+	            }
+	            this._contextState.start = node;
+	            this._contextState.startPrev = prev;
+	            this._contextState.prev = prev ? node : undefined;
+	            this._contextState.next = prev ? undefined : node;
+	        }
+
+	        // Check whether node already exist at the correct position
+	        // in the linked-list. If so, return that node immediately
+	        // and advance the prev/next pointer for the next/prev
+	        // lookup operation.
+	        var prevNode;
+	        var nextNode;
+	        if (prev) {
+	            if (this._contextState.prev && (this._contextState.prev.renderNode === renderNode)) {
+	                prevNode = this._contextState.prev;
+	            }
+	            else if (!this._contextState.prev && this._contextState.start && this._contextState.start._prev && (this._contextState.start._prev.renderNode === renderNode)) {
+	                prevNode = this._contextState.start._prev;
+	                this._contextState.prev = prevNode;
+	            }
+	            if (prevNode) {
+	                if (prevNode._prev) {
+	                    this._contextState.prev = prevNode._prev;
+	                }
+	                return prevNode;
+	            }
+	        }
+	        else {
+	            if (this._contextState.next && (this._contextState.next.renderNode === renderNode)) {
+	                nextNode = this._contextState.next;
+	            }
+	            else if (!this._contextState.next && this._contextState.start && this._contextState.start._next && (this._contextState.start._next.renderNode === renderNode)) {
+	                nextNode = this._contextState.start._next;
+	                this._contextState.next = nextNode;
+	            }
+	            if (nextNode) {
+	                if (nextNode._next) {
+	                    this._contextState.next = nextNode._next;
+	                }
+	                return nextNode;
+	            }
+	        }
+
+	        // Lookup the node anywhere in the list..
+	        node = this._first;
+	        while (node) {
+	            if (node.renderNode === renderNode) {
+	                break;
+	            }
+	            node = node._next;
+	        }
+
+	        // Create new node if neccessary
+	        if (!node) {
+	            node = this.createNode(renderNode);
+	        }
+
+	        // Node existed, remove from linked-list
+	        else {
+	            if (node._next) {
+	                node._next._prev = node._prev;
+	            }
+	            if (node._prev) {
+	                node._prev._next = node._next;
+	            }
+	            else {
+	                this._first = node._next;
+	            }
+	            node._next = undefined;
+	            node._prev = undefined;
+	        }
+
+	        // Insert node into the linked list
+	        if (prev) {
+	            prevNode = this._contextState.prev || this._contextState.start;
+	            if (prevNode._prev) {
+	                node._prev = prevNode._prev;
+	                prevNode._prev._next = node;
+	            }
+	            else {
+	                this._first = node;
+	            }
+	            prevNode._prev = node;
+	            node._next = prevNode;
+	            this._contextState.prev = node;
+	        }
+	        else {
+	            nextNode = this._contextState.next || this._contextState.start;
+	            if (nextNode._next) {
+	                node._next = nextNode._next;
+	                nextNode._next._prev = node;
+	            }
+	            nextNode._next = node;
+	            node._prev = nextNode;
+	            this._contextState.next = node;
+	        }
+
+	        return node;
+	    }
+
+	    /**
+	     * Get the next render-node
+	     */
+	    function _contextNext() {
+
+	        // Get the next node from the sequence
+	        if (!this._contextState.nextSequence) {
+	            return undefined;
+	        }
+	        if (this._context.reverse) {
+	            this._contextState.nextSequence = this._contextState.nextSequence.getNext();
+	            if (!this._contextState.nextSequence) {
+	                return undefined;
+	            }
+	        }
+	        var renderNode = this._contextState.nextSequence.get();
+	        if (!renderNode) {
+	            this._contextState.nextSequence = undefined;
+	            return undefined;
+	        }
+	        var nextSequence = this._contextState.nextSequence;
+	        if (!this._context.reverse) {
+	            this._contextState.nextSequence = this._contextState.nextSequence.getNext();
+	        }
+	        return {
+	            renderNode: renderNode,
+	            viewSequence: nextSequence,
+	            next: true,
+	            index: ++this._contextState.nextGetIndex
+	        };
+	    }
+
+	    /**
+	     * Get the previous render-node
+	     */
+	    function _contextPrev() {
+
+	        // Get the previous node from the sequence
+	        if (!this._contextState.prevSequence) {
+	            return undefined;
+	        }
+	        if (!this._context.reverse) {
+	            this._contextState.prevSequence = this._contextState.prevSequence.getPrevious();
+	            if (!this._contextState.prevSequence) {
+	                return undefined;
+	            }
+	        }
+	        var renderNode = this._contextState.prevSequence.get();
+	        if (!renderNode) {
+	            this._contextState.prevSequence = undefined;
+	            return undefined;
+	        }
+	        var prevSequence = this._contextState.prevSequence;
+	        if (this._context.reverse) {
+	            this._contextState.prevSequence = this._contextState.prevSequence.getPrevious();
+	        }
+	        return {
+	            renderNode: renderNode,
+	            viewSequence: prevSequence,
+	            prev: true,
+	            index: --this._contextState.prevGetIndex
+	        };
+	    }
+
+	    /**
+	     * Resolve id into a context-node.
+	     */
+	     function _contextGet(contextNodeOrId) {
+	        if (this._nodesById && ((contextNodeOrId instanceof String) || (typeof contextNodeOrId === 'string'))) {
+	            var renderNode = this._nodesById[contextNodeOrId];
+	            if (!renderNode) {
+	                return undefined;
+	            }
+
+	            // Return array
+	            if (renderNode instanceof Array) {
+	                var result = [];
+	                for (var i = 0, j = renderNode.length; i < j; i++) {
+	                    result.push({
+	                        renderNode: renderNode[i],
+	                        arrayElement: true
+	                    });
+	                }
+	                return result;
+	            }
+
+	            // Create context node
+	            return {
+	                renderNode: renderNode,
+	                byId: true
+	            };
+	        }
+	        else {
+	            return contextNodeOrId;
+	        }
+	    }
+
+	    /**
+	     * Set the node content
+	     */
+	    function _contextSet(contextNodeOrId, set) {
+	        var contextNode = this._nodesById ? _contextGet.call(this, contextNodeOrId) : contextNodeOrId;
+	        if (contextNode) {
+	            var node = contextNode.node;
+	            if (!node) {
+	                if (contextNode.next) {
+	                     if (contextNode.index < this._contextState.nextSetIndex) {
+	                        LayoutUtility.error('Nodes must be layed out in the same order as they were requested!');
+	                     }
+	                     this._contextState.nextSetIndex = contextNode.index;
+	                } else if (contextNode.prev) {
+	                     if (contextNode.index > this._contextState.prevSetIndex) {
+	                        LayoutUtility.error('Nodes must be layed out in the same order as they were requested!');
+	                     }
+	                     this._contextState.prevSetIndex = contextNode.index;
+	                }
+	                node = _contextGetCreateAndOrderNodes.call(this, contextNode.renderNode, contextNode.prev);
+	                node._viewSequence = contextNode.viewSequence;
+	                node._layoutCount++;
+	                if (node._layoutCount === 1) {
+	                    this._contextState.addCount++;
+	                }
+	                contextNode.node = node;
+	            }
+	            node.usesTrueSize = contextNode.usesTrueSize;
+	            node.trueSizeRequested = contextNode.trueSizeRequested;
+	            node.set(set, this._context.size);
+	            contextNode.set = set;
+	        }
+	    }
+
+	    /**
+	     * Resolve the size of the layout-node from the renderable itsself
+	     */
+	    function _contextResolveSize(contextNodeOrId, parentSize) {
+	        var contextNode = this._nodesById ? _contextGet.call(this, contextNodeOrId) : contextNodeOrId;
+	        var resolveSize = this._pool.resolveSize;
+	        if (!contextNode) {
+	            resolveSize[0] = 0;
+	            resolveSize[1] = 0;
+	            return resolveSize;
+	        }
+
+	        // Get in use size
+	        var renderNode = contextNode.renderNode;
+	        var size = renderNode.getSize();
+	        if (!size) {
+	            return parentSize;
+	        }
+
+	        // Check if true-size is used and it must be reavaluated
+	        var configSize = renderNode.size && (renderNode._trueSizeCheck !== undefined) ? renderNode.size : undefined;
+	        if (configSize && ((configSize[0] === true) || (configSize[1] === true))) {
+	            contextNode.usesTrueSize = true;
+	            var backupSize = renderNode._backupSize;
+	            if (renderNode._trueSizeCheck) {
+
+	                // Fix for true-size renderables. When true-size is used, the size
+	                // is incorrect for one render-cycle due to the fact that Surface.commit
+	                // updates the content after asking the DOM for the offsetHeight/offsetWidth.
+	                // The code below backs the size up, and re-uses that when this scenario
+	                // occurs.
+	                if (backupSize && (configSize !== size)) {
+	                    var newWidth = (configSize[0] === true) ? Math.max(backupSize[0], size[0]) : size[0];
+	                    var newHeight = (configSize[1] === true) ? Math.max(backupSize[1], size[1]) : size[1];
+	                    if ((newWidth !== backupSize[0]) || (newHeight !== backupSize[1])) {
+	                        this._trueSizeRequested = true;
+	                        contextNode.trueSizeRequested = true;
+	                    }
+	                    backupSize[0] = newWidth;
+	                    backupSize[1] = newHeight;
+	                    size = backupSize;
+	                    renderNode._backupSize = undefined;
+	                    backupSize = undefined;
+	                }
+	                else {
+	                    this._trueSizeRequested = true;
+	                    contextNode.trueSizeRequested = true;
+	                }
+	                //console.log('true size requested on node: ' + JSON.stringify(size));
+	            }
+	            if (this._reevalTrueSize) {
+	                renderNode._trueSizeCheck = true; // force request of true-size from DOM
+	            }
+
+	            // Backup the size of the node
+	            if (!backupSize) {
+	                renderNode._backupSize = [0, 0];
+	                backupSize = renderNode._backupSize;
+	            }
+	            backupSize[0] = size[0];
+	            backupSize[1] = size[1];
+	        }
+
+	        // Resolve 'undefined' to parent-size and true to 0
+	        if ((size[0] === undefined) || (size[0] === true) || (size[1] === undefined) || (size[1] === true)) {
+	            resolveSize[0] = size[0];
+	            resolveSize[1] = size[1];
+	            size = resolveSize;
+	            if (size[0] === undefined) {
+	                size[0] = parentSize[0];
+	            } else if (size[0] === true) {
+	                size[0] = 0;
+	                this._trueSizeRequested = true;
+	                contextNode.trueSizeRequested = true;
+	            }
+	            if (size[1] === undefined) {
+	                size[1] = parentSize[1];
+	            } else if (size[1] === true) {
+	                size[1] = 0;
+	                this._trueSizeRequested = true;
+	                contextNode.trueSizeRequested = true;
+	            }
+	        }
+	        return size;
+	    }
+
+	    module.exports = LayoutNodeManager;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * This Source Code is licensed under the MIT license. If a copy of the
+	 * MIT-license was not distributed with this file, You can obtain one at:
+	 * http://opensource.org/licenses/mit-license.html.
+	 *
+	 * @author: Hein Rutjes (IjzerenHein)
+	 * @license MIT
+	 * @copyright Gloey Apps, 2014
+	 */
+
+	/*global define*/
+	/*eslint no-use-before-define:0 */
+
+	/**
+	 * Internal LayoutNode class used by `LayoutController`.
+	 *
+	 * @module
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
+
+	    // import dependencies
+	    var Transform = __webpack_require__(27);
+	    var LayoutUtility = __webpack_require__(15);
+
+	    /**
+	     * @class
+	     * @param {Object} renderNode Render-node which this layout-node represents
+	     * @alias module:LayoutNode
+	     */
+	    function LayoutNode(renderNode, spec) {
+	        this.renderNode = renderNode;
+	        this._spec = spec ? LayoutUtility.cloneSpec(spec) : {};
+	        this._spec.renderNode = renderNode; // also store in spec
+	        this._specModified = true;
+	        this._invalidated = false;
+	        this._removing = false;
+	        //this.scrollLength = undefined;
+	        //this.trueSizeRequested = false;
+	    }
+
+	    /**
+	     * Called to update the options for the node
+	     */
+	    LayoutNode.prototype.setOptions = function(options) {
+	        // override to implement
+	    };
+
+	    /**
+	     * Called when the node is destroyed
+	     */
+	    LayoutNode.prototype.destroy = function() {
+	        this.renderNode = undefined;
+	        this._spec.renderNode = undefined;
+	        this._viewSequence = undefined;
+	    };
+
+	    /**
+	     * Reset the end-state. This function is called on all layout-nodes prior to
+	     * calling the layout-function. So that the layout-function starts with a clean slate.
+	     */
+	    LayoutNode.prototype.reset = function() {
+	        this._invalidated = false;
+	        this.trueSizeRequested = false;
+	    };
+
+	    /**
+	     * Set the spec of the node
+	     *
+	     * @param {Object} spec
+	     */
+	    LayoutNode.prototype.setSpec = function(spec) {
+	        this._specModified = true;
+	        if (spec.align) {
+	            if (!spec.align) {
+	                this._spec.align = [0, 0];
+	            }
+	            this._spec.align[0] = spec.align[0];
+	            this._spec.align[1] = spec.align[1];
+	        }
+	        else {
+	            this._spec.align = undefined;
+	        }
+	        if (spec.origin) {
+	            if (!spec.origin) {
+	                this._spec.origin = [0, 0];
+	            }
+	            this._spec.origin[0] = spec.origin[0];
+	            this._spec.origin[1] = spec.origin[1];
+	        }
+	        else {
+	            this._spec.origin = undefined;
+	        }
+	        if (spec.size) {
+	            if (!spec.size) {
+	                this._spec.size = [0, 0];
+	            }
+	            this._spec.size[0] = spec.size[0];
+	            this._spec.size[1] = spec.size[1];
+	        }
+	        else {
+	            this._spec.size = undefined;
+	        }
+	        if (spec.transform) {
+	            if (!spec.transform) {
+	                this._spec.transform = spec.transform.slice(0);
+	            }
+	            else {
+	                for (var i = 0; i < 16; i++) {
+	                    this._spec.transform[0] = spec.transform[0];
+	                }
+	            }
+	        }
+	        else {
+	            this._spec.transform = undefined;
+	        }
+	        this._spec.opacity = spec.opacity;
+	    };
+
+	    /**
+	     * Set the content of the node
+	     *
+	     * @param {Object} set
+	     */
+	    LayoutNode.prototype.set = function(set, size) {
+	        this._invalidated = true;
+	        this._specModified = true;
+	        this._removing = false;
+	        var spec = this._spec;
+	        spec.opacity = set.opacity;
+	        if (set.size) {
+	            if (!spec.size) {
+	                spec.size = [0, 0];
+	            }
+	            spec.size[0] = set.size[0];
+	            spec.size[1] = set.size[1];
+	        }
+	        else {
+	            spec.size = undefined;
+	        }
+	        if (set.origin) {
+	            if (!spec.origin) {
+	                spec.origin = [0, 0];
+	            }
+	            spec.origin[0] = set.origin[0];
+	            spec.origin[1] = set.origin[1];
+	        }
+	        else {
+	            spec.origin = undefined;
+	        }
+	        if (set.align) {
+	            if (!spec.align) {
+	                spec.align = [0, 0];
+	            }
+	            spec.align[0] = set.align[0];
+	            spec.align[1] = set.align[1];
+	        }
+	        else {
+	            spec.align = undefined;
+	        }
+
+	        if (set.skew || set.rotate || set.scale) {
+	            this._spec.transform = Transform.build({
+	                translate: set.translate || [0, 0, 0],
+	                skew: set.skew || [0, 0, 0],
+	                scale: set.scale || [1, 1, 1],
+	                rotate: set.rotate || [0, 0, 0]
+	            });
+	        }
+	        else if (set.translate) {
+	            this._spec.transform = Transform.translate(set.translate[0], set.translate[1], set.translate[2]);
+	        }
+	        else {
+	            this._spec.transform = undefined;
+	        }
+	        this.scrollLength = set.scrollLength;
+	    };
+
+	    /**
+	     * Creates the render-spec
+	     */
+	    LayoutNode.prototype.getSpec = function() {
+	        this._specModified = false;
+	        this._spec.removed = !this._invalidated;
+	        return this._spec;
+	    };
+
+	    /**
+	     * Marks the node for removal
+	     */
+	    LayoutNode.prototype.remove = function(removeSpec) {
+	        this._removing = true;
+	    };
+
+	    module.exports = LayoutNode;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * This Source Code is licensed under the MIT license. If a copy of the
+	 * MIT-license was not distributed with this file, You can obtain one at:
+	 * http://opensource.org/licenses/mit-license.html.
+	 *
+	 * @author: Hein Rutjes (IjzerenHein)
+	 * @license MIT
+	 * @copyright Gloey Apps, 2014
+	 */
+
+	/*global define*/
+	/*eslint no-use-before-define:0 */
+
+	/**
+	 * Internal LayoutNode class used by `FlowLayoutController`.
+	 *
+	 * @module
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
+
+	    // import dependencies
+	    var OptionsManager = __webpack_require__(35);
+	    var Transform = __webpack_require__(27);
+	    var Vector = __webpack_require__(68);
+	    var Particle = __webpack_require__(70);
+	    var Spring = __webpack_require__(71);
+	    var PhysicsEngine = __webpack_require__(69);
+	    var LayoutNode = __webpack_require__(38);
+	    var Transitionable = __webpack_require__(60);
+
+	    /**
+	     * @class
+	     * @extends LayoutNode
+	     * @param {Object} renderNode Render-node which this layout-node represents
+	     * @param {Spec} spec Initial state
+	     * @param {Object} physicsEngines physics-engines to use
+	     * @alias module:FlowLayoutNode
+	     */
+	    function FlowLayoutNode(renderNode, spec) {
+	        LayoutNode.apply(this, arguments);
+
+	        if (!this.options) {
+	            this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
+	            this._optionsManager = new OptionsManager(this.options);
+	        }
+
+	        if (!this._pe) {
+	            this._pe = new PhysicsEngine();
+	            this._pe.sleep();
+	        }
+
+	        this._options = {
+	            spring: {
+	                dampingRatio: 0.8,
+	                period: 300
+	            }
+	        };
+
+	        if (!this._properties) {
+	            this._properties = {};
+	        }
+	        else {
+	            for (var propName in this._properties) {
+	                this._properties[propName].init = false;
+	            }
+	        }
+
+	        this._specModified = true;
+	        this._initial = true;
+	        if (spec) {
+	            this.setSpec(spec);
+	        }
+	    }
+	    FlowLayoutNode.prototype = Object.create(LayoutNode.prototype);
+	    FlowLayoutNode.prototype.constructor = FlowLayoutNode;
+
+	    FlowLayoutNode.DEFAULT_OPTIONS = {
+	        spring: {
+	            dampingRatio: 0.8,
+	            period: 300
+	        },
+	        particleRounding: 0.001
+	    };
+
+	    /**
+	     * Defaults
+	     */
+	    var DEFAULT = {
+	        opacity: 1,
+	        opacity2D: [1, 0],
+	        size: [0, 0],
+	        origin: [0, 0],
+	        align: [0, 0],
+	        scale: [1, 1, 1],
+	        translate: [0, 0, 0],
+	        rotate: [0, 0, 0],
+	        skew: [0, 0, 0]
+	    };
+
+	    /**
+	     * Verifies that the integrity of the layout-node is oke.
+	     */
+	    /*function _verifyIntegrity() {
+	        var i;
+	        for (var propName in this._properties) {
+	            var prop = this._properties[propName];
+	            if (prop.particle) {
+	                if (isNaN(prop.particle.getEnergy())) {
+	                    throw 'invalid particle energy: ' + propName;
+	                }
+	                var value = prop.particle.getPosition();
+	                for (i = 0; i < value.length; i++) {
+	                    if (isNaN(value[i])) {
+	                       throw 'invalid particle value: ' + propName + '(' + i + ')';
+	                    }
+	                }
+	                value = prop.endState.get();
+	                for (i = 0; i < value.length; i++) {
+	                    if (isNaN(value[i])) {
+	                       throw 'invalid endState value: ' + propName + '(' + i + ')';
+	                    }
+	                }
+	            }
+	        }
+	    }*/
+
+	    /**
+	     * Sets the configuration options
+	     */
+	    FlowLayoutNode.prototype.setOptions = function(options) {
+	        this._optionsManager.setOptions(options);
+	        var wasSleeping = this._pe.isSleeping();
+	        for (var propName in this._properties) {
+	            var prop = this._properties[propName];
+	            if (prop.force) {
+	                prop.force.setOptions(prop.force);
+	            }
+	        }
+	        if (wasSleeping) {
+	            this._pe.sleep();
+	        }
+	        return this;
+	    };
+
+	    /**
+	     * Set the properties from a spec.
+	     */
+	    FlowLayoutNode.prototype.setSpec = function(spec) {
+	        var set;
+	        if (spec.transform) {
+	            set = Transform.interpret(spec.transform);
+	        }
+	        if (!set) {
+	            set = {};
+	        }
+	        set.opacity = spec.opacity;
+	        set.size = spec.size;
+	        set.align = spec.align;
+	        set.origin = spec.origin;
+
+	        var oldRemoving = this._removing;
+	        var oldInvalidated = this._invalidated;
+	        this.set(set);
+	        this._removing = oldRemoving;
+	        this._invalidated = oldInvalidated;
+	    };
+
+	    /**
+	     * Reset the end-state. This function is called on all layout-nodes prior to
+	     * calling the layout-function. So that the layout-function starts with a clean slate.
+	     */
+	    FlowLayoutNode.prototype.reset = function() {
+	        if (this._invalidated) {
+	            for (var propName in this._properties) {
+	                this._properties[propName].invalidated = false;
+	            }
+	            this._invalidated = false;
+	        }
+	        this.trueSizeRequested = false;
+	        this.usesTrueSize = false;
+	    };
+
+	    /**
+	     * Markes the node for removal.
+	     */
+	    FlowLayoutNode.prototype.remove = function(removeSpec) {
+
+	        // Transition to the remove-spec state
+	        this._removing = true;
+	        if (removeSpec) {
+	            this.setSpec(removeSpec);
+	        }
+	        else {
+	            this._pe.sleep();
+	            this._specModified = false;
+	        }
+
+	        // Mark for removal
+	        this._invalidated = false;
+	    };
+
+	    /**
+	     * Locks a property, or a specific array-dimension of the property
+	     * fixed to the end-state value. Use this to e.g. lock the x-translation
+	     * to a the fixed end-state, so that when scrolling the renderable sticks
+	     * to the x-axis and does not feel sluggish.
+	     */
+	    FlowLayoutNode.prototype.setDirectionLock = function(direction, value) {
+	        if (direction === undefined) {
+	            this._lockDirection = undefined;
+	        }
+	        else {
+	            this._lockDirection = direction;
+	            if (value !== undefined) {
+	                if (!this._lockTransitionable) {
+	                    this._lockTransitionable = new Transitionable(1);
+	                }
+	                this._lockTransitionable.halt();
+	                this._lockTransitionable.reset(value);
+	                if (value !== 1) {
+	                    this._lockTransitionable.set(1, {
+	                        duration: (1 - value) * 1000
+	                    });
+	                }
+	            }
+	        }
+	    };
+
+	    /**
+	     * Helper function for getting the property value.
+	     */
+	    function _getRoundedValue3D(prop, def, precision) {
+	        if (!prop || !prop.init) {
+	            return def;
+	        }
+	        precision = precision || this.options.particleRounding;
+	        var value = prop.particle.getPosition();
+	        return [
+	            Math.round(value[0] / precision) * precision,
+	            Math.round(value[1] / precision) * precision,
+	            Math.round(value[2] / precision) * precision
+	        ];
+	    }
+
+	    /**
+	     * Creates the render-spec
+	     */
+	    FlowLayoutNode.prototype.getSpec = function() {
+
+	        // When the end state was reached, return the previous spec
+	        var endStateReached = this._pe.isSleeping();
+	        if (!this._specModified && endStateReached) {
+	            this._spec.removed = !this._invalidated;
+	            return this._spec;
+	        }
+	        this._initial = false;
+	        this._specModified = !endStateReached;
+	        this._spec.removed = false;
+
+	        // Step physics engine when not sleeping
+	        if (!endStateReached) {
+	            this._pe.step();
+	        }
+
+	        // Build fresh spec
+	        var value;
+	        var spec = this._spec;
+	        var precision = this.options.particleRounding;
+
+	        // opacity
+	        var prop = this._properties.opacity;
+	        if (prop && prop.init) {
+	            spec.opacity = Math.round(Math.max(0,Math.min(1, prop.curState.x)) / precision) * precision;
+	        }
+	        else {
+	            spec.opacity = undefined;
+	        }
+
+	        // size
+	        prop = this._properties.size;
+	        if (prop && prop.init) {
+	            spec.size = spec.size || [0, 0];
+	            spec.size[0] = Math.round(prop.curState.x / 0.1) * 0.1;
+	            spec.size[1] = Math.round(prop.curState.y / 0.1) * 0.1;
+	        }
+	        else {
+	            spec.size = undefined;
+	        }
+
+	        // align
+	        prop = this._properties.align;
+	        if (prop && prop.init) {
+	            spec.align = spec.align || [0, 0];
+	            spec.align[0] = Math.round(prop.curState.x / 0.1) * 0.1;
+	            spec.align[1] = Math.round(prop.curState.y / 0.1) * 0.1;
+	        }
+	        else {
+	            spec.align = undefined;
+	        }
+
+	        // origin
+	        prop = this._properties.origin;
+	        if (prop && prop.init) {
+	            spec.origin = spec.origin || [0, 0];
+	            spec.origin[0] = Math.round(prop.curState.x / 0.1) * 0.1;
+	            spec.origin[1] = Math.round(prop.curState.y / 0.1) * 0.1;
+	        }
+	        else {
+	            spec.origin = undefined;
+	        }
+
+	        // translate
+	        var translate = this._properties.translate;
+	        var translateX;
+	        var translateY;
+	        var translateZ;
+	        if (translate && translate.init) {
+	            translateX = translate.curState.x;
+	            translateY = translate.curState.y;
+	            translateZ = translate.curState.z;
+	            if (this._lockDirection !== undefined) {
+	                value = this._lockDirection ? translateY : translateX;
+	                var endState = this._lockDirection ? translate.endState.y : translate.endState.x;
+	                var lockValue = value + ((endState - value) * this._lockTransitionable.get());
+	                if (this._lockDirection) {
+	                    translateX = Math.round(translateX / precision) * precision;
+	                    translateY = Math.round(lockValue / precision) * precision;
+	                }
+	                else {
+	                    translateX = Math.round(lockValue / precision) * precision;
+	                    translateY = Math.round(translateY / precision) * precision;
+	                }
+	            }
+	        }
+	        else {
+	            translateX = 0;
+	            translateY = 0;
+	            translateZ = 0;
+	        }
+
+	        // scale, skew, scale
+	        var scale = this._properties.scale;
+	        var skew = this._properties.skew;
+	        var rotate = this._properties.rotate;
+	        if (scale || skew || rotate) {
+	            spec.transform = Transform.build({
+	                translate: [translateX, translateY, translateZ],
+	                skew: _getRoundedValue3D.call(this, skew, DEFAULT.skew),
+	                scale: _getRoundedValue3D.call(this, scale, DEFAULT.scale),
+	                rotate: _getRoundedValue3D.call(this, rotate, DEFAULT.rotate)
+	            });
+	        }
+	        else if (translate) {
+	            if (!spec.transform) {
+	                spec.transform = Transform.translate(translateX, translateY, translateZ);
+	            }
+	            else {
+	                spec.transform[12] = translateX;
+	                spec.transform[13] = translateY;
+	                spec.transform[14] = translateZ;
+	            }
+	        }
+	        else {
+	            spec.transform = undefined;
+	        }
+
+	        //if (this.renderNode._debug) {
+	            //this.renderNode._debug = false;
+	            /*console.log(JSON.stringify({
+	                opacity: this._spec.opacity,
+	                size: this._spec.size,
+	                align: this._spec.align,
+	                origin: this._spec.origin,
+	                transform: this._spec.transform
+	            }));*/
+	        //}
+	        return this._spec;
+	    };
+
+	    /**
+	     * Helper function to set the property of a node (e.g. opacity, translate, etc..)
+	     */
+	    function _setPropertyValue(prop, propName, endState, defaultValue, immediate, isTranslate) {
+
+	        // Get property
+	        prop = prop || this._properties[propName];
+
+	        // Update the property
+	        if (prop && prop.init) {
+	            prop.invalidated = true;
+	            var value = defaultValue;
+	            if (endState !== undefined) {
+	                value = endState;
+	            }
+	            else if (this._removing) {
+	                value = prop.particle.getPosition();
+	            }
+	            if (isTranslate && (this._lockDirection !== undefined) && (this._lockTransitionable.get() === 1)) {
+	                immediate = true; // this is a bit dirty, it should check !_lockDirection for non changes as well before setting immediate to true
+	            }
+	            // set new end state (the quick way)
+	            prop.endState.x = value[0];
+	            prop.endState.y = (value.length > 1) ? value[1] : 0;
+	            prop.endState.z = (value.length > 2) ? value[2] : 0;
+	            if (immediate) {
+	                // set current state (the quick way)
+	                prop.curState.x = prop.endState.x;
+	                prop.curState.y = prop.endState.y;
+	                prop.curState.z = prop.endState.z;
+	                // reset velocity (the quick way)
+	                prop.velocity.x = 0;
+	                prop.velocity.y = 0;
+	                prop.velocity.z = 0;
+	            }
+	            else if ((prop.endState.x !== prop.curState.x) ||
+	                     (prop.endState.y !== prop.curState.y) ||
+	                     (prop.endState.z !== prop.curState.z)) {
+	                this._pe.wake();
+	            }
+	            return;
+	        }
+	        else {
+
+	            // Create property if neccesary
+	            var wasSleeping = this._pe.isSleeping();
+	            if (!prop) {
+	                prop = {
+	                    particle: new Particle({
+	                        position: (this._initial || immediate) ? endState : defaultValue
+	                    }),
+	                    endState: new Vector(endState)
+	                };
+	                prop.curState = prop.particle.position;
+	                prop.velocity = prop.particle.velocity;
+	                prop.force = new Spring(this.options.spring);
+	                prop.force.setOptions({
+	                    anchor: prop.endState
+	                });
+	                this._pe.addBody(prop.particle);
+	                prop.forceId = this._pe.attach(prop.force, prop.particle);
+	                this._properties[propName] = prop;
+	            }
+	            else {
+	                prop.particle.setPosition((this._initial || immediate) ? endState : defaultValue);
+	                prop.endState.set(endState);
+	            }
+	            if (!this._initial && !immediate) {
+	                this._pe.wake();
+	            } else if (wasSleeping) {
+	                this._pe.sleep(); // nothing has changed, put back to sleep
+	            }
+	            prop.init = true;
+	            prop.invalidated = true;
+	        }
+	    }
+
+	    /**
+	     * Get value if not equals.
+	     */
+	    function _getIfNE2D(a1, a2) {
+	        return ((a1[0] === a2[0]) && (a1[1] === a2[1])) ? undefined : a1;
+	    }
+	    function _getIfNE3D(a1, a2) {
+	        return ((a1[0] === a2[0]) && (a1[1] === a2[1]) && (a1[2] === a2[2])) ? undefined : a1;
+	    }
+
+	    /**
+	     * context.set(..)
+	     */
+	    FlowLayoutNode.prototype.set = function(set, defaultSize) {
+	        this._removing = false;
+	        this._invalidated = true;
+	        this.scrollLength = set.scrollLength;
+	        this._specModified = true;
+
+	        // opacity
+	        var prop = this._properties.opacity;
+	        var value = (set.opacity === DEFAULT.opacity) ? undefined : set.opacity;
+	        if ((value !== undefined) || (prop && prop.init)) {
+	            _setPropertyValue.call(this, prop, 'opacity', (value === undefined) ? undefined : [value, 0], DEFAULT.opacity2D);
+	        }
+
+	        // set align
+	        prop = this._properties.align;
+	        value = set.align ? _getIfNE2D(set.align, DEFAULT.align) : undefined;
+	        if (value || (prop && prop.init)) {
+	            _setPropertyValue.call(this, prop, 'align', value, DEFAULT.align);
+	        }
+
+	        // set orgin
+	        prop = this._properties.origin;
+	        value = set.origin ? _getIfNE2D(set.origin, DEFAULT.origin) : undefined;
+	        if (value || (prop && prop.init)) {
+	            _setPropertyValue.call(this, prop, 'origin', value, DEFAULT.origin);
+	        }
+
+	        // set size
+	        prop = this._properties.size;
+	        value = set.size || defaultSize;
+	        if (value || (prop && prop.init)) {
+	            _setPropertyValue.call(this, prop, 'size', value, defaultSize, this.usesTrueSize);
+	        }
+
+	        // set translate
+	        prop = this._properties.translate;
+	        value = set.translate;
+	        if (value || (prop && prop.init)) {
+	            _setPropertyValue.call(this, prop, 'translate', value, DEFAULT.translate, undefined, true);
+	        }
+
+	        // set scale
+	        prop = this._properties.scale;
+	        value = set.scale ? _getIfNE3D(set.scale, DEFAULT.scale) : undefined;
+	        if (value || (prop && prop.init)) {
+	            _setPropertyValue.call(this, prop, 'scale', value, DEFAULT.scale);
+	        }
+
+	        // set rotate
+	        prop = this._properties.rotate;
+	        value = set.rotate ? _getIfNE3D(set.rotate, DEFAULT.rotate) : undefined;
+	        if (value || (prop && prop.init)) {
+	            _setPropertyValue.call(this, prop, 'rotate', value, DEFAULT.rotate);
+	        }
+
+	        // set skew
+	        prop = this._properties.skew;
+	        value = set.skew ? _getIfNE3D(set.skew, DEFAULT.skew) : undefined;
+	        if (value || (prop && prop.init)) {
+	            _setPropertyValue.call(this, prop, 'skew', value, DEFAULT.skew);
+	        }
+	    };
+
+	    module.exports = FlowLayoutNode;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 40 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
 	 * This Source Code is licensed under the MIT license. If a copy of the
 	 * MIT-license was not distributed with this file, You can obtain one at:
@@ -7211,7 +9795,7 @@
 	/*eslint no-use-before-define:0, no-console:0 */
 
 	/**
-	 * Scrollable LayoutController.
+	 * Scrollable layout-controller.
 	 *
 	 * Key features:
 	 * -    Customizable layout
@@ -7228,20 +9812,20 @@
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
 
 	    // import dependencies
-	    var LayoutUtility = __webpack_require__(14);
-	    var LayoutController = __webpack_require__(12);
-	    var LayoutNode = __webpack_require__(39);
-	    var FlowLayoutNode = __webpack_require__(40);
-	    var LayoutNodeManager = __webpack_require__(38);
-	    var ContainerSurface = __webpack_require__(63);
+	    var LayoutUtility = __webpack_require__(15);
+	    var LayoutController = __webpack_require__(13);
+	    var LayoutNode = __webpack_require__(38);
+	    var FlowLayoutNode = __webpack_require__(39);
+	    var LayoutNodeManager = __webpack_require__(37);
+	    var ContainerSurface = __webpack_require__(65);
 	    var Transform = __webpack_require__(27);
-	    var EventHandler = __webpack_require__(37);
-	    var Group = __webpack_require__(64);
+	    var EventHandler = __webpack_require__(36);
+	    var Group = __webpack_require__(66);
 	    var Vector = __webpack_require__(68);
 	    var PhysicsEngine = __webpack_require__(69);
 	    var Particle = __webpack_require__(70);
-	    var Drag = __webpack_require__(71);
-	    var Spring = __webpack_require__(72);
+	    var Drag = __webpack_require__(72);
+	    var Spring = __webpack_require__(71);
 	    var ScrollSync = __webpack_require__(73);
 
 	    /**
@@ -7272,24 +9856,18 @@
 	    /**
 	     * @class
 	     * @extends LayoutController
-	     * @param {Object} options Options.
-	     * @param {Function|Object} [options.layout] Layout function or layout-literal.
-	     * @param {Object} [options.layoutOptions] Options to pass in to the layout-function.
-	     * @param {Array|ViewSequence|Object} [options.dataSource] Array, ViewSequence or Object with key/value pairs.
-	     * @param {Utility.Direction} [options.direction] Direction to layout into (e.g. Utility.Direction.Y) (when ommited the default direction of the layout is used)
-	     * @param {Bool} [options.flow] Enables flow animations when the layout changes (default: `false`).
-	     * @param {Spec} [options.insertSpec] Size, transform, opacity... to use when inserting new renderables into the scene (default: `{}`).
-	     * @param {Spec} [options.removeSpec] Size, transform, opacity... to use when removing renderables from the scene (default: `{}`).
+	     * @param {Object} options Configurable options (see LayoutController for all inherited options).
+	     * @param {Bool} [options.useContainer] Embeds the view in a ContainerSurface to hide any overflow and capture input events (default: `false`).
 	     * @param {Bool} [options.paginated] Enabled pagination when set to `true` (default: `false`).
 	     * @param {Number} [options.alignment] Alignment of the renderables (0 = top/left, 1 = bottom/right) (default: `0`).
 	     * @param {Bool} [options.mouseMove] Enables scrolling by holding the mouse-button down and moving the mouse (default: `false`).
+	     * @param {Bool} [options.enabled] Enables or disabled user input (default: `true`).
 	     * @param {Object} [options.nodeSpring] Spring options to use when transitioning renderables between scenes
 	     * @param {Object} [options.scrollParticle] Options for the scroll particle (default: `{}`)
 	     * @param {Object} [options.scrollSpring] Spring-force options that are applied on the scroll particle when e.g. bounds is reached (default: `{dampingRatio: 1.0, period: 350}`)
 	     * @param {Object} [options.scrollDrag] Drag-force options to apply on the scroll particle
 	     * @param {Object} [options.scrollFriction] Friction-force options to apply on the scroll particle
 	     * @param {Bool} [options.layoutAll] When set to true, always lays out all renderables in the datasource (default: `false`).
-	     * @param {Bool} [options.alwaysLayout] When set to true, always calls the layout function (default: `false`).
 	     * @param {Number} [options.visibleItemThresshold] Thresshold (0..1) used for determining whether an item is considered to be the first/last visible item (default: `0.5`).
 	     * @param {Bool} [options.debug] Logs debug output to the console (default: `false`).
 	     * @alias module:ScrollController
@@ -7421,26 +9999,18 @@
 	        enabled: true,          // set to false to disable scrolling
 	        layoutAll: false,       // set to true is you want all renderables layed out/rendered
 	        alwaysLayout: false,    // set to true to always call the layout function
-	        scrollCallback: undefined, //function(offset, force)
-	        debug: false,
-	        stressTest: 0
+	        extraBoundsSpace: [100, 100],
+	        debug: false
 	    };
 
-	    var oldSetOptions = ScrollController.prototype.setOptions;
 	    /**
 	     * Patches the ScrollController instance's options with the passed-in ones.
 	     *
-	     * @param {Object} options An object of configurable options for the ScrollController instance.
-	     * @param {Function|Object} [options.layout] Layout function or layout-literal.
-	     * @param {Object} [options.layoutOptions] Options to pass in to the layout-function.
-	     * @param {Array|ViewSequence|Object} [options.dataSource] Array, ViewSequence or Object with key/value pairs.
-	     * @param {Utility.Direction} [options.direction] Direction to layout into (e.g. Utility.Direction.Y) (when ommited the default direction of the layout is used)
-	     * @param {Spec} [options.insertSpec] Size, transform, opacity... to use when inserting new renderables into the scene (default: `{}`).
-	     * @param {Spec} [options.removeSpec] Size, transform, opacity... to use when removing renderables from the scene (default: `{}`).
-	     * @param {Bool} [options.useContainer] Embeds the view in a ContainerSurface to hide any overflow and capture input events (default: `false`).
+	     * @param {Object} options Configurable options (see LayoutController for all inherited options).
 	     * @param {Bool} [options.paginated] Enabled pagination when set to `true` (default: `false`).
 	     * @param {Number} [options.alignment] Alignment of the renderables (0 = top/left, 1 = bottom/right) (default: `0`).
 	     * @param {Bool} [options.mouseMove] Enables scrolling by holding the mouse-button down and moving the mouse (default: `false`).
+	     * @param {Bool} [options.enabled] Enables or disabled user input (default: `true`).
 	     * @param {Object} [options.nodeSpring] Spring options to use when transitioning renderables between scenes
 	     * @param {Object} [options.scrollParticle] Options for the scroll particle (default: `{}`)
 	     * @param {Object} [options.scrollSpring] Spring-force options that are applied on the scroll particle when e.g. bounds is reached (default: `{dampingRatio: 1.0, period: 500}`)
@@ -7448,12 +10018,11 @@
 	     * @param {Object} [options.scrollFriction] Friction-force options to apply on the scroll particle
 	     * @param {Number} [options.visibleItemThresshold] Thresshold (0..1) used for determining whether an item is considered to be the first/last visible item (default: `0.5`).
 	     * @param {Bool} [options.layoutAll] When set to true, always lays out all renderables in the datasource (default: `false`).
-	     * @param {Bool} [options.alwaysLayout] When set to true, always calls the layout function (default: `false`).
 	     * @param {Bool} [options.debug] Logs debug output to the console (default: `false`).
 	     * @return {ScrollController} this
 	     */
 	    ScrollController.prototype.setOptions = function(options) {
-	        oldSetOptions.call(this, options);
+	        LayoutController.prototype.setOptions.call(this, options);
 	        if (this._scroll) {
 	            if (options.scrollSpring) {
 	                this._scroll.springForce.setOptions(options.scrollSpring);
@@ -7475,18 +10044,12 @@
 	     * is immediately updated when the user scrolls the view.
 	     */
 	    function _initLayoutNode(node, spec) {
-	        if (node.setOptions) {
-	            node.setOptions({
-	                spring: this.options.nodeSpring
-	            });
-	        }
 	        if (!spec && this.options.insertSpec) {
 	            node.setSpec(this.options.insertSpec);
 	        }
 	        if (node.setDirectionLock) {
 	            node.setDirectionLock(this._direction, 1);
 	        }
-	        node._spec._translatedSpec = undefined; // for debugging..
 	    }
 
 	    /**
@@ -7520,7 +10083,7 @@
 	                if (this._scroll.springForceId !== undefined) {
 	                    this._scroll.pe.detach(this._scroll.springForceId);
 	                    this._scroll.springForceId = undefined;
-	                    _log.call(this, 'disabled spring');
+	                    //_log.call(this, 'disabled spring');
 	                }
 	            }
 	            else {
@@ -7529,7 +10092,7 @@
 	                }
 	                this._scroll.springEndState.set1D(springValue);
 	                this._scroll.pe.wake();
-	                _log.call(this, 'setting spring to: ', springValue, ' (', this._scroll.springSource, ')');
+	                //_log.call(this, 'setting spring to: ', springValue, ' (', this._scroll.springSource, ')');
 	            }
 	        }
 	    }
@@ -7617,17 +10180,24 @@
 	     * touch gestures.
 	     */
 	    function _touchStart(event) {
-	        //_log.call(this, 'touchStart');
-	        //this._eventOutput.emit('touchstart', event);
+
+	        // Create touch-end event listener
+	        if (!this._touchEndEventListener) {
+	            this._touchEndEventListener = function(event) {
+	                event.target.removeEventListener('touchend', this._touchEndEventListener);
+	                _touchEnd.call(this, event);
+	            }.bind(this);
+	        }
 
 	        // Remove any touches that are no longer active
 	        var oldTouchesCount = this._scroll.activeTouches.length;
 	        var i = 0;
+	        var j;
 	        var touchFound;
 	        while (i < this._scroll.activeTouches.length) {
 	            var activeTouch = this._scroll.activeTouches[i];
 	            touchFound = false;
-	            for (var j = 0; j < event.touches.length; j++) {
+	            for (j = 0; j < event.touches.length; j++) {
 	                var touch = event.touches[j];
 	                if (touch.identifier === activeTouch.id) {
 	                    touchFound = true;
@@ -7647,7 +10217,7 @@
 	        for (i = 0; i < event.touches.length; i++) {
 	            var changedTouch = event.touches[i];
 	            touchFound = false;
-	            for (j = 0; j < this._scroll.activeTouches.length; i++) {
+	            for (j = 0; j < this._scroll.activeTouches.length; j++) {
 	                if (this._scroll.activeTouches[j].id === changedTouch.identifier) {
 	                    touchFound = true;
 	                    break;
@@ -7664,6 +10234,10 @@
 	                    time: time,
 	                    prevTime: time
 	                });
+
+	                // The following listener is automatically removed after touchend is received
+	                // and ensures that the scrollview always received touchend.
+	                changedTouch.target.addEventListener('touchend', this._touchEndEventListener);
 	            }
 	        }
 
@@ -7671,10 +10245,6 @@
 	        if (!oldTouchesCount && this._scroll.activeTouches.length) {
 	            this.applyScrollForce(0);
 	            this._scroll.touchDelta = 0;
-	            if (this.options.scrollCallback) {
-	                this.options.scrollCallback(0, 1);
-	            }
-	            //this._eventOutput.emit('scrollstart', this._scroll.activeTouches[0]);
 	        }
 	    }
 
@@ -7686,8 +10256,6 @@
 	        if (!this.options.enabled) {
 	            return;
 	        }
-	        //_log.call(this, 'touchMove');
-	        //this._eventOutput.emit('touchmove', event);
 
 	        // Process the touch event
 	        var primaryTouch;
@@ -7719,12 +10287,8 @@
 	        // Update move offset and emit event
 	        if (primaryTouch) {
 	            var delta = primaryTouch.current[this._direction] - primaryTouch.start[this._direction];
-	            if (this.options.scrollCallback) {
-	                delta = this.options.scrollCallback(delta, 2);
-	            }
 	            this.updateScrollForce(this._scroll.touchDelta, delta);
 	            this._scroll.touchDelta = delta;
-	            //this._eventOutput.emit('scrollmove', this._scroll.activeTouches[0]);
 	        }
 	    }
 
@@ -7735,8 +10299,6 @@
 	     * certain direction.
 	     */
 	    function _touchEnd(event) {
-	        //_log.call(this, 'touchEnd');
-	        //this._eventOutput.emit('touchend', event);
 
 	        // Remove touch
 	        var primaryTouch = this._scroll.activeTouches.length ? this._scroll.activeTouches[0] : undefined;
@@ -7774,18 +10336,10 @@
 	            velocity = diffOffset / diffTime;
 	        }
 
-	        // Execute callback
-	        var delta = this._scroll.touchDelta;
-	        if (this.options.scrollCallback) {
-	            delta = this.options.scrollCallback(delta, 3, velocity);
-	        }
-
 	        // Release scroll force
+	        var delta = this._scroll.touchDelta;
 	        this.releaseScrollForce(delta, velocity);
 	        this._scroll.touchDelta = 0;
-
-	        // Emit end event
-	        //this._eventOutput.emit('scrollend', primaryTouch);
 	    }
 
 	    /**
@@ -7797,9 +10351,6 @@
 	            return;
 	        }
 	        var offset = Array.isArray(event.delta) ? event.delta[this._direction] : event.delta;
-	        if (this.options.scrollCallback) {
-	            offset = this.options.scrollCallback(offset, 0);
-	        }
 	        this.scroll(offset);
 	    }
 
@@ -7832,6 +10383,7 @@
 	        // by two.
 	        if (refreshParticle || (this._scroll.particleValue === undefined)) {
 	            this._scroll.particleValue = this._scroll.particle.getPosition1D();
+	            this._scroll.particleValue = Math.round(this._scroll.particleValue * 1000) / 1000;
 	        }
 
 	        // do stuff
@@ -7868,22 +10420,25 @@
 
 	    /**
 	     * Helper function that calculates the next/prev layed out height.
+	     * @private
 	     */
-	    function _calcHeight(next) {
+	    ScrollController.prototype._calcScrollHeight = function(next) {
 	        var calcedHeight = 0;
 	        var node = this._nodes.getStartEnumNode(next);
 	        while (node) {
-	            if (!node._invalidated) {
-	                break;
-	            } else if ((node.scrollLength === undefined) || node.trueSizeRequested) {
-	                calcedHeight = undefined;
-	                break;
+	            if (node._invalidated) {
+	                if (node.trueSizeRequested) {
+	                    calcedHeight = undefined;
+	                    break;
+	                }
+	                if (node.scrollLength !== undefined) {
+	                    calcedHeight += node.scrollLength;
+	                }
 	            }
-	            calcedHeight += node.scrollLength;
 	            node = next ? node._next : node._prev;
 	        }
 	        return calcedHeight;
-	    }
+	    };
 
 	    /**
 	     * Normalizes the scroll-offset so that scroll-offset is as close
@@ -7897,8 +10452,17 @@
 	    function _calcBounds(size, scrollOffset) {
 
 	        // Local data
-	        var prevHeight = _calcHeight.call(this, false);
-	        var nextHeight = _calcHeight.call(this, true);
+	        var prevHeight = this._calcScrollHeight(false);
+	        var nextHeight = this._calcScrollHeight(true);
+
+	        // 0. Don't set any springs when either next or prev-height could
+	        //    not be determined due to true-size renderables.
+	        if ((prevHeight === undefined) || (nextHeight === undefined)) {
+	            this._scroll.boundsReached = Bounds.NONE;
+	            this._scroll.springPosition = undefined;
+	            this._scroll.springSource = SpringSource.NONE;
+	            return;
+	        }
 
 	        // 1. When the rendered height is smaller than the total height,
 	        //    then lock to the primary bounds
@@ -7975,38 +10539,42 @@
 	        // 2. Find the node to scroll to
 	        var foundNode;
 	        var scrollToOffset = 0;
-	        this._nodes.forEach(function(node) {
-	            if (node.scrollLength === undefined) {
-	                return true;
+	        var node = this._nodes.getStartEnumNode(true);
+	        while (node) {
+	            if (!node._invalidated || (node.scrollLength === undefined)) {
+	                break;
 	            }
 	            if (this.options.alignment) {
 	                scrollToOffset -= node.scrollLength;
 	            }
 	            if (node._viewSequence === this._scroll.scrollToSequence) {
 	                foundNode = node;
-	                return true;
+	                break;
 	            }
 	            if (!this.options.alignment) {
 	                scrollToOffset -= node.scrollLength;
 	            }
-	        }.bind(this), true);
+	            node = node._next;
+	        }
 	        if (!foundNode) {
 	            scrollToOffset = 0;
-	            this._nodes.forEach(function(node) {
-	                if (node.scrollLength === undefined) {
-	                    return true;
+	            node = this._nodes.getStartEnumNode(false);
+	            while (node) {
+	                if (!node._invalidated || (node.scrollLength === undefined)) {
+	                   break;
 	                }
 	                if (!this.options.alignment) {
 	                    scrollToOffset += node.scrollLength;
 	                }
 	                if (node._viewSequence === this._scroll.scrollToSequence) {
 	                    foundNode = node;
-	                    return true;
+	                    break;
 	                }
 	                if (this.options.alignment) {
 	                    scrollToOffset += node.scrollLength;
 	                }
-	            }.bind(this), false);
+	                node = node._prev;
+	            }
 	        }
 	        if (foundNode) {
 	            this._scroll.springPosition = scrollToOffset;
@@ -8026,14 +10594,13 @@
 	    }
 
 	    /**
-	     * Snaps to a page when paginanation is enabled and the energy of the particle
-	     * is below the thesshold.
+	     * Snaps to a page when pagination is enabled.
 	     */
 	    function _snapToPage(size, scrollOffset) {
 
 	        // Check whether pagination is active
 	        if (!this.options.paginated ||
-	            this._scroll.scrollForceCount ||
+	            this._scroll.scrollForceCount || //don't paginate while moving
 	            (this._scroll.springPosition !== undefined)) {
 	            return;
 	        }
@@ -8044,35 +10611,44 @@
 	        var hasNext;
 
 	        // Lookup page in previous direction
-	        var bound = this.options.alignment ? size[this._direction] : 0;
-	        this._nodes.forEach(function(node) {
+	        var node = this._nodes.getStartEnumNode(false);
+	        while (node) {
+	            if (!node._invalidated) {
+	                break;
+	            }
 	            if (node.scrollLength !== 0) {
-	                if ((pageOffset <= bound) || (node.scrollLength === undefined)) {
-	                    return true;
+	                if ((pageOffset <= 0) || (node.scrollLength === undefined)) {
+	                    break;
 	                }
 	                hasNext = (pageLength !== undefined);
 	                pageLength = node.scrollLength;
 	                pageOffset -= node.scrollLength;
 	            }
-	        }, false);
+	            node = node._prev;
+	        }
 
 	        // Lookup page in next direction
 	        if (pageLength === undefined) {
-	            this._nodes.forEach(function(node) {
+	            node = this._nodes.getStartEnumNode(true);
+	            while (node) {
+	                if (!node._invalidated) {
+	                    break;
+	                }
 	                if (node.scrollLength !== 0) {
 	                    if (node.scrollLength === undefined) {
-	                        return true;
+	                        break;
 	                    }
 	                    hasNext = (pageLength !== undefined);
 	                    if (hasNext) {
-	                        if ((pageOffset + pageLength) > bound) {
-	                            return true;
+	                        if ((pageOffset + pageLength) > 0) {
+	                            break;
 	                        }
 	                        pageOffset += pageLength;
 	                    }
 	                    pageLength = node.scrollLength;
 	                }
-	            }, true);
+	                node = node._next;
+	            }
 	        }
 	        if (!pageLength) {
 	            return;
@@ -8088,21 +10664,21 @@
 	            flipToNext = velocity < 0;
 	        }
 
-	        // Determine snap spring-position
-	        var boundOffset = pageOffset - bound;
+	        // Determine snap spring-position (not quite working properly yet for alignment = 1...)
+	        var boundOffset = pageOffset;
 	        var snapSpringPosition;
 	        if (!hasNext || flipToPrev || (!flipToNext && ((Math.abs(boundOffset) < Math.abs(boundOffset + pageLength))))) {
-	            snapSpringPosition = (scrollOffset - pageOffset) + (this.options.alignment ? size[this._direction] : 0);
+	            snapSpringPosition = (scrollOffset - pageOffset) - (this.options.alignment ? pageLength : 0);
 	            if (snapSpringPosition !== this._scroll.springPosition) {
-	                _log.call(this, 'setting snap-spring to #1: ', snapSpringPosition, ', previous: ', this._scroll.springPosition);
+	                //_log.call(this, 'setting snap-spring to #1: ', snapSpringPosition, ', previous: ', this._scroll.springPosition);
 	                this._scroll.springPosition = snapSpringPosition;
 	                this._scroll.springSource = SpringSource.SNAPPREV;
 	            }
 	        }
 	        else {
-	            snapSpringPosition = (scrollOffset - (pageOffset + pageLength)) + (this.options.alignment ? size[this._direction] : 0);
+	            snapSpringPosition = (scrollOffset - (pageOffset + pageLength));
 	            if (snapSpringPosition !== this._scroll.springPosition) {
-	                _log.call(this, 'setting snap-spring to #2: ', snapSpringPosition, ', previous: ', this._scroll.springPosition);
+	                //_log.call(this, 'setting snap-spring to #2: ', snapSpringPosition, ', previous: ', this._scroll.springPosition);
 	                this._scroll.springPosition = snapSpringPosition;
 	                this._scroll.springSource = SpringSource.SNAPNEXT;
 	            }
@@ -8118,18 +10694,19 @@
 	        //var startScrollOffset = scrollOffset;
 	        var normalizedScrollOffset = scrollOffset;
 	        var normalizeNextPrev = false;
-	        this._nodes.forEach(function(node) {
+	        var node = this._nodes.getStartEnumNode(false);
+	        while (node) {
+	            if (!node._invalidated || !node._viewSequence) {
+	                break;
+	            }
 	            if (normalizeNextPrev) {
 	                this._viewSequence = node._viewSequence;
 	                normalizedScrollOffset = scrollOffset;
 	                //normalizedCount = count;
 	                normalizeNextPrev = false;
 	            }
-	            if (scrollOffset < 0) {
-	                return true;
-	            }
-	            if ((node.scrollLength === undefined) || node.trueSizeRequested) {
-	                return true;
+	            if ((node.scrollLength === undefined) || node.trueSizeRequested || (scrollOffset < 0)) {
+	                break;
 	            }
 	            scrollOffset -= node.scrollLength;
 	            count++;
@@ -8143,7 +10720,8 @@
 	                    //normalizedCount = count;
 	                }
 	            }
-	        }.bind(this), false);
+	            node = node._prev;
+	        }
 	        /*if (normalizedCount) {
 	            //_log.call(this, 'normalized ', normalizedCount, ' prev node(s) with length: ', normalizedScrollOffset - startScrollOffset);
 	        }*/
@@ -8154,12 +10732,11 @@
 	        //var normalizedCount = 0;
 	        //var startScrollOffset = scrollOffset;
 	        var normalizedScrollOffset = scrollOffset;
-	        this._nodes.forEach(function(node) {
-	            if ((scrollOffset > 0) && (!this.options.alignment || (node.scrollLength !== 0))) {
-	                return true;
-	            }
-	            if ((node.scrollLength === undefined) || node.trueSizeRequested) {
-	                return true;
+	        var node = this._nodes.getStartEnumNode(true);
+	        while (node) {
+	            if (!node._invalidated || (node.scrollLength === undefined) || node.trueSizeRequested || !node._viewSequence ||
+	                ((scrollOffset > 0) && (!this.options.alignment || (node.scrollLength !== 0)))) {
+	                break;
 	            }
 	            if (this.options.alignment) {
 	                scrollOffset += node.scrollLength;
@@ -8174,7 +10751,8 @@
 	                scrollOffset += node.scrollLength;
 	                count++;
 	            }
-	        }.bind(this), true);
+	            node = node._next;
+	        }
 	        /*if (normalizedCount) {
 	            //_log.call(this, 'normalized ', normalizedCount, ' next node(s) with length: ', normalizedScrollOffset - startScrollOffset);
 	        }*/
@@ -8183,9 +10761,10 @@
 	    function _normalizeViewSequence(size, scrollOffset) {
 
 	        // Check whether normalisation is disabled
-	        if (this._layout.capabilities && this._layout.capabilities.debug &&
-	            (this._layout.capabilities.debug.normalize !== undefined) &&
-	            !this._layout.capabilities.debug.normalize) {
+	        var caps = this._layout.capabilities;
+	        if (caps && caps.debug &&
+	            (caps.debug.normalize !== undefined) &&
+	            !caps.debug.normalize) {
 	            return scrollOffset;
 	        }
 
@@ -8218,10 +10797,10 @@
 	            var delta = normalizedScrollOffset - scrollOffset;
 
 	            // Adjust particle
-	            //var particleValue = this._scroll.particle.getPosition1D();
-	            var particleValue = this._scroll.particleValue;
+	            var particleValue = this._scroll.particle.getPosition1D();
+	            //var particleValue = this._scroll.particleValue;
 	            _setParticle.call(this, particleValue + delta, undefined, 'normalize');
-	            _log.call(this, 'normalized scrollOffset: ', normalizedScrollOffset, ', old: ', scrollOffset, ', particle: ', particleValue + delta);
+	            //_log.call(this, 'normalized scrollOffset: ', normalizedScrollOffset, ', old: ', scrollOffset, ', particle: ', particleValue + delta);
 
 	            // Adjust scroll spring
 	            if (this._scroll.springPosition !== undefined) {
@@ -8229,7 +10808,7 @@
 	            }
 
 	            // Adjust group offset
-	            if (this._layout.capabilities.sequentialScrollingOptimized) {
+	            if (caps && caps.sequentialScrollingOptimized) {
 	                this._scroll.groupStart -= delta;
 	            }
 	        }
@@ -8575,8 +11154,8 @@
 
 	        // Calculate height in both directions
 	        var scrollOffset = _calcScrollOffset.call(this);
-	        var prevHeight = _calcHeight.call(this, false);
-	        var nextHeight = _calcHeight.call(this, true);
+	        var prevHeight = this._calcScrollHeight(false);
+	        var nextHeight = this._calcScrollHeight(true);
 
 	        // When the rendered height is smaller than the total height,
 	        // then no scrolling whatsover is allowed.
@@ -8591,7 +11170,7 @@
 	        // Determine the offset that we can scroll
 	        if ((delta < 0) && (nextHeight !== undefined)) {
 	            var nextOffset = this._contextSizeCache[this._direction] - (scrollOffset + nextHeight);
-	            return Math.min(nextOffset, delta);
+	            return Math.max(nextOffset, delta);
 	        } else if ((delta > 0) && (prevHeight !== undefined)) {
 	            var prevOffset = -(scrollOffset - prevHeight);
 	            return Math.min(prevOffset, delta);
@@ -8723,9 +11302,8 @@
 	        //_log.call(this, 'Layout, scrollOffset: ', scrollOffset, ', particle: ', this._scroll.particle.getPosition1D());
 
 	        // Determine start & end
-	        var scrollLength = size[this._direction] / 2;
-	        var scrollStart = -scrollLength;
-	        var scrollEnd = size[this._direction] + scrollLength;
+	        var scrollStart = 0 - Math.max(this.options.extraBoundsSpace[0], 1);
+	        var scrollEnd = size[this._direction] + Math.max(this.options.extraBoundsSpace[1], 1);
 	        if (this.options.layoutAll) {
 	            scrollStart = -1000000;
 	            scrollEnd = 1000000;
@@ -8752,6 +11330,11 @@
 	            );
 	        }
 
+	        // Call post-layout function
+	        if (this._postLayout) {
+	            this._postLayout(size, scrollOffset);
+	        }
+
 	        // Mark non-invalidated nodes for removal
 	        this._nodes.removeNonInvalidatedNodes(this.options.removeSpec);
 
@@ -8768,7 +11351,7 @@
 	        // than before, then re-layout entirely using the new offset.
 	        var newScrollOffset = _calcScrollOffset.call(this, true);
 	        if (!nested && (newScrollOffset !== scrollOffset)) {
-	            _log.call(this, 'offset changed, re-layouting... (', scrollOffset, ' != ', newScrollOffset, ')');
+	            //_log.call(this, 'offset changed, re-layouting... (', scrollOffset, ' != ', newScrollOffset, ')');
 	            return _layout.call(this, size, newScrollOffset, true);
 	        }
 
@@ -8841,7 +11424,6 @@
 	            this._isDirty ||
 	            this._scroll.scrollDirty ||
 	            this._nodes._trueSizeRequested ||
-	            this.options.stressTest ||
 	            this.options.alwaysLayout ||
 	            this._scrollOffsetCache !== scrollOffset) {
 
@@ -8883,10 +11465,7 @@
 	            this._scroll.scrollDirty = false;
 
 	            // Perform layout
-	            var count = this.options.stressTest || 1;
-	            for (var i = 0; i < count; i++) {
-	                scrollOffset = _layout.call(this, size, scrollOffset);
-	            }
+	            scrollOffset = _layout.call(this, size, scrollOffset);
 	            this._scrollOffsetCache = scrollOffset;
 
 	            // Emit end event
@@ -8969,1845 +11548,6 @@
 
 
 /***/ },
-/* 36 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/* This Source Code Form is subject to the terms of the Mozilla Public
-	 * License, v. 2.0. If a copy of the MPL was not distributed with this
-	 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
-	 *
-	 * Owner: mark@famo.us
-	 * @license MPL 2.0
-	 * @copyright Famous Industries, Inc. 2014
-	 */
-
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-	    var EventHandler = __webpack_require__(37);
-
-	    /**
-	     *  A collection of methods for setting options which can be extended
-	     *  onto other classes.
-	     *
-	     *
-	     *  **** WARNING ****
-	     *  You can only pass through objects that will compile into valid JSON.
-	     *
-	     *  Valid options:
-	     *      Strings,
-	     *      Arrays,
-	     *      Objects,
-	     *      Numbers,
-	     *      Nested Objects,
-	     *      Nested Arrays.
-	     *
-	     *    This excludes:
-	     *        Document Fragments,
-	     *        Functions
-	     * @class OptionsManager
-	     * @constructor
-	     * @param {Object} value options dictionary
-	     */
-	    function OptionsManager(value) {
-	        this._value = value;
-	        this.eventOutput = null;
-	    }
-
-	    /**
-	     * Create options manager from source dictionary with arguments overriden by patch dictionary.
-	     *
-	     * @static
-	     * @method OptionsManager.patch
-	     *
-	     * @param {Object} source source arguments
-	     * @param {...Object} data argument additions and overwrites
-	     * @return {Object} source object
-	     */
-	    OptionsManager.patch = function patchObject(source, data) {
-	        var manager = new OptionsManager(source);
-	        for (var i = 1; i < arguments.length; i++) manager.patch(arguments[i]);
-	        return source;
-	    };
-
-	    function _createEventOutput() {
-	        this.eventOutput = new EventHandler();
-	        this.eventOutput.bindThis(this);
-	        EventHandler.setOutputHandler(this, this.eventOutput);
-	    }
-
-	    /**
-	     * Create OptionsManager from source with arguments overriden by patches.
-	     *   Triggers 'change' event on this object's event handler if the state of
-	     *   the OptionsManager changes as a result.
-	     *
-	     * @method patch
-	     *
-	     * @param {...Object} arguments list of patch objects
-	     * @return {OptionsManager} this
-	     */
-	    OptionsManager.prototype.patch = function patch() {
-	        var myState = this._value;
-	        for (var i = 0; i < arguments.length; i++) {
-	            var data = arguments[i];
-	            for (var k in data) {
-	                if ((k in myState) && (data[k] && data[k].constructor === Object) && (myState[k] && myState[k].constructor === Object)) {
-	                    if (!myState.hasOwnProperty(k)) myState[k] = Object.create(myState[k]);
-	                    this.key(k).patch(data[k]);
-	                    if (this.eventOutput) this.eventOutput.emit('change', {id: k, value: this.key(k).value()});
-	                }
-	                else this.set(k, data[k]);
-	            }
-	        }
-	        return this;
-	    };
-
-	    /**
-	     * Alias for patch
-	     *
-	     * @method setOptions
-	     *
-	     */
-	    OptionsManager.prototype.setOptions = OptionsManager.prototype.patch;
-
-	    /**
-	     * Return OptionsManager based on sub-object retrieved by key
-	     *
-	     * @method key
-	     *
-	     * @param {string} identifier key
-	     * @return {OptionsManager} new options manager with the value
-	     */
-	    OptionsManager.prototype.key = function key(identifier) {
-	        var result = new OptionsManager(this._value[identifier]);
-	        if (!(result._value instanceof Object) || result._value instanceof Array) result._value = {};
-	        return result;
-	    };
-
-	    /**
-	     * Look up value by key or get the full options hash
-	     * @method get
-	     *
-	     * @param {string} key key
-	     * @return {Object} associated object or full options hash
-	     */
-	    OptionsManager.prototype.get = function get(key) {
-	        return key ? this._value[key] : this._value;
-	    };
-
-	    /**
-	     * Alias for get
-	     * @method getOptions
-	     */
-	    OptionsManager.prototype.getOptions = OptionsManager.prototype.get;
-
-	    /**
-	     * Set key to value.  Outputs 'change' event if a value is overwritten.
-	     *
-	     * @method set
-	     *
-	     * @param {string} key key string
-	     * @param {Object} value value object
-	     * @return {OptionsManager} new options manager based on the value object
-	     */
-	    OptionsManager.prototype.set = function set(key, value) {
-	        var originalValue = this.get(key);
-	        this._value[key] = value;
-	        if (this.eventOutput && value !== originalValue) this.eventOutput.emit('change', {id: key, value: value});
-	        return this;
-	    };
-
-	    /**
-	     * Bind a callback function to an event type handled by this object.
-	     *
-	     * @method "on"
-	     *
-	     * @param {string} type event type key (for example, 'change')
-	     * @param {function(string, Object)} handler callback
-	     * @return {EventHandler} this
-	     */
-	    OptionsManager.prototype.on = function on() {
-	        _createEventOutput.call(this);
-	        return this.on.apply(this, arguments);
-	    };
-
-	    /**
-	     * Unbind an event by type and handler.
-	     *   This undoes the work of "on".
-	     *
-	     * @method removeListener
-	     *
-	     * @param {string} type event type key (for example, 'change')
-	     * @param {function} handler function object to remove
-	     * @return {EventHandler} internal event handler object (for chaining)
-	     */
-	    OptionsManager.prototype.removeListener = function removeListener() {
-	        _createEventOutput.call(this);
-	        return this.removeListener.apply(this, arguments);
-	    };
-
-	    /**
-	     * Add event handler object to set of downstream handlers.
-	     *
-	     * @method pipe
-	     *
-	     * @param {EventHandler} target event handler target object
-	     * @return {EventHandler} passed event handler
-	     */
-	    OptionsManager.prototype.pipe = function pipe() {
-	        _createEventOutput.call(this);
-	        return this.pipe.apply(this, arguments);
-	    };
-
-	    /**
-	     * Remove handler object from set of downstream handlers.
-	     * Undoes work of "pipe"
-	     *
-	     * @method unpipe
-	     *
-	     * @param {EventHandler} target target handler object
-	     * @return {EventHandler} provided target
-	     */
-	    OptionsManager.prototype.unpipe = function unpipe() {
-	        _createEventOutput.call(this);
-	        return this.unpipe.apply(this, arguments);
-	    };
-
-	    module.exports = OptionsManager;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 37 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/* This Source Code Form is subject to the terms of the Mozilla Public
-	 * License, v. 2.0. If a copy of the MPL was not distributed with this
-	 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
-	 *
-	 * Owner: mark@famo.us
-	 * @license MPL 2.0
-	 * @copyright Famous Industries, Inc. 2014
-	 */
-
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-	    var EventEmitter = __webpack_require__(65);
-
-	    /**
-	     * EventHandler forwards received events to a set of provided callback functions.
-	     * It allows events to be captured, processed, and optionally piped through to other event handlers.
-	     *
-	     * @class EventHandler
-	     * @extends EventEmitter
-	     * @constructor
-	     */
-	    function EventHandler() {
-	        EventEmitter.apply(this, arguments);
-
-	        this.downstream = []; // downstream event handlers
-	        this.downstreamFn = []; // downstream functions
-
-	        this.upstream = []; // upstream event handlers
-	        this.upstreamListeners = {}; // upstream listeners
-	    }
-	    EventHandler.prototype = Object.create(EventEmitter.prototype);
-	    EventHandler.prototype.constructor = EventHandler;
-
-	    /**
-	     * Assign an event handler to receive an object's input events.
-	     *
-	     * @method setInputHandler
-	     * @static
-	     *
-	     * @param {Object} object object to mix trigger, subscribe, and unsubscribe functions into
-	     * @param {EventHandler} handler assigned event handler
-	     */
-	    EventHandler.setInputHandler = function setInputHandler(object, handler) {
-	        object.trigger = handler.trigger.bind(handler);
-	        if (handler.subscribe && handler.unsubscribe) {
-	            object.subscribe = handler.subscribe.bind(handler);
-	            object.unsubscribe = handler.unsubscribe.bind(handler);
-	        }
-	    };
-
-	    /**
-	     * Assign an event handler to receive an object's output events.
-	     *
-	     * @method setOutputHandler
-	     * @static
-	     *
-	     * @param {Object} object object to mix pipe, unpipe, on, addListener, and removeListener functions into
-	     * @param {EventHandler} handler assigned event handler
-	     */
-	    EventHandler.setOutputHandler = function setOutputHandler(object, handler) {
-	        if (handler instanceof EventHandler) handler.bindThis(object);
-	        object.pipe = handler.pipe.bind(handler);
-	        object.unpipe = handler.unpipe.bind(handler);
-	        object.on = handler.on.bind(handler);
-	        object.addListener = object.on;
-	        object.removeListener = handler.removeListener.bind(handler);
-	    };
-
-	    /**
-	     * Trigger an event, sending to all downstream handlers
-	     *   listening for provided 'type' key.
-	     *
-	     * @method emit
-	     *
-	     * @param {string} type event type key (for example, 'click')
-	     * @param {Object} event event data
-	     * @return {EventHandler} this
-	     */
-	    EventHandler.prototype.emit = function emit(type, event) {
-	        EventEmitter.prototype.emit.apply(this, arguments);
-	        var i = 0;
-	        for (i = 0; i < this.downstream.length; i++) {
-	            if (this.downstream[i].trigger) this.downstream[i].trigger(type, event);
-	        }
-	        for (i = 0; i < this.downstreamFn.length; i++) {
-	            this.downstreamFn[i](type, event);
-	        }
-	        return this;
-	    };
-
-	    /**
-	     * Alias for emit
-	     * @method addListener
-	     */
-	    EventHandler.prototype.trigger = EventHandler.prototype.emit;
-
-	    /**
-	     * Add event handler object to set of downstream handlers.
-	     *
-	     * @method pipe
-	     *
-	     * @param {EventHandler} target event handler target object
-	     * @return {EventHandler} passed event handler
-	     */
-	    EventHandler.prototype.pipe = function pipe(target) {
-	        if (target.subscribe instanceof Function) return target.subscribe(this);
-
-	        var downstreamCtx = (target instanceof Function) ? this.downstreamFn : this.downstream;
-	        var index = downstreamCtx.indexOf(target);
-	        if (index < 0) downstreamCtx.push(target);
-
-	        if (target instanceof Function) target('pipe', null);
-	        else if (target.trigger) target.trigger('pipe', null);
-
-	        return target;
-	    };
-
-	    /**
-	     * Remove handler object from set of downstream handlers.
-	     *   Undoes work of "pipe".
-	     *
-	     * @method unpipe
-	     *
-	     * @param {EventHandler} target target handler object
-	     * @return {EventHandler} provided target
-	     */
-	    EventHandler.prototype.unpipe = function unpipe(target) {
-	        if (target.unsubscribe instanceof Function) return target.unsubscribe(this);
-
-	        var downstreamCtx = (target instanceof Function) ? this.downstreamFn : this.downstream;
-	        var index = downstreamCtx.indexOf(target);
-	        if (index >= 0) {
-	            downstreamCtx.splice(index, 1);
-	            if (target instanceof Function) target('unpipe', null);
-	            else if (target.trigger) target.trigger('unpipe', null);
-	            return target;
-	        }
-	        else return false;
-	    };
-
-	    /**
-	     * Bind a callback function to an event type handled by this object.
-	     *
-	     * @method "on"
-	     *
-	     * @param {string} type event type key (for example, 'click')
-	     * @param {function(string, Object)} handler callback
-	     * @return {EventHandler} this
-	     */
-	    EventHandler.prototype.on = function on(type, handler) {
-	        EventEmitter.prototype.on.apply(this, arguments);
-	        if (!(type in this.upstreamListeners)) {
-	            var upstreamListener = this.trigger.bind(this, type);
-	            this.upstreamListeners[type] = upstreamListener;
-	            for (var i = 0; i < this.upstream.length; i++) {
-	                this.upstream[i].on(type, upstreamListener);
-	            }
-	        }
-	        return this;
-	    };
-
-	    /**
-	     * Alias for "on"
-	     * @method addListener
-	     */
-	    EventHandler.prototype.addListener = EventHandler.prototype.on;
-
-	    /**
-	     * Listen for events from an upstream event handler.
-	     *
-	     * @method subscribe
-	     *
-	     * @param {EventEmitter} source source emitter object
-	     * @return {EventHandler} this
-	     */
-	    EventHandler.prototype.subscribe = function subscribe(source) {
-	        var index = this.upstream.indexOf(source);
-	        if (index < 0) {
-	            this.upstream.push(source);
-	            for (var type in this.upstreamListeners) {
-	                source.on(type, this.upstreamListeners[type]);
-	            }
-	        }
-	        return this;
-	    };
-
-	    /**
-	     * Stop listening to events from an upstream event handler.
-	     *
-	     * @method unsubscribe
-	     *
-	     * @param {EventEmitter} source source emitter object
-	     * @return {EventHandler} this
-	     */
-	    EventHandler.prototype.unsubscribe = function unsubscribe(source) {
-	        var index = this.upstream.indexOf(source);
-	        if (index >= 0) {
-	            this.upstream.splice(index, 1);
-	            for (var type in this.upstreamListeners) {
-	                source.removeListener(type, this.upstreamListeners[type]);
-	            }
-	        }
-	        return this;
-	    };
-
-	    module.exports = EventHandler;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 38 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * This Source Code is licensed under the MIT license. If a copy of the
-	 * MIT-license was not distributed with this file, You can obtain one at:
-	 * http://opensource.org/licenses/mit-license.html.
-	 *
-	 * @author: Hein Rutjes (IjzerenHein)
-	 * @license MIT
-	 * @copyright Gloey Apps, 2014
-	 */
-
-	/*global define*/
-	/*eslint no-use-before-define:0 */
-
-	/**
-	 * LayoutNodeManager is a private class used internally by the LayoutControllers and
-	 * ScrollViews. It manages the layout-nodes that are rendered and exposes the layout-context
-	 * which is passed along to the layout-function.
-	 *
-	 * LayoutNodeManager keeps track of every rendered node through an ordered double-linked
-	 * list. The first time the layout-function is called, the linked list is created.
-	 * After that, the linked list is updated to reflect the output of the layout-function.
-	 * When the layout is unchanged, then the linked-list exactly matches the order of the
-	 * accessed nodes in the layout-function, and no layout-nodes need to be created or
-	 * re-ordered.
-	 *
-	 * @module
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-
-	    // import dependencies
-	    var LayoutContext = __webpack_require__(66);
-	    var LayoutUtility = __webpack_require__(14);
-
-	    var MAX_POOL_SIZE = 100;
-	    var LOG_PREFIX = 'Nodes: ';
-
-	    /**
-	     * @class
-	     * @param {LayoutNode} LayoutNode Layout-nodes to create
-	     * @param {Function} initLayoutNodeFn function to use when initializing new nodes
-	     * @alias module:LayoutNodeManager
-	     */
-	    function LayoutNodeManager(LayoutNode, initLayoutNodeFn) {
-	        this.LayoutNode = LayoutNode;
-	        this._initLayoutNodeFn = initLayoutNodeFn;
-	        this._context = new LayoutContext({
-	            next: _contextNext.bind(this),
-	            prev: _contextPrev.bind(this),
-	            get: _contextGet.bind(this),
-	            set: _contextSet.bind(this),
-	            resolveSize: _contextResolveSize.bind(this),
-	            size: [0, 0]
-	            //,cycle: 0
-	        });
-	        this._contextState = {
-	            // enumation state for the context
-	            //nextSequence: undefined,
-	            //prevSequence: undefined,
-	            //next: undefined
-	            //prev: undefined
-	            //start: undefined
-	        };
-	        this._pool = {
-	            layoutNodes: {
-	                size: 0
-	                //first: undefined
-	            },
-	            resolveSize: [0, 0]
-	        };
-	        this.verbose = false;
-	        //this._first = undefined; // first item in the linked list
-	        //this._nodesById = undefined;
-	        //this._trueSizeRequested = false;
-	    }
-
-	    /**
-	     * Prepares the manager for a new layout iteration, after which it returns the
-	     * context which can be used by the layout-function.
-	     *
-	     * @param {ViewSequence} viewSequence first node to layout
-	     * @param {Object} [nodesById] dictionary to use when looking up nodes by id
-	     * @return {LayoutContext} context which can be passed to the layout-function
-	     */
-	    LayoutNodeManager.prototype.prepareForLayout = function(viewSequence, nodesById, contextData) {
-
-	        // Reset all nodes
-	        var node = this._first;
-	        while (node) {
-	            node.reset();
-	            node = node._next;
-	        }
-
-	        // Prepare data
-	        var context = this._context;
-	        this._nodesById = nodesById;
-	        this._trueSizeRequested = false;
-	        this._reevalTrueSize =
-	            !context.size ||
-	            (context.size[0] !== contextData.size[0]) ||
-	            (context.size[1] !== contextData.size[1]);
-
-	        // Prepare context for enumation
-	        var contextState = this._contextState;
-	        contextState.nextSequence = viewSequence;
-	        contextState.prevSequence = viewSequence;
-	        contextState.next = undefined;
-	        contextState.prev = undefined;
-	        contextState.nextGetIndex = 0;
-	        contextState.prevGetIndex = 0;
-	        contextState.nextSetIndex = 0;
-	        contextState.prevSetIndex = 0;
-
-	        // Prepare content
-	        context.size[0] = contextData.size[0];
-	        context.size[1] = contextData.size[1];
-	        context.direction = contextData.direction;
-	        context.reverse = contextData.reverse;
-	        context.scrollOffset = contextData.scrollOffset || 0;
-	        context.scrollStart = contextData.scrollStart || 0;
-	        context.scrollEnd = contextData.scrollEnd || context.size[context.direction];
-	        //context.cycle++;
-	        return context;
-	    };
-
-	    /**
-	     * When the layout-function no longer lays-out the node, then it is not longer
-	     * being invalidated. In this case the destination is set to the removeSpec
-	     * after which the node is animated towards the remove-spec.
-	     *
-	     * @param {Spec} [removeSpec] spec towards which the no longer layed-out nodes are animated
-	     */
-	    LayoutNodeManager.prototype.removeNonInvalidatedNodes = function(removeSpec) {
-	        var node = this._first;
-	        while (node) {
-
-	            // If a node existed, but it is no longer being layed out,
-	            // then set it to the '_removing' state.
-	            if (!node._invalidated && !node._removing) {
-	                if (this.verbose) {
-	                    LayoutUtility.log(LOG_PREFIX, 'removing node');
-	                }
-	                node.remove(removeSpec);
-	            }
-
-	            // Move to next node
-	            node = node._next;
-	        }
-	    };
-
-	    /**
-	     * Builds the render-spec and destroy any layout-nodes that no longer
-	     * return a render-spec.
-	     *
-	     * @return {Array.Spec} array of Specs
-	     */
-	    LayoutNodeManager.prototype.buildSpecAndDestroyUnrenderedNodes = function(translate) {
-	        var specs = [];
-	        var result = {
-	            specs: specs,
-	            modified: false
-	        };
-	        var node = this._first;
-	        while (node) {
-	            var modified = node._specModified;
-	            var spec = node.getSpec();
-	            if (!spec) {
-
-	                // Destroy node
-	                var destroyNode = node;
-	                node = node._next;
-	                _destroyNode.call(this, destroyNode);
-
-	                // Mark as modified
-	                result.modified = true;
-	            }
-	            else {
-
-	                // Update stats
-	                if (modified) {
-	                    if (spec.transform && translate) {
-	                        spec.transform[12] += translate[0];
-	                        spec.transform[13] += translate[1];
-	                        spec.transform[14] += translate[2];
-	                    }
-	                    result.modified = true;
-	                }
-
-	                // Add node to result output
-	                specs.push(spec);
-	                node = node._next;
-	            }
-	        }
-	        return result;
-	    };
-
-	    /**
-	     * Get the layout-node by its renderable.
-	     *
-	     * @param {Object} renderable renderable
-	     * @return {LayoutNode} layout-node or undefined
-	     */
-	    LayoutNodeManager.prototype.getNodeByRenderNode = function(renderable) {
-	        var node = this._first;
-	        while (node) {
-	            if (node.renderNode === renderable) {
-	                return node;
-	            }
-	            node = node._next;
-	        }
-	        return undefined;
-	    };
-
-	    /**
-	     * Inserts a layout-node into the linked-list.
-	     *
-	     * @param {LayoutNode} node layout-node to insert
-	     */
-	    LayoutNodeManager.prototype.insertNode = function(node) {
-	        node._next = this._first;
-	        if (this._first) {
-	            this._first._prev = node;
-	        }
-	        this._first = node;
-	        _checkIntegrity.call(this);
-	    };
-
-	    /**
-	     * Creates a layout-node
-	     *
-	     * @param {Object} renderNode render-node for whom to create a layout-node for
-	     * @return {LayoutNode} layout-node
-	     */
-	    LayoutNodeManager.prototype.createNode = function(renderNode, spec) {
-	        var node;
-	        if (this._pool.layoutNodes.first) {
-	            node = this._pool.layoutNodes.first;
-	            this._pool.layoutNodes.first = node._next;
-	            this._pool.layoutNodes.size--;
-	            node.constructor.apply(node, arguments);
-	        }
-	        else {
-	            node = new this.LayoutNode(renderNode, spec);
-	        }
-	        node._prev = undefined;
-	        node._next = undefined;
-	        node._viewSequence = undefined;
-	        if (this._initLayoutNodeFn) {
-	            this._initLayoutNodeFn.call(this, node, spec);
-	        }
-	        return node;
-	    };
-
-	    /**
-	     * Destroys a layout-node
-	     */
-	    function _destroyNode(node) {
-
-	        // Remove node from linked-list
-	        if (node._next) {
-	            node._next._prev = node._prev;
-	        }
-	        if (node._prev) {
-	            node._prev._next = node._next;
-	        }
-	        else {
-	            this._first = node._next;
-	        }
-
-	        // Destroy the node
-	        node.destroy();
-	        if (this.verbose) {
-	            LayoutUtility.log(LOG_PREFIX, 'destroying node');
-	        }
-
-	        // Add node to pool
-	        if (this._pool.layoutNodes.size < MAX_POOL_SIZE) {
-	            this._pool.layoutNodes.size++;
-	            node._prev = undefined;
-	            node._next = this._pool.layoutNodes.first;
-	            this._pool.layoutNodes.first = node;
-	        }
-
-	        _checkIntegrity.call(this);
-	    }
-
-	    /**
-	     * Enumates all layout-nodes.
-	     *
-	     * @param {Function} callback Function that is called every node
-	     * @param {Bool} [next] undefined = all, true = all next, false = all previous
-	     */
-	    LayoutNodeManager.prototype.forEach = function(callback, next) {
-	        var node;
-	        if (next === undefined) {
-	            node = this._first;
-	            while (node) {
-	                if (callback(node)) {
-	                    return;
-	                }
-	                node = node._next;
-	            }
-	        } else if (next === true) {
-	            node = (this._contextState.start && this._contextState.startPrev) ? this._contextState.start._next : this._contextState.start;
-	            while (node) {
-	                if (!node._invalidated || callback(node)) {
-	                    return;
-	                }
-	                node = node._next;
-	            }
-	        } else if (next === false) {
-	            node = (this._contextState.start && !this._contextState.startPrev) ? this._contextState.start._prev : this._contextState.start;
-	            while (node) {
-	                if (!node._invalidated || callback(node)) {
-	                    return;
-	                }
-	                node = node._prev;
-	            }
-	        }
-	    };
-
-	    /**
-	     * Gets start layout-node for enumeration.
-	     *
-	     * @param {Bool} [next] undefined = all, true = all next, false = all previous
-	     * @return {LayoutNode} layout-node or undefined
-	     */
-	    LayoutNodeManager.prototype.getStartEnumNode = function(next) {
-	        if (next === undefined) {
-	            return this._first;
-	        } else if (next === true) {
-	            return (this._contextState.start && this._contextState.startPrev) ? this._contextState.start._next : this._contextState.start;
-	        } else if (next === false) {
-	            return (this._contextState.start && !this._contextState.startPrev) ? this._contextState.start._prev : this._contextState.start;
-	        }
-	    };
-
-	    /**
-	     * Checks the integrity of the linked-list.
-	     */
-	    function _checkIntegrity() {
-	        /*var node = this._first;
-	        var count = 0;
-	        var prevNode;
-	        while (node) {
-	            if (!node._prev && (node !== this._first)) {
-	                throw 'No prev but not first';
-	            }
-	            if (node._prev !== prevNode) {
-	                throw 'Bork';
-	            }
-	            prevNode = node;
-	            node = node._next;
-	            count++;
-	        }*/
-	    }
-
-	    /**
-	     * Creates or gets a layout node.
-	     */
-	    function _contextGetCreateAndOrderNodes(renderNode, prev) {
-
-	        // The first time this function is called, the current
-	        // prev/next position is obtained.
-	        var node;
-	        if (!this._contextState.prev && !this._contextState.next) {
-	            node = this._first;
-	            while (node) {
-	                if (node.renderNode === renderNode) {
-	                    break;
-	                }
-	                node = node._next;
-	            }
-	            if (!node) {
-	                node = this.createNode(renderNode);
-	                node._next = this._first;
-	                if (this._first) {
-	                    this._first._prev = node;
-	                }
-	                this._first = node;
-	            }
-	            this._contextState.start = node;
-	            this._contextState.startPrev = prev;
-	            this._contextState.prev = prev ? node : undefined;
-	            this._contextState.next = prev ? undefined : node;
-	            _checkIntegrity.call(this);
-	        }
-
-	        // Check whether node already exist at the correct position
-	        // in the linked-list. If so, return that node immediately
-	        // and advance the prev/next pointer for the next/prev
-	        // lookup operation.
-	        var prevNode;
-	        var nextNode;
-	        if (prev) {
-	            if (this._contextState.prev && (this._contextState.prev.renderNode === renderNode)) {
-	                prevNode = this._contextState.prev;
-	            }
-	            else if (!this._contextState.prev && this._contextState.start && this._contextState.start._prev && (this._contextState.start._prev.renderNode === renderNode)) {
-	                prevNode = this._contextState.start._prev;
-	                this._contextState.prev = prevNode;
-	            }
-	            if (prevNode) {
-	                if (prevNode._prev) {
-	                    this._contextState.prev = prevNode._prev;
-	                }
-	                _checkIntegrity.call(this);
-	                return prevNode;
-	            }
-	        }
-	        else {
-	            if (this._contextState.next && (this._contextState.next.renderNode === renderNode)) {
-	                nextNode = this._contextState.next;
-	            }
-	            else if (!this._contextState.next && this._contextState.start && this._contextState.start._next && (this._contextState.start._next.renderNode === renderNode)) {
-	                nextNode = this._contextState.start._next;
-	                this._contextState.next = nextNode;
-	            }
-	            if (nextNode) {
-	                if (nextNode._next) {
-	                    this._contextState.next = nextNode._next;
-	                }
-	                _checkIntegrity.call(this);
-	                return nextNode;
-	            }
-	        }
-
-	        // Lookup the node anywhere in the list..
-	        node = this._first;
-	        while (node) {
-	            if (node.renderNode === renderNode) {
-	                break;
-	            }
-	            node = node._next;
-	        }
-
-	        // Create new node if neccessary
-	        if (!node) {
-	            node = this.createNode(renderNode);
-	        }
-
-	        // Node existed, remove from linked-list
-	        else {
-	            if (node._next) {
-	                node._next._prev = node._prev;
-	            }
-	            if (node._prev) {
-	                node._prev._next = node._next;
-	            }
-	            else {
-	                this._first = node._next;
-	            }
-	            node._next = undefined;
-	            node._prev = undefined;
-	            _checkIntegrity.call(this);
-	        }
-
-	        // Insert node into the linked list
-	        if (prev) {
-	            prevNode = this._contextState.prev || this._contextState.start;
-	            if (prevNode._prev) {
-	                node._prev = prevNode._prev;
-	                prevNode._prev._next = node;
-	            }
-	            else {
-	                this._first = node;
-	            }
-	            prevNode._prev = node;
-	            node._next = prevNode;
-	            this._contextState.prev = node;
-	        }
-	        else {
-	            nextNode = this._contextState.next || this._contextState.start;
-	            if (nextNode._next) {
-	                node._next = nextNode._next;
-	                nextNode._next._prev = node;
-	            }
-	            nextNode._next = node;
-	            node._prev = nextNode;
-	            this._contextState.next = node;
-	        }
-	        _checkIntegrity.call(this);
-
-	        return node;
-	    }
-
-	    /**
-	     * Get the next render-node
-	     */
-	    function _contextNext() {
-
-	        // Get the next node from the sequence
-	        if (!this._contextState.nextSequence) {
-	            return undefined;
-	        }
-	        if (this._context.reverse) {
-	            this._contextState.nextSequence = this._contextState.nextSequence.getNext();
-	            if (!this._contextState.nextSequence) {
-	                return undefined;
-	            }
-	        }
-	        var renderNode = this._contextState.nextSequence.get();
-	        if (!renderNode) {
-	            this._contextState.nextSequence = undefined;
-	            return undefined;
-	        }
-	        var nextSequence = this._contextState.nextSequence;
-	        if (!this._context.reverse) {
-	            this._contextState.nextSequence = this._contextState.nextSequence.getNext();
-	        }
-	        return {
-	            renderNode: renderNode,
-	            viewSequence: nextSequence,
-	            next: true,
-	            index: ++this._contextState.nextGetIndex
-	        };
-	    }
-
-	    /**
-	     * Get the previous render-node
-	     */
-	    function _contextPrev() {
-
-	        // Get the previous node from the sequence
-	        if (!this._contextState.prevSequence) {
-	            return undefined;
-	        }
-	        if (!this._context.reverse) {
-	            this._contextState.prevSequence = this._contextState.prevSequence.getPrevious();
-	            if (!this._contextState.prevSequence) {
-	                return undefined;
-	            }
-	        }
-	        var renderNode = this._contextState.prevSequence.get();
-	        if (!renderNode) {
-	            this._contextState.prevSequence = undefined;
-	            return undefined;
-	        }
-	        var prevSequence = this._contextState.prevSequence;
-	        if (this._context.reverse) {
-	            this._contextState.prevSequence = this._contextState.prevSequence.getPrevious();
-	        }
-	        return {
-	            renderNode: renderNode,
-	            viewSequence: prevSequence,
-	            prev: true,
-	            index: --this._contextState.prevGetIndex
-	        };
-	    }
-
-	    /**
-	     * Resolve id into a context-node.
-	     */
-	     function _contextGet(contextNodeOrId) {
-	        if (this._nodesById && ((contextNodeOrId instanceof String) || (typeof contextNodeOrId === 'string'))) {
-	            var renderNode = this._nodesById[contextNodeOrId];
-	            if (!renderNode) {
-	                return undefined;
-	            }
-
-	            // Return array
-	            if (renderNode instanceof Array) {
-	                var result = [];
-	                for (var i = 0, j = renderNode.length; i < j; i++) {
-	                    result.push({
-	                        renderNode: renderNode[i],
-	                        arrayElement: true
-	                    });
-	                }
-	                return result;
-	            }
-
-	            // Create context node
-	            return {
-	                renderNode: renderNode,
-	                byId: true
-	            };
-	        }
-	        else {
-	            return contextNodeOrId;
-	        }
-	    }
-
-	    /**
-	     * Set the node content
-	     */
-	    function _contextSet(contextNodeOrId, set) {
-	        var contextNode = this._nodesById ? _contextGet.call(this, contextNodeOrId) : contextNodeOrId;
-	        if (contextNode) {
-	            var node = contextNode.node;
-	            if (!node) {
-	                if (contextNode.next) {
-	                     if (contextNode.index < this._contextState.nextSetIndex) {
-	                        LayoutUtility.error('Nodes must be layed out in the same order as they were requested!');
-	                     }
-	                     this._contextState.nextSetIndex = contextNode.index;
-	                } else if (contextNode.prev) {
-	                     if (contextNode.index > this._contextState.prevSetIndex) {
-	                        LayoutUtility.error('Nodes must be layed out in the same order as they were requested!');
-	                     }
-	                     this._contextState.prevSetIndex = contextNode.index;
-	                }
-	                node = _contextGetCreateAndOrderNodes.call(this, contextNode.renderNode, contextNode.prev);
-	                node._viewSequence = contextNode.viewSequence;
-	                contextNode.node = node;
-	            }
-	            node.usesTrueSize = contextNode.usesTrueSize;
-	            node.trueSizeRequested = contextNode.trueSizeRequested;
-	            node.set(set, this._context.size);
-	            contextNode.set = set;
-	        }
-	    }
-
-	    /**
-	     * Resolve the size of the layout-node from the renderable itsself
-	     */
-	    function _contextResolveSize(contextNodeOrId, parentSize) {
-	        var contextNode = this._nodesById ? _contextGet.call(this, contextNodeOrId) : contextNodeOrId;
-	        var resolveSize = this._pool.resolveSize;
-	        if (!contextNode) {
-	            resolveSize[0] = 0;
-	            resolveSize[1] = 0;
-	            return resolveSize;
-	        }
-
-	        // Get in use size
-	        var renderNode = contextNode.renderNode;
-	        var size = renderNode.getSize();
-	        if (!size) {
-	            return parentSize;
-	        }
-
-	        // Check if true-size is used and it must be reavaluated
-	        var configSize = renderNode.size && (renderNode._trueSizeCheck !== undefined) ? renderNode.size : undefined;
-	        if (configSize && ((configSize[0] === true) || (configSize[1] === true))) {
-	            contextNode.usesTrueSize = true;
-	            if (renderNode._trueSizeCheck) {
-
-	                // Fix for true-size renderables. When true-size is used, the size
-	                // is incorrect for one render-cycle due to the fact that Surface.commit
-	                // updates the content after asking the DOM for the offsetHeight/offsetWidth.
-	                // The code below backs the size up, and re-uses that when this scenario
-	                // occurs.
-	                if (renderNode._backupSize) {
-	                    if (configSize[0] === true) {
-	                        renderNode._backupSize[0] = Math.max(renderNode._backupSize[0], size[0]);
-	                    }
-	                    else {
-	                        renderNode._backupSize[0] = size[0];
-	                    }
-	                    if (configSize[1] === true) {
-	                        renderNode._backupSize[1] = Math.max(renderNode._backupSize[1], size[1]);
-	                    }
-	                    else {
-	                        renderNode._backupSize[1] = size[1];
-	                    }
-	                    size = renderNode._backupSize;
-	                    renderNode._backupSize = undefined;
-	                }
-	                this._trueSizeRequested = true;
-	                contextNode.trueSizeRequested = true;
-	                //console.log('true size requested on node: ' + JSON.stringify(size));
-	            }
-	            if (this._reevalTrueSize) {
-	                renderNode._trueSizeCheck = true; // force request of true-size from DOM
-	            }
-	            //this._trueSizeRequested = true;
-
-	            // Backup the size of the node
-	            if (!contextNode.renderNode._backupSize) {
-	                renderNode._backupSize = [0, 0];
-	            }
-	            renderNode._backupSize[0] = size[0];
-	            renderNode._backupSize[1] = size[1];
-	        }
-
-	        // Resolve 'undefined' to parent-size and true to 0
-	        if ((size[0] === undefined) || (size[0] === true) || (size[1] === undefined) || (size[1] === true)) {
-	            resolveSize[0] = size[0];
-	            resolveSize[1] = size[1];
-	            size = resolveSize;
-	            if (size[0] === undefined) {
-	                size[0] = parentSize[0];
-	            } else if (size[0] === true) {
-	                size[0] = 0;
-	                this._trueSizeRequested = true;
-	                contextNode.trueSizeRequested = true;
-	            }
-	            if (size[1] === undefined) {
-	                size[1] = parentSize[1];
-	            } else if (size[1] === true) {
-	                size[1] = 0;
-	                this._trueSizeRequested = true;
-	                contextNode.trueSizeRequested = true;
-	            }
-	        }
-	        return size;
-	    }
-
-	    module.exports = LayoutNodeManager;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 39 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * This Source Code is licensed under the MIT license. If a copy of the
-	 * MIT-license was not distributed with this file, You can obtain one at:
-	 * http://opensource.org/licenses/mit-license.html.
-	 *
-	 * @author: Hein Rutjes (IjzerenHein)
-	 * @license MIT
-	 * @copyright Gloey Apps, 2014
-	 */
-
-	/*global define*/
-	/*eslint no-use-before-define:0 */
-
-	/**
-	 * Internal LayoutNode class used by `LayoutController`.
-	 *
-	 * @module
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-
-	    // import dependencies
-	    var Transform = __webpack_require__(27);
-	    var LayoutUtility = __webpack_require__(14);
-
-	    /**
-	     * @class
-	     * @param {Object} renderNode Render-node which this layout-node represents
-	     * @alias module:LayoutNode
-	     */
-	    function LayoutNode(renderNode, spec) {
-	        this.renderNode = renderNode;
-	        this._spec = spec ? LayoutUtility.cloneSpec(spec) : {};
-	        this._spec.renderNode = renderNode; // also store in spec
-	        this._specModified = true;
-	        this._invalidated = false;
-	        this._removing = false;
-	        //this.scrollLength = undefined;
-	        //this.trueSizeRequested = false;
-	    }
-
-	    /**
-	     * Called to update the options for the node
-	     */
-	    LayoutNode.prototype.setOptions = function(options) {
-	        // override to implement
-	    };
-
-	    /**
-	     * Called when the node is destroyed
-	     */
-	    LayoutNode.prototype.destroy = function() {
-	        this.renderNode = undefined;
-	        this._spec.renderNode = undefined;
-	        this._viewSequence = undefined;
-	    };
-
-	    /**
-	     * Reset the end-state. This function is called on all layout-nodes prior to
-	     * calling the layout-function. So that the layout-function starts with a clean slate.
-	     */
-	    LayoutNode.prototype.reset = function() {
-	        this._invalidated = false;
-	        this.trueSizeRequested = false;
-	    };
-
-	    /**
-	     * Set the spec of the node
-	     *
-	     * @param {Object} spec
-	     */
-	    LayoutNode.prototype.setSpec = function(spec) {
-	        this._specModified = true;
-	        if (spec.align) {
-	            if (!spec.align) {
-	                this._spec.align = [0, 0];
-	            }
-	            this._spec.align[0] = spec.align[0];
-	            this._spec.align[1] = spec.align[1];
-	        }
-	        else {
-	            this._spec.align = undefined;
-	        }
-	        if (spec.origin) {
-	            if (!spec.origin) {
-	                this._spec.origin = [0, 0];
-	            }
-	            this._spec.origin[0] = spec.origin[0];
-	            this._spec.origin[1] = spec.origin[1];
-	        }
-	        else {
-	            this._spec.origin = undefined;
-	        }
-	        if (spec.size) {
-	            if (!spec.size) {
-	                this._spec.size = [0, 0];
-	            }
-	            this._spec.size[0] = spec.size[0];
-	            this._spec.size[1] = spec.size[1];
-	        }
-	        else {
-	            this._spec.size = undefined;
-	        }
-	        if (spec.transform) {
-	            if (!spec.transform) {
-	                this._spec.transform = spec.transform.slice(0);
-	            }
-	            else {
-	                for (var i = 0; i < 16; i++) {
-	                    this._spec.transform[0] = spec.transform[0];
-	                }
-	            }
-	        }
-	        else {
-	            this._spec.transform = undefined;
-	        }
-	        this._spec.opacity = spec.opacity;
-	    };
-
-	    /**
-	     * Set the content of the node
-	     *
-	     * @param {Object} set
-	     */
-	    LayoutNode.prototype.set = function(set, size) {
-	        this._invalidated = true;
-	        this._specModified = true;
-	        this._removing = false;
-	        var spec = this._spec;
-	        spec.opacity = set.opacity;
-	        if (set.size) {
-	            if (!spec.size) {
-	                spec.size = [0, 0];
-	            }
-	            spec.size[0] = set.size[0];
-	            spec.size[1] = set.size[1];
-	        }
-	        else {
-	            spec.size = undefined;
-	        }
-	        if (set.origin) {
-	            if (!spec.origin) {
-	                spec.origin = [0, 0];
-	            }
-	            spec.origin[0] = set.origin[0];
-	            spec.origin[1] = set.origin[1];
-	        }
-	        else {
-	            spec.origin = undefined;
-	        }
-	        if (set.align) {
-	            if (!spec.align) {
-	                spec.align = [0, 0];
-	            }
-	            spec.align[0] = set.align[0];
-	            spec.align[1] = set.align[1];
-	        }
-	        else {
-	            spec.align = undefined;
-	        }
-
-	        if (set.skew || set.rotate || set.scale) {
-	            this._spec.transform = Transform.build({
-	                translate: set.translate || [0, 0, 0],
-	                skew: set.skew || [0, 0, 0],
-	                scale: set.scale || [1, 1, 1],
-	                rotate: set.rotate || [0, 0, 0]
-	            });
-	        }
-	        else if (set.translate) {
-	            this._spec.transform = Transform.translate(set.translate[0], set.translate[1], set.translate[2]);
-	        }
-	        else {
-	            this._spec.transform = undefined;
-	        }
-	        this.scrollLength = set.scrollLength;
-	    };
-
-	    /**
-	     * Creates the render-spec
-	     */
-	    LayoutNode.prototype.getSpec = function() {
-	        this._specModified = false;
-	        return this._invalidated ? this._spec : undefined;
-	    };
-
-	    /**
-	     * Marks the node for removal
-	     */
-	    LayoutNode.prototype.remove = function(removeSpec) {
-	        this._removing = true;
-	    };
-
-	    module.exports = LayoutNode;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 40 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * This Source Code is licensed under the MIT license. If a copy of the
-	 * MIT-license was not distributed with this file, You can obtain one at:
-	 * http://opensource.org/licenses/mit-license.html.
-	 *
-	 * @author: Hein Rutjes (IjzerenHein)
-	 * @license MIT
-	 * @copyright Gloey Apps, 2014
-	 */
-
-	/*global define*/
-	/*eslint no-use-before-define:0 */
-
-	/**
-	 * Internal LayoutNode class used by `FlowLayoutController`.
-	 *
-	 * @module
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-
-	    // import dependencies
-	    var OptionsManager = __webpack_require__(36);
-	    var Transform = __webpack_require__(27);
-	    var Vector = __webpack_require__(68);
-	    var Particle = __webpack_require__(70);
-	    var Spring = __webpack_require__(72);
-	    var PhysicsEngine = __webpack_require__(69);
-	    var LayoutNode = __webpack_require__(39);
-	    var Transitionable = __webpack_require__(60);
-
-	    /**
-	     * @class
-	     * @extends LayoutNode
-	     * @param {Object} renderNode Render-node which this layout-node represents
-	     * @param {Spec} spec Initial state
-	     * @param {Object} physicsEngines physics-engines to use
-	     * @alias module:FlowLayoutNode
-	     */
-	    function FlowLayoutNode(renderNode, spec) {
-	        LayoutNode.apply(this, arguments);
-
-	        if (!this.options) {
-	            this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
-	            this._optionsManager = new OptionsManager(this.options);
-	        }
-
-	        if (!this._pe) {
-	            this._pe = new PhysicsEngine();
-	        }
-
-	        this._options = {
-	            spring: {
-	                dampingRatio: 0.8,
-	                period: 300
-	            }
-	        };
-
-	        if (!this._properties) {
-	            this._properties = {};
-	        }
-	        else {
-	            for (var propName in this._properties) {
-	                this._properties[propName].init = false;
-	            }
-	        }
-	        _verifyIntegrity.call(this);
-
-	        this._specModified = true;
-	        this._initial = true;
-	        if (spec) {
-	            this.setSpec(spec);
-	        }
-	        _verifyIntegrity.call(this);
-	    }
-	    FlowLayoutNode.prototype = Object.create(LayoutNode.prototype);
-	    FlowLayoutNode.prototype.constructor = FlowLayoutNode;
-
-	    FlowLayoutNode.DEFAULT_OPTIONS = {
-	        spring: {
-	            dampingRatio: 0.8,
-	            period: 300
-	        },
-	        particleRounding: 0.001
-	    };
-
-	    /**
-	     * Defaults
-	     */
-	    var DEFAULT = {
-	        opacity: 1,
-	        opacity2D: [1, 0],
-	        size: [0, 0],
-	        origin: [0, 0],
-	        align: [0, 0],
-	        scale: [1, 1, 1],
-	        translate: [0, 0, 0],
-	        rotate: [0, 0, 0],
-	        skew: [0, 0, 0]
-	    };
-
-	    /**
-	     * Verifies that the integrity of the layout-node is oke.
-	     */
-	    function _verifyIntegrity() {
-	        /*var i;
-	        for (var propName in this._properties) {
-	            var prop = this._properties[propName];
-	            if (prop.particle) {
-	                if (isNaN(prop.particle.getEnergy())) {
-	                    throw 'invalid particle energy: ' + propName;
-	                }
-	                var value = prop.particle.getPosition();
-	                for (i = 0; i < value.length; i++) {
-	                    if (isNaN(value[i])) {
-	                       throw 'invalid particle value: ' + propName + '(' + i + ')';
-	                    }
-	                }
-	                value = prop.endState.get();
-	                for (i = 0; i < value.length; i++) {
-	                    if (isNaN(value[i])) {
-	                       throw 'invalid endState value: ' + propName + '(' + i + ')';
-	                    }
-	                }
-	            }
-	        }*/
-	    }
-
-	    /**
-	     * Sets the configuration options
-	     */
-	    FlowLayoutNode.prototype.setOptions = function(options) {
-	        this._optionsManager.setOptions(options);
-	        for (var propName in this._properties) {
-	            var prop = this._properties[propName];
-	            if (prop.force) {
-	                prop.force.setOptions(prop.force);
-	            }
-	        }
-	        _verifyIntegrity.call(this);
-	        return this;
-	    };
-
-	    /**
-	     * Set the properties from a spec.
-	     */
-	    FlowLayoutNode.prototype.setSpec = function(spec) {
-	        var set;
-	        if (spec.transform) {
-	            set = Transform.interpret(spec.transform);
-	        }
-	        if (!set) {
-	            set = {};
-	        }
-	        set.opacity = spec.opacity;
-	        set.size = spec.size;
-	        set.align = spec.align;
-	        set.origin = spec.origin;
-
-	        var oldRemoving = this._removing;
-	        var oldInvalidated = this._invalidated;
-	        this.set(set);
-	        this._removing = oldRemoving;
-	        this._invalidated = oldInvalidated;
-	    };
-
-	    /**
-	     * Reset the end-state. This function is called on all layout-nodes prior to
-	     * calling the layout-function. So that the layout-function starts with a clean slate.
-	     */
-	    FlowLayoutNode.prototype.reset = function() {
-	        if (this._invalidated) {
-	            for (var propName in this._properties) {
-	                this._properties[propName].invalidated = false;
-	            }
-	            this._invalidated = false;
-	        }
-	        this.trueSizeRequested = false;
-	        this.usesTrueSize = false;
-	    };
-
-	    /**
-	     * Markes the node for removal.
-	     */
-	    FlowLayoutNode.prototype.remove = function(removeSpec) {
-
-	        // Transition to the remove-spec state
-	        this._removing = true;
-	        if (removeSpec) {
-	            this.setSpec(removeSpec);
-	        }
-	        else {
-	            this._pe.sleep();
-	            this._specModified = false;
-	        }
-
-	        // Mark for removal
-	        this._invalidated = false;
-	    };
-
-	    /**
-	     * Locks a property, or a specific array-dimension of the property
-	     * fixed to the end-state value. Use this to e.g. lock the x-translation
-	     * to a the fixed end-state, so that when scrolling the renderable sticks
-	     * to the x-axis and does not feel sluggish.
-	     */
-	    FlowLayoutNode.prototype.setDirectionLock = function(direction, value) {
-	        if (direction === undefined) {
-	            this._lockDirection = undefined;
-	        }
-	        else {
-	            this._lockDirection = direction;
-	            if (value !== undefined) {
-	                if (!this._lockTransitionable) {
-	                    this._lockTransitionable = new Transitionable(1);
-	                }
-	                this._lockTransitionable.halt();
-	                this._lockTransitionable.reset(value);
-	                if (value !== 1) {
-	                    this._lockTransitionable.set(1, {
-	                        duration: (1 - value) * 1000
-	                    });
-	                }
-	            }
-	        }
-	    };
-
-	    /**
-	     * Helper function for getting the property value.
-	     */
-	    function _getRoundedValue3D(prop, def, precision) {
-	        if (!prop || !prop.init) {
-	            return def;
-	        }
-	        precision = precision || this.options.particleRounding;
-	        var value = prop.particle.getPosition();
-	        return [
-	            Math.round(value[0] / precision) * precision,
-	            Math.round(value[1] / precision) * precision,
-	            Math.round(value[2] / precision) * precision
-	        ];
-	    }
-
-	    /**
-	     * Creates the render-spec
-	     */
-	    FlowLayoutNode.prototype.getSpec = function() {
-
-	        // When the end state was reached, return the previous spec
-	        var endStateReached = this._pe.isSleeping();
-	        if (!this._specModified && endStateReached) {
-	            if (this._invalidated) {
-	                return this._spec;
-	            }
-	            else {
-	                return undefined;
-	            }
-	        }
-	        this._initial = false;
-	        this._specModified = !endStateReached;
-
-	        // Build fresh spec
-	        var value;
-	        var spec = this._spec;
-	        var precision = this.options.particleRounding;
-
-	        // opacity
-	        var opacity = this._properties.opacity;
-	        if (opacity && opacity.init) {
-	            spec.opacity = Math.round(Math.max(0,Math.min(1, opacity.particle.getPosition1D())) / precision) * precision;
-	        }
-	        else {
-	            spec.opacity = undefined;
-	        }
-
-	        // size
-	        var size = this._properties.size;
-	        if (size && size.init) {
-	            value = size.particle.getPosition();
-	            if (!spec.size) {
-	                spec.size = [0, 0];
-	            }
-	            spec.size[0] = Math.round(value[0] / 0.1) * 0.1;
-	            spec.size[1] = Math.round(value[1] / 0.1) * 0.1;
-	        }
-	        else {
-	            spec.size = undefined;
-	        }
-
-	        // align
-	        var align = this._properties.align;
-	        if (align && align.init) {
-	            value = align.particle.getPosition();
-	            if (!spec.align) {
-	                spec.align = [0, 0];
-	            }
-	            spec.align[0] = Math.round(value[0] / 0.1) * 0.1;
-	            spec.align[1] = Math.round(value[1] / 0.1) * 0.1;
-	        }
-	        else {
-	            spec.align = undefined;
-	        }
-
-	        // origin
-	        var origin = this._properties.origin;
-	        if (origin && origin.init) {
-	            value = origin.particle.getPosition();
-	            if (!spec.origin) {
-	                spec.origin = [0, 0];
-	            }
-	            spec.origin[0] = Math.round(value[0] / 0.1) * 0.1;
-	            spec.origin[1] = Math.round(value[1] / 0.1) * 0.1;
-	        }
-	        else {
-	            spec.origin = undefined;
-	        }
-
-	        // translate
-	        var translate = this._properties.translate;
-	        var translateVal;
-	        if (translate && translate.init) {
-	            translateVal = translate.particle.getPosition();
-	            if (this._lockDirection !== undefined) {
-	                value = translateVal[this._lockDirection];
-	                var endState = translate.endState.get()[this._lockDirection];
-	                var lockValue = value + ((endState - value) * this._lockTransitionable.get());
-	                translateVal[0] = Math.round(translateVal[0] / precision) * precision;
-	                translateVal[1] = Math.round(translateVal[1] / precision) * precision;
-	                translateVal[2] = Math.round(translateVal[2] / precision) * precision;
-	                translateVal[this._lockDirection] = Math.round(lockValue / precision) * precision;
-	            }
-	        }
-	        else {
-	            translateVal = DEFAULT.translate;
-	        }
-
-	        // scale, skew, scale
-	        var scale = this._properties.scale;
-	        var skew = this._properties.skew;
-	        var rotate = this._properties.rotate;
-	        if (scale || skew || rotate) {
-	            spec.transform = Transform.build({
-	                translate: translateVal,
-	                skew: _getRoundedValue3D.call(this, skew, DEFAULT.skew),
-	                scale: _getRoundedValue3D.call(this, scale, DEFAULT.scale),
-	                rotate: _getRoundedValue3D.call(this, rotate, DEFAULT.rotate)
-	            });
-	        }
-	        else if (translate) {
-	            if (!spec.transform) {
-	                spec.transform = Transform.translate(translateVal[0], translateVal[1], translateVal[2]);
-	            }
-	            else {
-	                spec.transform[12] = translateVal[0];
-	                spec.transform[13] = translateVal[1];
-	                spec.transform[14] = translateVal[2];
-	            }
-	        }
-	        else {
-	            spec.transform = undefined;
-	        }
-
-	        //if (this.renderNode._debug) {
-	            //this.renderNode._debug = false;
-	            /*console.log(JSON.stringify({
-	                opacity: this._spec.opacity,
-	                size: this._spec.size,
-	                align: this._spec.align,
-	                origin: this._spec.origin,
-	                transform: this._spec.transform
-	            }));*/
-	        //}
-	        return this._spec;
-	    };
-
-	    /**
-	     * Helper function to set the property of a node (e.g. opacity, translate, etc..)
-	     */
-	    function _setPropertyValue(prop, propName, endState, defaultValue, immediate, isTranslate) {
-
-	        // Get property
-	        prop = prop || this._properties[propName];
-
-	        // Update the property
-	        if (prop && prop.init) {
-	            prop.invalidated = true;
-	            var value = defaultValue;
-	            if (endState !== undefined) {
-	                value = endState;
-	            }
-	            else if (this._removing) {
-	                value = prop.particle.getPosition();
-	            }
-	            prop.endState.x = value[0];
-	            prop.endState.y = (value.length > 1) ? value[1] : 0;
-	            prop.endState.z = (value.length > 2) ? value[2] : 0;
-	            if (isTranslate && (this._lockDirection !== undefined) && (this._lockTransitionable.get() === 1)) {
-	                immediate = true; // this is a bit dirty, it should check !_lockDirection for non changes as well before setting immediate to true
-	            }
-	            if (immediate) {
-	                prop.particle.position.x = value[0];
-	                prop.particle.position.y = (value.length > 1) ? value[1] : 0;
-	                prop.particle.position.z = (value.length > 2) ? value[2] : 0;
-	            }
-	            else {
-	                this._pe.wake();
-	            }
-	            return;
-	        }
-	        else {
-
-	            // Create property if neccesary
-	            if (!prop) {
-	                prop = {
-	                    particle: new Particle({
-	                        position: (this._initial || immediate) ? endState : defaultValue
-	                    }),
-	                    endState: new Vector(endState)
-	                };
-	                prop.force = new Spring(this.options.spring);
-	                prop.force.setOptions({
-	                    anchor: prop.endState
-	                });
-	                this._pe.addBody(prop.particle);
-	                prop.forceId = this._pe.attach(prop.force, prop.particle);
-	                this._properties[propName] = prop;
-	            }
-	            else {
-	                prop.particle.setPosition((this._initial || immediate) ? endState : defaultValue);
-	                prop.endState.set(endState);
-	                if (!this._initial && !immediate) {
-	                    this._pe.wake();
-	                }
-	            }
-	            prop.init = true;
-	            prop.invalidated = true;
-	        }
-	    }
-
-	    /**
-	     * Get value if not equals.
-	     */
-	    function _getIfNE2D(a1, a2) {
-	        return ((a1[0] === a2[0]) && (a1[1] === a2[1])) ? undefined : a1;
-	    }
-	    function _getIfNE3D(a1, a2) {
-	        return ((a1[0] === a2[0]) && (a1[1] === a2[1]) && (a1[2] === a2[2])) ? undefined : a1;
-	    }
-
-	    /**
-	     * context.set(..)
-	     */
-	    FlowLayoutNode.prototype.set = function(set, defaultSize) {
-	        this._removing = false;
-	        this._invalidated = true;
-	        this._specModified = true;
-	        this.scrollLength = set.scrollLength;
-
-	        // set opacity
-	        var opacity = (set.opacity === DEFAULT.opacity) ? undefined : set.opacity;
-	        if ((opacity !== undefined) || (this._properties.opacity && this._properties.opacity.init)) {
-	            _setPropertyValue.call(this, this._properties.opacity, 'opacity', (opacity === undefined) ? undefined : [opacity, 0], DEFAULT.opacity2D);
-	        }
-
-	        // set align
-	        var align = set.align ? _getIfNE2D(set.align, DEFAULT.align) : undefined;
-	        if ((align !== undefined) || (this._properties.align && this._properties.align.init)) {
-	            _setPropertyValue.call(this, this._properties.align, 'align', align, DEFAULT.align);
-	        }
-
-	        // set orgin
-	        var origin = set.origin ? _getIfNE2D(set.origin, DEFAULT.origin) : undefined;
-	        if ((origin !== undefined) || (this._properties.origin && this._properties.origin.init)) {
-	            _setPropertyValue.call(this, this._properties.origin, 'origin', origin, DEFAULT.origin);
-	        }
-
-	        // set size
-	        var size = set.size || defaultSize;
-	        if ((size !== undefined) || (this._properties.size && this._properties.size.init)) {
-	            _setPropertyValue.call(this, this._properties.size, 'size', size, defaultSize, this.usesTrueSize);
-	        }
-
-	        // set translate
-	        var translate = set.translate ? _getIfNE3D(set.translate, DEFAULT.translate) : undefined;
-	        if ((translate !== undefined) || (this._properties.translate && this._properties.translate.init)) {
-	            _setPropertyValue.call(this, this._properties.translate, 'translate', translate, DEFAULT.translate, undefined, true);
-	        }
-
-	        // set scale
-	        var scale = set.scale ? _getIfNE3D(set.scale, DEFAULT.scale) : undefined;
-	        if ((scale !== undefined) || (this._properties.scale && this._properties.scale.init)) {
-	            _setPropertyValue.call(this, this._properties.scale, 'scale', scale, DEFAULT.scale);
-	        }
-
-	        // set rotate
-	        var rotate = set.rotate ? _getIfNE3D(set.rotate, DEFAULT.rotate) : undefined;
-	        if ((rotate !== undefined) || (this._properties.rotate && this._properties.rotate.init)) {
-	            _setPropertyValue.call(this, this._properties.rotate, 'rotate', rotate, DEFAULT.rotate);
-	        }
-
-	        // set skew
-	        var skew = set.skew ? _getIfNE3D(set.skew, DEFAULT.skew) : undefined;
-	        if ((skew !== undefined) || (this._properties.skew && this._properties.skew.init)) {
-	            _setPropertyValue.call(this, this._properties.skew, 'skew', skew, DEFAULT.skew);
-	        }
-	    };
-
-	    module.exports = FlowLayoutNode;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
 /* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -10882,7 +11622,7 @@
 
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
 	    var RenderNode = __webpack_require__(62);
-	    var EventHandler = __webpack_require__(37);
+	    var EventHandler = __webpack_require__(36);
 	    var ElementAllocator = __webpack_require__(67);
 	    var Transform = __webpack_require__(27);
 	    var Transitionable = __webpack_require__(60);
@@ -11121,7 +11861,7 @@
 
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
 	    var Entity = __webpack_require__(53);
-	    var EventHandler = __webpack_require__(37);
+	    var EventHandler = __webpack_require__(36);
 	    var Transform = __webpack_require__(27);
 
 	    var usePrefix = !('transform' in document.documentElement.style);
@@ -12659,257 +13399,6 @@
 /* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;
-	/* This Source Code Form is subject to the terms of the Mozilla Public
-	 * License, v. 2.0. If a copy of the MPL was not distributed with this
-	 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
-	 *
-	 * Owner: mark@famo.us
-	 * @license MPL 2.0
-	 * @copyright Famous Industries, Inc. 2014
-	 */
-
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-	    var Surface = __webpack_require__(28);
-	    var Context = __webpack_require__(51);
-
-	    /**
-	     * ContainerSurface is an object designed to contain surfaces and
-	     *   set properties to be applied to all of them at once.
-	     *   This extends the Surface class.
-	     *   A container surface will enforce these properties on the
-	     *   surfaces it contains:
-	     *
-	     *   size (clips contained surfaces to its own width and height);
-	     *
-	     *   origin;
-	     *
-	     *   its own opacity and transform, which will be automatically
-	     *   applied to  all Surfaces contained directly and indirectly.
-	     *
-	     * @class ContainerSurface
-	     * @extends Surface
-	     * @constructor
-	     * @param {Array.Number} [options.size] [width, height] in pixels
-	     * @param {Array.string} [options.classes] CSS classes to set on all inner content
-	     * @param {Array} [options.properties] string dictionary of HTML attributes to set on target div
-	     * @param {string} [options.content] inner (HTML) content of surface (should not be used)
-	     */
-	    function ContainerSurface(options) {
-	        Surface.call(this, options);
-	        this._container = document.createElement('div');
-	        this._container.classList.add('famous-group');
-	        this._container.classList.add('famous-container-group');
-	        this._shouldRecalculateSize = false;
-	        this.context = new Context(this._container);
-	        this.setContent(this._container);
-	    }
-
-	    ContainerSurface.prototype = Object.create(Surface.prototype);
-	    ContainerSurface.prototype.constructor = ContainerSurface;
-	    ContainerSurface.prototype.elementType = 'div';
-	    ContainerSurface.prototype.elementClass = 'famous-surface';
-
-	    /**
-	     * Add renderables to this object's render tree
-	     *
-	     * @method add
-	     *
-	     * @param {Object} obj renderable object
-	     * @return {RenderNode} RenderNode wrapping this object, if not already a RenderNode
-	     */
-	    ContainerSurface.prototype.add = function add() {
-	        return this.context.add.apply(this.context, arguments);
-	    };
-
-	    /**
-	     * Return spec for this surface.  Note: Can result in a size recalculation.
-	     *
-	     * @private
-	     * @method render
-	     *
-	     * @return {Object} render spec for this surface (spec id)
-	     */
-	    ContainerSurface.prototype.render = function render() {
-	        if (this._sizeDirty) this._shouldRecalculateSize = true;
-	        return Surface.prototype.render.apply(this, arguments);
-	    };
-
-	    /**
-	     * Place the document element this component manages into the document.
-	     *
-	     * @private
-	     * @method deploy
-	     * @param {Node} target document parent of this container
-	     */
-	    ContainerSurface.prototype.deploy = function deploy() {
-	        this._shouldRecalculateSize = true;
-	        return Surface.prototype.deploy.apply(this, arguments);
-	    };
-
-	    /**
-	     * Apply changes from this component to the corresponding document element.
-	     * This includes changes to classes, styles, size, content, opacity, origin,
-	     * and matrix transforms.
-	     *
-	     * @private
-	     * @method commit
-	     * @param {Context} context commit context
-	     * @param {Transform} transform unused TODO
-	     * @param {Number} opacity  unused TODO
-	     * @param {Array.Number} origin unused TODO
-	     * @param {Array.Number} size unused TODO
-	     * @return {undefined} TODO returns an undefined value
-	     */
-	    ContainerSurface.prototype.commit = function commit(context, transform, opacity, origin, size) {
-	        var previousSize = this._size ? [this._size[0], this._size[1]] : null;
-	        var result = Surface.prototype.commit.apply(this, arguments);
-	        if (this._shouldRecalculateSize || (previousSize && (this._size[0] !== previousSize[0] || this._size[1] !== previousSize[1]))) {
-	            this.context.setSize();
-	            this._shouldRecalculateSize = false;
-	        }
-	        this.context.update();
-	        return result;
-	    };
-
-	    module.exports = ContainerSurface;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 64 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/* This Source Code Form is subject to the terms of the Mozilla Public
-	 * License, v. 2.0. If a copy of the MPL was not distributed with this
-	 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
-	 *
-	 * Owner: mark@famo.us
-	 * @license MPL 2.0
-	 * @copyright Famous Industries, Inc. 2014
-	 */
-
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-	    var Context = __webpack_require__(51);
-	    var Transform = __webpack_require__(27);
-	    var Surface = __webpack_require__(28);
-
-	    /**
-	     * A Context designed to contain surfaces and set properties
-	     *   to be applied to all of them at once.
-	     *   This is primarily used for specific performance improvements in the rendering engine.
-	     *   Private.
-	     *
-	     * @private
-	     * @class Group
-	     * @extends Surface
-	     * @constructor
-	     * @param {Object} [options] Surface options array (see Surface})
-	     */
-	    function Group(options) {
-	        Surface.call(this, options);
-	        this._shouldRecalculateSize = false;
-	        this._container = document.createDocumentFragment();
-	        this.context = new Context(this._container);
-	        this.setContent(this._container);
-	        this._groupSize = [undefined, undefined];
-	    }
-
-	    /** @const */
-	    Group.SIZE_ZERO = [0, 0];
-
-	    Group.prototype = Object.create(Surface.prototype);
-	    Group.prototype.elementType = 'div';
-	    Group.prototype.elementClass = 'famous-group';
-
-	    /**
-	     * Add renderables to this component's render tree.
-	     *
-	     * @method add
-	     * @private
-	     * @param {Object} obj renderable object
-	     * @return {RenderNode} Render wrapping provided object, if not already a RenderNode
-	     */
-	    Group.prototype.add = function add() {
-	        return this.context.add.apply(this.context, arguments);
-	    };
-
-	    /**
-	     * Generate a render spec from the contents of this component.
-	     *
-	     * @private
-	     * @method render
-	     * @return {Number} Render spec for this component
-	     */
-	    Group.prototype.render = function render() {
-	        return Surface.prototype.render.call(this);
-	    };
-
-	    /**
-	     * Place the document element this component manages into the document.
-	     *
-	     * @private
-	     * @method deploy
-	     * @param {Node} target document parent of this container
-	     */
-	    Group.prototype.deploy = function deploy(target) {
-	        this.context.migrate(target);
-	    };
-
-	    /**
-	     * Remove this component and contained content from the document
-	     *
-	     * @private
-	     * @method recall
-	     *
-	     * @param {Node} target node to which the component was deployed
-	     */
-	    Group.prototype.recall = function recall(target) {
-	        this._container = document.createDocumentFragment();
-	        this.context.migrate(this._container);
-	    };
-
-	    /**
-	     * Apply changes from this component to the corresponding document element.
-	     *
-	     * @private
-	     * @method commit
-	     *
-	     * @param {Object} context update spec passed in from above in the render tree.
-	     */
-	    Group.prototype.commit = function commit(context) {
-	        var transform = context.transform;
-	        var origin = context.origin;
-	        var opacity = context.opacity;
-	        var size = context.size;
-	        var result = Surface.prototype.commit.call(this, {
-	            allocator: context.allocator,
-	            transform: Transform.thenMove(transform, [-origin[0] * size[0], -origin[1] * size[1], 0]),
-	            opacity: opacity,
-	            origin: origin,
-	            size: Group.SIZE_ZERO
-	        });
-	        if (size[0] !== this._groupSize[0] || size[1] !== this._groupSize[1]) {
-	            this._groupSize[0] = size[0];
-	            this._groupSize[1] = size[1];
-	            this.context.setSize(size);
-	        }
-	        this.context.update({
-	            transform: Transform.translate(-origin[0] * size[0], -origin[1] * size[1], 0),
-	            origin: origin,
-	            size: size
-	        });
-	        return result;
-	    };
-
-	    module.exports = Group;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 65 */
-/***/ function(module, exports, __webpack_require__) {
-
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* This Source Code Form is subject to the terms of the Mozilla Public
 	 * License, v. 2.0. If a copy of the MPL was not distributed with this
 	 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -13008,7 +13497,7 @@
 
 
 /***/ },
-/* 66 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -13274,6 +13763,257 @@
 	    };
 
 	    module.exports = LayoutContext;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 65 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;
+	/* This Source Code Form is subject to the terms of the Mozilla Public
+	 * License, v. 2.0. If a copy of the MPL was not distributed with this
+	 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+	 *
+	 * Owner: mark@famo.us
+	 * @license MPL 2.0
+	 * @copyright Famous Industries, Inc. 2014
+	 */
+
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
+	    var Surface = __webpack_require__(28);
+	    var Context = __webpack_require__(51);
+
+	    /**
+	     * ContainerSurface is an object designed to contain surfaces and
+	     *   set properties to be applied to all of them at once.
+	     *   This extends the Surface class.
+	     *   A container surface will enforce these properties on the
+	     *   surfaces it contains:
+	     *
+	     *   size (clips contained surfaces to its own width and height);
+	     *
+	     *   origin;
+	     *
+	     *   its own opacity and transform, which will be automatically
+	     *   applied to  all Surfaces contained directly and indirectly.
+	     *
+	     * @class ContainerSurface
+	     * @extends Surface
+	     * @constructor
+	     * @param {Array.Number} [options.size] [width, height] in pixels
+	     * @param {Array.string} [options.classes] CSS classes to set on all inner content
+	     * @param {Array} [options.properties] string dictionary of HTML attributes to set on target div
+	     * @param {string} [options.content] inner (HTML) content of surface (should not be used)
+	     */
+	    function ContainerSurface(options) {
+	        Surface.call(this, options);
+	        this._container = document.createElement('div');
+	        this._container.classList.add('famous-group');
+	        this._container.classList.add('famous-container-group');
+	        this._shouldRecalculateSize = false;
+	        this.context = new Context(this._container);
+	        this.setContent(this._container);
+	    }
+
+	    ContainerSurface.prototype = Object.create(Surface.prototype);
+	    ContainerSurface.prototype.constructor = ContainerSurface;
+	    ContainerSurface.prototype.elementType = 'div';
+	    ContainerSurface.prototype.elementClass = 'famous-surface';
+
+	    /**
+	     * Add renderables to this object's render tree
+	     *
+	     * @method add
+	     *
+	     * @param {Object} obj renderable object
+	     * @return {RenderNode} RenderNode wrapping this object, if not already a RenderNode
+	     */
+	    ContainerSurface.prototype.add = function add() {
+	        return this.context.add.apply(this.context, arguments);
+	    };
+
+	    /**
+	     * Return spec for this surface.  Note: Can result in a size recalculation.
+	     *
+	     * @private
+	     * @method render
+	     *
+	     * @return {Object} render spec for this surface (spec id)
+	     */
+	    ContainerSurface.prototype.render = function render() {
+	        if (this._sizeDirty) this._shouldRecalculateSize = true;
+	        return Surface.prototype.render.apply(this, arguments);
+	    };
+
+	    /**
+	     * Place the document element this component manages into the document.
+	     *
+	     * @private
+	     * @method deploy
+	     * @param {Node} target document parent of this container
+	     */
+	    ContainerSurface.prototype.deploy = function deploy() {
+	        this._shouldRecalculateSize = true;
+	        return Surface.prototype.deploy.apply(this, arguments);
+	    };
+
+	    /**
+	     * Apply changes from this component to the corresponding document element.
+	     * This includes changes to classes, styles, size, content, opacity, origin,
+	     * and matrix transforms.
+	     *
+	     * @private
+	     * @method commit
+	     * @param {Context} context commit context
+	     * @param {Transform} transform unused TODO
+	     * @param {Number} opacity  unused TODO
+	     * @param {Array.Number} origin unused TODO
+	     * @param {Array.Number} size unused TODO
+	     * @return {undefined} TODO returns an undefined value
+	     */
+	    ContainerSurface.prototype.commit = function commit(context, transform, opacity, origin, size) {
+	        var previousSize = this._size ? [this._size[0], this._size[1]] : null;
+	        var result = Surface.prototype.commit.apply(this, arguments);
+	        if (this._shouldRecalculateSize || (previousSize && (this._size[0] !== previousSize[0] || this._size[1] !== previousSize[1]))) {
+	            this.context.setSize();
+	            this._shouldRecalculateSize = false;
+	        }
+	        this.context.update();
+	        return result;
+	    };
+
+	    module.exports = ContainerSurface;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 66 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/* This Source Code Form is subject to the terms of the Mozilla Public
+	 * License, v. 2.0. If a copy of the MPL was not distributed with this
+	 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+	 *
+	 * Owner: mark@famo.us
+	 * @license MPL 2.0
+	 * @copyright Famous Industries, Inc. 2014
+	 */
+
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
+	    var Context = __webpack_require__(51);
+	    var Transform = __webpack_require__(27);
+	    var Surface = __webpack_require__(28);
+
+	    /**
+	     * A Context designed to contain surfaces and set properties
+	     *   to be applied to all of them at once.
+	     *   This is primarily used for specific performance improvements in the rendering engine.
+	     *   Private.
+	     *
+	     * @private
+	     * @class Group
+	     * @extends Surface
+	     * @constructor
+	     * @param {Object} [options] Surface options array (see Surface})
+	     */
+	    function Group(options) {
+	        Surface.call(this, options);
+	        this._shouldRecalculateSize = false;
+	        this._container = document.createDocumentFragment();
+	        this.context = new Context(this._container);
+	        this.setContent(this._container);
+	        this._groupSize = [undefined, undefined];
+	    }
+
+	    /** @const */
+	    Group.SIZE_ZERO = [0, 0];
+
+	    Group.prototype = Object.create(Surface.prototype);
+	    Group.prototype.elementType = 'div';
+	    Group.prototype.elementClass = 'famous-group';
+
+	    /**
+	     * Add renderables to this component's render tree.
+	     *
+	     * @method add
+	     * @private
+	     * @param {Object} obj renderable object
+	     * @return {RenderNode} Render wrapping provided object, if not already a RenderNode
+	     */
+	    Group.prototype.add = function add() {
+	        return this.context.add.apply(this.context, arguments);
+	    };
+
+	    /**
+	     * Generate a render spec from the contents of this component.
+	     *
+	     * @private
+	     * @method render
+	     * @return {Number} Render spec for this component
+	     */
+	    Group.prototype.render = function render() {
+	        return Surface.prototype.render.call(this);
+	    };
+
+	    /**
+	     * Place the document element this component manages into the document.
+	     *
+	     * @private
+	     * @method deploy
+	     * @param {Node} target document parent of this container
+	     */
+	    Group.prototype.deploy = function deploy(target) {
+	        this.context.migrate(target);
+	    };
+
+	    /**
+	     * Remove this component and contained content from the document
+	     *
+	     * @private
+	     * @method recall
+	     *
+	     * @param {Node} target node to which the component was deployed
+	     */
+	    Group.prototype.recall = function recall(target) {
+	        this._container = document.createDocumentFragment();
+	        this.context.migrate(this._container);
+	    };
+
+	    /**
+	     * Apply changes from this component to the corresponding document element.
+	     *
+	     * @private
+	     * @method commit
+	     *
+	     * @param {Object} context update spec passed in from above in the render tree.
+	     */
+	    Group.prototype.commit = function commit(context) {
+	        var transform = context.transform;
+	        var origin = context.origin;
+	        var opacity = context.opacity;
+	        var size = context.size;
+	        var result = Surface.prototype.commit.call(this, {
+	            allocator: context.allocator,
+	            transform: Transform.thenMove(transform, [-origin[0] * size[0], -origin[1] * size[1], 0]),
+	            opacity: opacity,
+	            origin: origin,
+	            size: Group.SIZE_ZERO
+	        });
+	        if (size[0] !== this._groupSize[0] || size[1] !== this._groupSize[1]) {
+	            this._groupSize[0] = size[0];
+	            this._groupSize[1] = size[1];
+	            this.context.setSize(size);
+	        }
+	        this.context.update({
+	            transform: Transform.translate(-origin[0] * size[0], -origin[1] * size[1], 0),
+	            origin: origin,
+	            size: size
+	        });
+	        return result;
+	    };
+
+	    module.exports = Group;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
@@ -13787,7 +14527,7 @@
 	 * @copyright Famous Industries, Inc. 2014
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-	    var EventHandler = __webpack_require__(37);
+	    var EventHandler = __webpack_require__(36);
 
 	    /**
 	     * The Physics Engine is responsible for mediating bodies with their
@@ -14320,7 +15060,7 @@
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
 	    var Vector = __webpack_require__(68);
 	    var Transform = __webpack_require__(27);
-	    var EventHandler = __webpack_require__(37);
+	    var EventHandler = __webpack_require__(36);
 	    var Integrator = __webpack_require__(78);
 
 	    /**
@@ -14710,131 +15450,6 @@
 	 * @copyright Famous Industries, Inc. 2014
 	 */
 
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-	    var Force = __webpack_require__(77);
-
-	    /**
-	     * Drag is a force that opposes velocity. Attach it to the physics engine
-	     * to slow down a physics body in motion.
-	     *
-	     * @class Drag
-	     * @constructor
-	     * @extends Force
-	     * @param {Object} options options to set on drag
-	     */
-	    function Drag(options) {
-	        this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
-	        if (options) this.setOptions(options);
-
-	        Force.call(this);
-	    }
-
-	    Drag.prototype = Object.create(Force.prototype);
-	    Drag.prototype.constructor = Drag;
-
-	    /**
-	     * @property Drag.FORCE_FUNCTIONS
-	     * @type Object
-	     * @protected
-	     * @static
-	     */
-	    Drag.FORCE_FUNCTIONS = {
-
-	        /**
-	         * A drag force proportional to the velocity
-	         * @attribute LINEAR
-	         * @type Function
-	         * @param {Vector} velocity
-	         * @return {Vector} drag force
-	         */
-	        LINEAR : function(velocity) {
-	            return velocity;
-	        },
-
-	        /**
-	         * A drag force proportional to the square of the velocity
-	         * @attribute QUADRATIC
-	         * @type Function
-	         * @param {Vector} velocity
-	         * @return {Vector} drag force
-	         */
-	        QUADRATIC : function(velocity) {
-	            return velocity.mult(velocity.norm());
-	        }
-	    };
-
-	    /**
-	     * @property Drag.DEFAULT_OPTIONS
-	     * @type Object
-	     * @protected
-	     * @static
-	     */
-	    Drag.DEFAULT_OPTIONS = {
-
-	        /**
-	         * The strength of the force
-	         *    Range : [0, 0.1]
-	         * @attribute strength
-	         * @type Number
-	         * @default 0.01
-	         */
-	        strength : 0.01,
-
-	        /**
-	         * The type of opposing force
-	         * @attribute forceFunction
-	         * @type Function
-	         */
-	        forceFunction : Drag.FORCE_FUNCTIONS.LINEAR
-	    };
-
-	    /**
-	     * Adds a drag force to a physics body's force accumulator.
-	     *
-	     * @method applyForce
-	     * @param targets {Array.Body} Array of bodies to apply drag force to.
-	     */
-	    Drag.prototype.applyForce = function applyForce(targets) {
-	        var strength        = this.options.strength;
-	        var forceFunction   = this.options.forceFunction;
-	        var force           = this.force;
-	        var index;
-	        var particle;
-
-	        for (index = 0; index < targets.length; index++) {
-	            particle = targets[index];
-	            forceFunction(particle.velocity).mult(-strength).put(force);
-	            particle.applyForce(force);
-	        }
-	    };
-
-	    /**
-	     * Basic options setter
-	     *
-	     * @method setOptions
-	     * @param {Objects} options
-	     */
-	    Drag.prototype.setOptions = function setOptions(options) {
-	        for (var key in options) this.options[key] = options[key];
-	    };
-
-	    module.exports = Drag;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 72 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/* This Source Code Form is subject to the terms of the Mozilla Public
-	 * License, v. 2.0. If a copy of the MPL was not distributed with this
-	 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
-	 *
-	 * Owner: david@famo.us
-	 * @license MPL 2.0
-	 * @copyright Famous Industries, Inc. 2014
-	 */
-
 	/*global console */
 
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
@@ -15096,6 +15711,131 @@
 
 
 /***/ },
+/* 72 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/* This Source Code Form is subject to the terms of the Mozilla Public
+	 * License, v. 2.0. If a copy of the MPL was not distributed with this
+	 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+	 *
+	 * Owner: david@famo.us
+	 * @license MPL 2.0
+	 * @copyright Famous Industries, Inc. 2014
+	 */
+
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
+	    var Force = __webpack_require__(77);
+
+	    /**
+	     * Drag is a force that opposes velocity. Attach it to the physics engine
+	     * to slow down a physics body in motion.
+	     *
+	     * @class Drag
+	     * @constructor
+	     * @extends Force
+	     * @param {Object} options options to set on drag
+	     */
+	    function Drag(options) {
+	        this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
+	        if (options) this.setOptions(options);
+
+	        Force.call(this);
+	    }
+
+	    Drag.prototype = Object.create(Force.prototype);
+	    Drag.prototype.constructor = Drag;
+
+	    /**
+	     * @property Drag.FORCE_FUNCTIONS
+	     * @type Object
+	     * @protected
+	     * @static
+	     */
+	    Drag.FORCE_FUNCTIONS = {
+
+	        /**
+	         * A drag force proportional to the velocity
+	         * @attribute LINEAR
+	         * @type Function
+	         * @param {Vector} velocity
+	         * @return {Vector} drag force
+	         */
+	        LINEAR : function(velocity) {
+	            return velocity;
+	        },
+
+	        /**
+	         * A drag force proportional to the square of the velocity
+	         * @attribute QUADRATIC
+	         * @type Function
+	         * @param {Vector} velocity
+	         * @return {Vector} drag force
+	         */
+	        QUADRATIC : function(velocity) {
+	            return velocity.mult(velocity.norm());
+	        }
+	    };
+
+	    /**
+	     * @property Drag.DEFAULT_OPTIONS
+	     * @type Object
+	     * @protected
+	     * @static
+	     */
+	    Drag.DEFAULT_OPTIONS = {
+
+	        /**
+	         * The strength of the force
+	         *    Range : [0, 0.1]
+	         * @attribute strength
+	         * @type Number
+	         * @default 0.01
+	         */
+	        strength : 0.01,
+
+	        /**
+	         * The type of opposing force
+	         * @attribute forceFunction
+	         * @type Function
+	         */
+	        forceFunction : Drag.FORCE_FUNCTIONS.LINEAR
+	    };
+
+	    /**
+	     * Adds a drag force to a physics body's force accumulator.
+	     *
+	     * @method applyForce
+	     * @param targets {Array.Body} Array of bodies to apply drag force to.
+	     */
+	    Drag.prototype.applyForce = function applyForce(targets) {
+	        var strength        = this.options.strength;
+	        var forceFunction   = this.options.forceFunction;
+	        var force           = this.force;
+	        var index;
+	        var particle;
+
+	        for (index = 0; index < targets.length; index++) {
+	            particle = targets[index];
+	            forceFunction(particle.velocity).mult(-strength).put(force);
+	            particle.applyForce(force);
+	        }
+	    };
+
+	    /**
+	     * Basic options setter
+	     *
+	     * @method setOptions
+	     * @param {Objects} options
+	     */
+	    Drag.prototype.setOptions = function setOptions(options) {
+	        for (var key in options) this.options[key] = options[key];
+	    };
+
+	    module.exports = Drag;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
 /* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -15108,9 +15848,9 @@
 	 * @copyright Famous Industries, Inc. 2014
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
-	    var EventHandler = __webpack_require__(37);
+	    var EventHandler = __webpack_require__(36);
 	    var Engine = __webpack_require__(25);
-	    var OptionsManager = __webpack_require__(36);
+	    var OptionsManager = __webpack_require__(35);
 
 	    /**
 	     * Handles piped in mousewheel events.
@@ -16010,7 +16750,7 @@
 
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require, exports, module) {
 	    var Vector = __webpack_require__(68);
-	    var EventHandler = __webpack_require__(37);
+	    var EventHandler = __webpack_require__(36);
 
 	    /**
 	     * Force base class.
