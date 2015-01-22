@@ -30,25 +30,28 @@ define(function(require) {
 
     // import dependencies
     var Engine = require('famous/core/Engine');
-    var Modifier = require('famous/core/Modifier');
-    var Transform = require('famous/core/Transform');
+    //var Modifier = require('famous/core/Modifier');
+    //var Transform = require('famous/core/Transform');
     var Surface = require('famous/core/Surface');
+    var ContainerSurface = require('famous/surfaces/ContainerSurface');
     var InputSurface = require('famous/surfaces/InputSurface');
     var LayoutController = require('famous-flex/LayoutController');
     var FlexScrollView = require('famous-flex/FlexScrollView');
     var LayoutUtility = require('famous-flex/LayoutUtility');
-    var NewYork = require('./data/newyork/collection');
+    //var NewYork = require('./data/newyork/collection');
     var LayoutDockHelper = require('famous-flex/helpers/LayoutDockHelper');
-    var BkImageSurface = require('famous-bkimagesurface/BkImageSurface');
+    //var BkImageSurface = require('famous-bkimagesurface/BkImageSurface');
     // layouts
     var GridLayout = require('famous-flex/layouts/GridLayout');
+    var ProportionalLayout = require('famous-flex/layouts/ProportionalLayout');
     var NavBarLayout = require('famous-flex/layouts/NavBarLayout');
     var ListLayout = require('famous-flex/layouts/ListLayout');
     var CollectionLayout = require('famous-flex/layouts/CollectionLayout');
-    var CoverLayout = require('famous-flex/layouts/CoverLayout');
+    //var CoverLayout = require('famous-flex/layouts/CoverLayout');
+    var WheelLayout = require('famous-flex/layouts/WheelLayout');
     //var CubeLayout = require('famous-flex/layouts/CubeLayout');
     // lagometer
-    var Lagometer = require('famous-lagometer/Lagometer');
+    //var Lagometer = require('famous-lagometer/Lagometer');
     var collectionItemId = 0;
 
     // create the main context
@@ -62,11 +65,19 @@ define(function(require) {
     var layoutDetailsView;
     var navbar = _createNavbar();
     var sidebar = _createSidebar();
-    var collectionView = _createCollectionView();
+    var container = new ContainerSurface();
+    var back = new Surface({
+        classes: ['back']
+    });
+    container.context.setPerspective(500);
+    var scrollView = _createScrollView();
+    container.add(scrollView);
+    container.pipe(scrollView);
     var shell = _createShell({
+        back: back,
         navbar: navbar,
         sidebar: sidebar,
-        content: collectionView
+        content: container
     });
     mainContext.add(shell);
 
@@ -75,8 +86,13 @@ define(function(require) {
      */
     function ShellLayout(context, options) {
         var size = context.size;
+        context.set('back', {
+            size: context.size,
+            translate: [0, 0, -10000]
+        });
         context.set('navbar', {
-            size: [size[0], options.navBarHeight]
+            size: [size[0], options.navBarHeight],
+            translate: [0, 0, 100]
         });
         context.set('content', {
             size: [size[0], size[1] - options.navBarHeight],
@@ -100,6 +116,8 @@ define(function(require) {
                 navBarHeight: 58,
                 sideBarWidth: 160
             },
+            flow: true,
+            reflowOnResize: false,
             dataSource: renderables
         });
     }
@@ -121,7 +139,9 @@ define(function(require) {
             dataSource: {
                 'list': _createLayoutListView(),
                 'details': layoutDetailsView,
-                'back': new Surface({classes:['panel']})
+                'back': new Surface({
+                    classes: ['panel']
+                })
             }
         });
     }
@@ -155,21 +175,21 @@ define(function(require) {
     }
     function _moveNextItem() {
         _hideSidebar.call(this);
-        collectionView.goToNextPage();
+        scrollView.goToNextPage();
     }
     function _movePrevItem() {
         _hideSidebar.call(this);
-        collectionView.goToPreviousPage();
+        scrollView.goToPreviousPage();
     }
     function _rotateLayout() {
         _hideSidebar.call(this);
-        var direction = collectionView.getDirection(true);
-        collectionView.setDirection((direction + 1) % 2);
+        var direction = scrollView.getDirection(true);
+        scrollView.setDirection((direction + 1) % 2);
     }
     function _toggleLayoutAlignment() {
         _hideSidebar.call(this);
-        collectionView.setOptions({
-            alignment: collectionView.options.alignment ? 0 : 1
+        scrollView.setOptions({
+            alignment: scrollView.options.alignment ? 0 : 1
         });
     }
     function _createNavbar() {
@@ -230,60 +250,80 @@ define(function(require) {
             }
         });*/
         collectionItemId++;
-        return new Surface({
-            //content: 'Item ' + collectionItemId,
+        var text = 'Item ' + collectionItemId;
+        var sur = new Surface({
+            classes: ['item'],
+            content: '<div>' + text + '</div>',
             properties: {
-                backgroundColor: window.Please.make_color()
+                /*backgroundColor: window.Please.make_color({
+                    'base_color': 'salmon'
+                })*/
             }
         });
-
+        sur.text = text;
+        return sur;
     }
     function _addCollectionItem() {
-        if (collectionView && collectionView.insert) {
+        if (scrollView) {
             var rightItems = navbar.getSpec('rightItems');
             var insertSpec = LayoutUtility.cloneSpec(navbar.getSpec(rightItems[1]));
             var pos = Math.floor(Math.random() * (Math.min(collection.length, 5) + 1));
-            pos = Math.max(pos, 1);
+            //pos = Math.max(pos, 1);
+            /*pos = 0;
+            insertSpec = {
+                opacity: 0
+            };*/
             var item = _createCollectionItem();
-            collectionView.insert(pos, _createCollectionItem(), insertSpec);
-            collectionView.goToRenderNode(item);
+            scrollView.insert(pos, item, insertSpec);
+            //scrollView.ensureVisible(item);
+            scrollView.goToRenderNode(item);
         }
         else {
-            collection.unshift(_createCollectionItem());
-            if (collectionView) {
-                collectionView.reflowLayout();
+            collection.push(_createCollectionItem());
+            if (scrollView) {
+                scrollView.reflowLayout();
             }
         }
     }
     function _removeCollectionItem() {
-        if (collectionView && collectionView.remove) {
+        if (scrollView) {
             var rightItems = navbar.getSpec('rightItems');
             var removeSpec = LayoutUtility.cloneSpec(navbar.getSpec(rightItems[0]));
             removeSpec.opacity = 0;
             var pos = Math.floor(Math.random() * Math.min(collection.length, 5));
-            collectionView.remove(pos, removeSpec);
+            //pos = 0;
+            scrollView.remove(pos, removeSpec);
         }
         else if (collection.length) {
             collection.splice(0, 1);
-            if (collectionView) {
-                collectionView.reflowLayout();
+            if (scrollView) {
+                scrollView.reflowLayout();
             }
         }
     }
-    function _createCollectionView() {
-        for (var i = 0; i < 5; i++) {
+    function _createScrollView() {
+        for (var i = 0; i < 20; i++) {
             _addCollectionItem();
         }
-        return new FlexScrollView({
+        var scr = new FlexScrollView({
             dataSource: collection,
             flow: true,
-            useContainer: true,
+            debug: true,
             mouseMove: true,
+            paginated: false,
             nodeSpring: {
-                dampingRatio: 0.8,
-                period: 700
+                dampingRatio: 0.6,
+                period: 600
             }
         });
+        scr.on('pagechange', function(event) {
+            console.log('pagechange: ' + (event.renderNode ? event.renderNode.text : 'none'));
+        });
+        scr.on('scrollend', function(event) {
+            var item = scr.getFirstVisibleItem();
+            console.log('scrollend: ' + (item ? item.renderNode.text : 'none'));
+        });
+        return scr;
     }
 
     /**
@@ -319,7 +359,7 @@ define(function(require) {
         input.setValue(JSON.stringify(option.value));
         var layoutOptions = {};
         layoutOptions[option.name] = option.value;
-        collectionView.setLayoutOptions(layoutOptions);
+        scrollView.setLayoutOptions(layoutOptions);
     }
     function _changeLayoutOption(option, event) {
         if (Array.isArray(option.value)) {
@@ -332,7 +372,7 @@ define(function(require) {
         option.value = JSON.parse(event.currentTarget.value);
         var layoutOptions = {};
         layoutOptions[option.name] = option.value;
-        collectionView.setLayoutOptions(layoutOptions);
+        scrollView.setLayoutOptions(layoutOptions);
     }
     function _createLayoutDetailItem(option) {
         var title = new Surface({
@@ -400,7 +440,7 @@ define(function(require) {
         for (i = 0; i < layout.options.length; i++) {
             layoutOptions[layout.options[i].name] = layout.options[i].value;
         }
-        collectionView.setLayout(layout.layout, layoutOptions);
+        scrollView.setLayout(layout.layout, layoutOptions);
 
         // Highlight the selected layout
         for (i = 0; i < layouts.length; i++) {
@@ -437,25 +477,33 @@ define(function(require) {
             {name: 'margins',    value: [20, 20, 20, 20], min: [0, 0, 0, 0], max: [100, 100, 100, 100]},
             {name: 'spacing',    value: [20, 20], min: [0, 0], max: [100, 100]}
         ]);
+        _addLayout('ProportionalLayout', ProportionalLayout, [
+            {name: 'ratios',     value: [1, 2, 3, 1], min: [0, 0, 0, 0], max: [10000, 10000, 10000, 10000]},
+        ]);
         _addLayout('ListLayout', ListLayout, [
             {name: 'itemSize',   value: 50, min: 0, max: 1000},
             {name: 'margins',    value: [5, 5, 5, 5], min: [-100, -100, -100, -100], max: [100, 100, 100, 100]},
-            {name: 'spacing',    value: 0, min: -100, max: 1000}
+            {name: 'spacing',    value: 5, min: -100, max: 1000}
         ]);
         _addLayout('CollectionLayout', CollectionLayout, [
-            {name: 'itemSize',   value: [100, 100], min: [0, 0], max: [1000, 1000]},
-            {name: 'justify',    value: [1, 1], min: [0, 0], max: [1, 1]},
-            {name: 'margins',    value: [5, 5, 5, 5], min: [-100, -100, -100, -100], max: [100, 100, 100, 100]},
-            {name: 'spacing',    value: [5, 5], min: [-100, -100], max: [100, 100]}
+            {name: 'itemSize',   value: [90, 90], min: [0, 0], max: [1000, 1000]},
+            {name: 'justify',    value: [0, 0], min: [0, 0], max: [1, 1]},
+            {name: 'margins',    value: [10, 10, 10, 10], min: [-100, -100, -100, -100], max: [100, 100, 100, 100]},
+            {name: 'spacing',    value: [10, 10], min: [-100, -100], max: [100, 100]}
         ]);
-        /*_addLayout('CoverLayout', CoverLayout, [
-            {name: 'itemSize',   value: [260, 200], min: [0, 0], max: [1000, 1000]}
-        ]);*/
         _addLayout('FullScreen', ListLayout, [
             {name: 'itemSize',   value: undefined, editable: false},
             {name: 'margins',    value: [0, 0, 0, 0], min: [-100, -100, -100, -100], max: [100, 100, 100, 100]},
             {name: 'spacing',    value: 0, min: -100, max: 1000}
         ]);
+        _addLayout('WheelLayout', WheelLayout, [
+            {name: 'itemSize',   value: 70, min: 0, max: 1000},
+            {name: 'diameter',   value: 500, min: 10, max: 100000},
+            {name: 'edgeOpacity',value: 0, min: -2, max: 1}
+        ]);
+        /*_addLayout('CoverLayout', CoverLayout, [
+            {name: 'itemSize',   value: [260, 200], min: [0, 0], max: [1000, 1000]}
+        ]);*/
         /*_addLayout('CubeLayout', CubeLayout, [
             {name: 'itemSize',   value: [100, 100], min: [0, 0], max: [1000, 1000]}
         ]);*/
@@ -466,7 +514,7 @@ define(function(require) {
     /**
      * Lagometer
      */
-    var lagometerModifier = new Modifier({
+    /*var lagometerModifier = new Modifier({
         size: [100, 100],
         align: [1.0, 0.0],
         origin: [1.0, 0.0],
@@ -475,5 +523,5 @@ define(function(require) {
     var lagometer = new Lagometer({
         size: lagometerModifier.getSize()
     });
-    //mainContext.add(lagometerModifier).add(lagometer);
+    mainContext.add(lagometerModifier).add(lagometer);*/
 });
