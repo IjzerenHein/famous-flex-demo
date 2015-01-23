@@ -1,7 +1,6 @@
 body, div {
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-  font-weight: normal;
-  color: black;
+  font-weight: bold;
   /* prevent text selection */
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -12,12 +11,7 @@ body, div {
 }
 
 .back {
-  background-color: #ececec;
-}
-
-.navbar-default, .btn-default {
-  background-color: #009bb5;
-  border: none;
+  background: black;
 }
 
 .title {
@@ -28,51 +22,31 @@ body, div {
 }
 
 .panel {
-  background-color: rgba(230, 230, 230, 0.85);
+  background-color: rgba(34, 34, 34, 0.7);
 }
 
 .layout-list-item {
   padding-left: 10px;
   line-height: 50px;
   cursor: pointer;
-  color: #009bb5;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .layout-list-item.selected {
   color: white;
-  background-color: #009bb5
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .layout-detail-item-title {
-  color: #666666;
+  color: #BBBBBB;
   font-size: 13px;
   text-align: center;
 }
 
 .layout-detail-item-input {
   border: none;
-  color: #333333;
+  color: white;
   background: rgba(0, 0, 0, 0);
   text-align: center;
 }
 
-.item {
-  /*border-bottom: 1px solid #888888;*/
-  background-color: #FFFFFF;
-  -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.4);
-  -moz-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.4);
-  box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.4);
-}
-
-.item > div {
-  text-align: center;
-  position: relative;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-  -moz-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  -o-transform: translateY(-50%);
-  transform: translateY(-50%);
-  color: white;
-  font-size: 13px;
-}

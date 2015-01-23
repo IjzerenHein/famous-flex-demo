@@ -253,11 +253,9 @@ define(function(require) {
         var text = 'Item ' + collectionItemId;
         var sur = new Surface({
             classes: ['item'],
-            content: '<div>' + text + '</div>',
+            //content: '<div>' + text + '</div>',
             properties: {
-                backgroundColor: window.Please.make_color({
-                    //'base_color': 'skyblue'
-                })
+                backgroundColor: window.Please.make_color()
             }
         });
         sur.text = text;
