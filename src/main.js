@@ -33,6 +33,7 @@ define(function(require) {
     //var Modifier = require('famous/core/Modifier');
     //var Transform = require('famous/core/Transform');
     var Surface = require('famous/core/Surface');
+    var ViewSequence = require('famous/core/ViewSequence');
     var ContainerSurface = require('famous/surfaces/ContainerSurface');
     var InputSurface = require('famous/surfaces/InputSurface');
     var LayoutController = require('famous-flex/LayoutController');
@@ -59,7 +60,6 @@ define(function(require) {
 
     // Create the shell
     var layoutListRenderables = [];
-    var layoutDetailsRenderables = [];
     var collection = [];
     var layouts = [];
     var layoutDetailsView;
@@ -114,7 +114,7 @@ define(function(require) {
             layout: ShellLayout,
             layoutOptions: {
                 navBarHeight: 58,
-                sideBarWidth: 160
+                sideBarWidth: 180
             },
             flow: true,
             reflowOnResize: false,
@@ -255,9 +255,9 @@ define(function(require) {
             classes: ['item'],
             content: '<div>' + text + '</div>',
             properties: {
-                /*backgroundColor: window.Please.make_color({
-                    'base_color': 'salmon'
-                })*/
+                backgroundColor: window.Please.make_color({
+                    //'base_color': 'skyblue'
+                })
             }
         });
         sur.text = text;
@@ -340,8 +340,7 @@ define(function(require) {
         return new FlexScrollView({
             autoPipeEvents: true,
             alignment: 1,
-            layoutOptions: { itemSize: 40 },
-            dataSource: layoutDetailsRenderables
+            layoutOptions: { itemSize: 40 }
         });
     }
 
@@ -414,14 +413,15 @@ define(function(require) {
         });
     }
     function _updateLayoutDetails(name) {
-        layoutDetailsRenderables = [];
+        var viewSequence = new ViewSequence();
         var layout = _findLayout(name);
         for (var i = 0; i < layout.options.length; i++) {
-            if ((layout.options.editable === undefined) || layout.options.editable) {
-                layoutDetailsRenderables.push(_createLayoutDetailItem(layout.options[i]));
+            if ((layout.options[i].editable === undefined) || layout.options[i].editable) {
+                viewSequence.push(_createLayoutDetailItem(layout.options[i]));
+                viewSequence = viewSequence.getNext() || viewSequence;
             }
         }
-        layoutDetailsView.setDataSource(layoutDetailsRenderables);
+        layoutDetailsView.setDataSource(viewSequence);
     }
     function _findLayout(name) {
         for (var i =0; i < layouts.length; i++) {
@@ -473,33 +473,33 @@ define(function(require) {
     }
     function _addLayouts() {
         _addLayout('GridLayout', GridLayout, [
-            {name: 'cells',      value: [3, 3], min: [1, 1], max: [50, 50]},
-            {name: 'margins',    value: [20, 20, 20, 20], min: [0, 0, 0, 0], max: [100, 100, 100, 100]},
-            {name: 'spacing',    value: [20, 20], min: [0, 0], max: [100, 100]}
+            {name: 'cells', value: [3, 3], min: [1, 1], max: [50, 50]},
+            {name: 'margins', value: [20, 20, 20, 20], min: [0, 0, 0, 0], max: [100, 100, 100, 100]},
+            {name: 'spacing', value: [20, 20], min: [0, 0], max: [100, 100]}
         ]);
         _addLayout('ProportionalLayout', ProportionalLayout, [
-            {name: 'ratios',     value: [1, 2, 3, 1], min: [0, 0, 0, 0], max: [10000, 10000, 10000, 10000]},
+            {name: 'ratios', value: [1, 2, 3, 1], min: [0, 0, 0, 0], max: [10000, 10000, 10000, 10000]}
         ]);
         _addLayout('ListLayout', ListLayout, [
-            {name: 'itemSize',   value: 50, min: 0, max: 1000},
-            {name: 'margins',    value: [5, 5, 5, 5], min: [-100, -100, -100, -100], max: [100, 100, 100, 100]},
-            {name: 'spacing',    value: 5, min: -100, max: 1000}
+            {name: 'itemSize', value: 50, min: 0, max: 1000},
+            {name: 'margins', value: [5, 5, 5, 5], min: [-100, -100, -100, -100], max: [100, 100, 100, 100]},
+            {name: 'spacing', value: 5, min: -100, max: 1000}
         ]);
         _addLayout('CollectionLayout', CollectionLayout, [
-            {name: 'itemSize',   value: [90, 90], min: [0, 0], max: [1000, 1000]},
-            {name: 'justify',    value: [0, 0], min: [0, 0], max: [1, 1]},
-            {name: 'margins',    value: [10, 10, 10, 10], min: [-100, -100, -100, -100], max: [100, 100, 100, 100]},
-            {name: 'spacing',    value: [10, 10], min: [-100, -100], max: [100, 100]}
+            {name: 'itemSize', value: [90, 90], min: [0, 0], max: [1000, 1000]},
+            {name: 'justify', value: [0, 0], min: [0, 0], max: [1, 1]},
+            {name: 'margins', value: [10, 10, 10, 10], min: [-100, -100, -100, -100], max: [100, 100, 100, 100]},
+            {name: 'spacing', value: [10, 10], min: [-100, -100], max: [100, 100]}
         ]);
         _addLayout('FullScreen', ListLayout, [
-            {name: 'itemSize',   value: undefined, editable: false},
-            {name: 'margins',    value: [0, 0, 0, 0], min: [-100, -100, -100, -100], max: [100, 100, 100, 100]},
-            {name: 'spacing',    value: 0, min: -100, max: 1000}
+            {name: 'itemSize', value: undefined, editable: false},
+            {name: 'margins', value: [0, 0, 0, 0], min: [-100, -100, -100, -100], max: [100, 100, 100, 100]},
+            {name: 'spacing', value: 0, min: -100, max: 1000}
         ]);
         _addLayout('WheelLayout', WheelLayout, [
-            {name: 'itemSize',   value: 70, min: 0, max: 1000},
-            {name: 'diameter',   value: 500, min: 10, max: 100000},
-            {name: 'edgeOpacity',value: 0, min: -2, max: 1}
+            {name: 'itemSize', value: 70, min: 0, max: 1000},
+            {name: 'diameter', value: 500, min: 10, max: 100000},
+            {name: 'edgeOpacity', value: 0, min: -2, max: 1}
         ]);
         /*_addLayout('CoverLayout', CoverLayout, [
             {name: 'itemSize',   value: [260, 200], min: [0, 0], max: [1000, 1000]}
