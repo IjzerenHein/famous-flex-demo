@@ -1,6 +1,7 @@
 {
   "name": "famous-flex-demo",
   "version": "0.0.1",
+  "private": "true",
   "homepage": "https://github.com/IjzerenHein/famous-flex-demo",
   "repository": {
     "type": "git",
