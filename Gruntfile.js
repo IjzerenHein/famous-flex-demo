@@ -27,11 +27,12 @@ module.exports = function(grunt) {
       }
     },
     exec: {
-      clean: 'rm -rf ./dist',
-      build: 'webpack --minify',
-      'build-debug': 'webpack',
-      'open-dev': 'open http://localhost:8080/webpack-dev-server/',
-      'run-dev': 'webpack-dev-server'
+      'build': 'webpack -d',
+      'build-prod': 'webpack -p',
+      'open': 'open dist/index.html',
+      'clean': 'rm -rf ./dist',
+      'serve': 'webpack-dev-server -d --inline --reload=localhost',
+      'open-serve': 'open http://localhost:8080'
     }
   });
 
@@ -42,8 +43,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-exec');
 
   // Default task.
-  grunt.registerTask('default', ['eslint', 'jscs', 'exec:clean', 'exec:build']);
+  grunt.registerTask('default', ['eslint', 'jscs', 'exec:build']);
+  grunt.registerTask('prod', ['exec:clean', 'eslint', 'jscs', 'exec:build-prod']);
+  grunt.registerTask('open', ['exec:open']);
   grunt.registerTask('clean', ['exec:clean']);
-  grunt.registerTask('serve', ['eslint', 'jscs', 'exec:open-dev', 'exec:run-dev']);
-  grunt.registerTask('deploy', ['eslint', 'jscs', 'exec:clean', 'exec:build-debug', 'ftp-deploy']);
+  grunt.registerTask('serve', ['exec:open-serve', 'exec:serve']);
+  grunt.registerTask('open-serve', ['exec:open-serve']);
+  grunt.registerTask('deploy', ['eslint', 'jscs', 'exec:clean', 'exec:build', 'ftp-deploy']);
 };

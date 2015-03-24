@@ -15,18 +15,18 @@ var argv = require('optimist')
 
 var config = {
   context: path.join(__dirname, 'src'),
-  entry: ['./main'],
-  output:{
+  entry: {'bundle': './main'},
+  output: {
     path: path.join(__dirname, 'dist'),
-    filename: 'bundle.js',
+    filename: '[name].js',
     publicPath: isDevServer() ? '/' : ''
   },
   devServer: {
     publicPath: '/'
   },
   reload: isDevServer() ? 'localhost' : null,
-  module:{
-    loaders:[
+  module: {
+    loaders: [
       { test: /\.json$/,            loader: 'json-loader' },
       { test: /\.css$/,             loader: 'style-loader!css-loader' },
       { test: /\.less$/,            loader: 'style-loader!css-loader!less-loader' },
@@ -40,11 +40,10 @@ var config = {
   },
   resolve: {
     alias: {
-      'famous-flex': 'famous-flex/src',
-      'famous': 'famous/src'
+      'famous-flex': 'famous-flex/src'
     }
   },
-  plugins:[
+  plugins: [
     new webpack.DefinePlugin({
       VERSION: JSON.stringify(require('./package.json').version),
       ENV: JSON.stringify(argv.env)
