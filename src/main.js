@@ -57,15 +57,11 @@ define(function(require) {
     var navbar = _createNavbar();
     var sidebar = _createSidebar();
     var container = new ContainerSurface();
-    var back = new Surface({
-        classes: ['back']
-    });
     container.context.setPerspective(500);
     var scrollView = _createScrollView();
     container.add(scrollView);
     container.pipe(scrollView);
     var shell = _createShell({
-        back: back,
         navbar: navbar,
         sidebar: sidebar,
         content: container
@@ -77,10 +73,6 @@ define(function(require) {
      */
     function ShellLayout(context, options) {
         var size = context.size;
-        context.set('back', {
-            size: context.size,
-            translate: [0, 0, -10000]
-        });
         context.set('navbar', {
             size: [size[0], options.navBarHeight],
             translate: [0, 0, 100]
