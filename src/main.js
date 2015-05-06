@@ -5,11 +5,11 @@
  *
  * @author: Hein Rutjes (IjzerenHein)
  * @license MIT
- * @copyright Gloey Apps, 2014
+ * @copyright Gloey Apps, 2014/2015
  */
 
-/*global define, Please, console*/
-/*eslint no-console:0 no-use-before-define:0*/
+/*global Please, console*/
+/*eslint no-console:0*/
 
 define(function(require) {
 
@@ -30,8 +30,6 @@ define(function(require) {
 
     // import dependencies
     var Engine = require('famous/core/Engine');
-    //var Modifier = require('famous/core/Modifier');
-    //var Transform = require('famous/core/Transform');
     var Surface = require('famous/core/Surface');
     var ViewSequence = require('famous/core/ViewSequence');
     var ContainerSurface = require('famous/surfaces/ContainerSurface');
@@ -39,20 +37,13 @@ define(function(require) {
     var LayoutController = require('famous-flex/LayoutController');
     var FlexScrollView = require('famous-flex/FlexScrollView');
     var LayoutUtility = require('famous-flex/LayoutUtility');
-    //var NewYork = require('./data/newyork/collection');
     var LayoutDockHelper = require('famous-flex/helpers/LayoutDockHelper');
-    //var BkImageSurface = require('famous-bkimagesurface/BkImageSurface');
-    // layouts
-    var GridLayout = require('famous-flex/layouts/GridLayout');
     var ProportionalLayout = require('famous-flex/layouts/ProportionalLayout');
     var NavBarLayout = require('famous-flex/layouts/NavBarLayout');
     var ListLayout = require('famous-flex/layouts/ListLayout');
     var CollectionLayout = require('famous-flex/layouts/CollectionLayout');
-    //var CoverLayout = require('famous-flex/layouts/CoverLayout');
+    //var FontLayout = require('famous-flex/layouts/FontLayout');
     var WheelLayout = require('famous-flex/layouts/WheelLayout');
-    //var CubeLayout = require('famous-flex/layouts/CubeLayout');
-    // lagometer
-    //var Lagometer = require('famous-lagometer/Lagometer');
     var collectionItemId = 0;
 
     // create the main context
@@ -117,7 +108,9 @@ define(function(require) {
                 sideBarWidth: 180
             },
             flow: true,
-            reflowOnResize: false,
+            flowOptions: {
+                reflowOnResize: false
+            },
             dataSource: renderables
         });
     }
@@ -240,20 +233,10 @@ define(function(require) {
      * Collection
      */
     function _createCollectionItem() {
-        //var imageUrl = NewYork[collection.length % NewYork.length];
-        /*return new BkImageSurface({
-            classes: ['image-frame'],
-            content: imageUrl,
-            sizeMode: 'cover',
-            properties: {
-                backgroundColor: 'black'
-            }
-        });*/
         collectionItemId++;
         var text = 'Item ' + collectionItemId;
         var sur = new Surface({
             classes: ['item'],
-            //content: '<div>' + text + '</div>',
             properties: {
                 backgroundColor: window.Please.make_color()
             }
@@ -289,7 +272,6 @@ define(function(require) {
             var removeSpec = LayoutUtility.cloneSpec(navbar.getSpec(rightItems[0]));
             removeSpec.opacity = 0;
             var pos = Math.floor(Math.random() * Math.min(collection.length, 5));
-            //pos = 0;
             scrollView.remove(pos, removeSpec);
         }
         else if (collection.length) {
@@ -300,19 +282,21 @@ define(function(require) {
         }
     }
     function _createScrollView() {
-        for (var i = 0; i < 20; i++) {
+        for (var i = 0; i < 200; i++) {
             _addCollectionItem();
         }
         var scr = new FlexScrollView({
             dataSource: collection,
             flow: true,
+            flowOptions: {
+                spring: {
+                    dampingRatio: 0.6,
+                    period: 600
+                }
+            },
             debug: true,
             mouseMove: true,
-            paginated: false,
-            nodeSpring: {
-                dampingRatio: 0.6,
-                period: 600
-            }
+            paginated: false
         });
         scr.on('pagechange', function(event) {
             console.log('pagechange: ' + (event.renderNode ? event.renderNode.text : 'none'));
@@ -343,15 +327,19 @@ define(function(require) {
     }
 
     function _incrementLayoutOption(option, value, input) {
+        var step;
         if (Array.isArray(option.value)) {
             var newValue = [];
             for (var i = 0; i < option.value.length; i++) {
-                newValue.push(Math.max(Math.min(option.value[i] + value, option.max[i]), option.min[i]));
+                step = option.step ? option.step[i] : 1;
+                newValue.push(Math.round(Math.max(Math.min(option.value[i] + (value * step), option.max[i]), option.min[i]) * 100) / 100);
             }
             option.value = newValue;
         }
         else {
-            option.value = Math.max(Math.min(option.value + value, option.max), option.min);
+            step = option.step || 1;
+            option.value = Math.max(Math.min(option.value + (value * step), option.max), option.min);
+            option.value = Math.round(option.value * 100) / 100;
         }
         input.setValue(JSON.stringify(option.value));
         var layoutOptions = {};
@@ -470,11 +458,6 @@ define(function(require) {
         layoutListRenderables.push(listRenderable);
     }
     function _addLayouts() {
-        _addLayout('GridLayout', GridLayout, [
-            {name: 'cells', value: [3, 3], min: [1, 1], max: [50, 50]},
-            {name: 'margins', value: [20, 20, 20, 20], min: [0, 0, 0, 0], max: [100, 100, 100, 100]},
-            {name: 'spacing', value: [20, 20], min: [0, 0], max: [100, 100]}
-        ]);
         _addLayout('ProportionalLayout', ProportionalLayout, [
             {name: 'ratios', value: [1, 2, 3, 1], min: [0, 0, 0, 0], max: [10000, 10000, 10000, 10000]}
         ]);
@@ -484,10 +467,12 @@ define(function(require) {
             {name: 'spacing', value: 5, min: -100, max: 1000}
         ]);
         _addLayout('CollectionLayout', CollectionLayout, [
+            {name: 'cells', value: [3, 5], min: [1, 1], max: [1000, 1000]},
             {name: 'itemSize', value: [90, 90], min: [0, 0], max: [1000, 1000]},
             {name: 'justify', value: [0, 0], min: [0, 0], max: [1, 1]},
             {name: 'margins', value: [10, 10, 10, 10], min: [-100, -100, -100, -100], max: [100, 100, 100, 100]},
-            {name: 'spacing', value: [10, 10], min: [-100, -100], max: [100, 100]}
+            {name: 'spacing', value: [10, 10], min: [-100, -100], max: [100, 100]},
+            {name: 'suppressWarnings', value: true, editable: false}
         ]);
         _addLayout('FullScreen', ListLayout, [
             {name: 'itemSize', value: undefined, editable: false},
@@ -497,8 +482,12 @@ define(function(require) {
         _addLayout('WheelLayout', WheelLayout, [
             {name: 'itemSize', value: 70, min: 0, max: 1000},
             {name: 'diameter', value: 500, min: 10, max: 100000},
-            {name: 'edgeOpacity', value: 0, min: -2, max: 1}
+            {name: 'radialOpacity', value: 0, min: -2, max: 1, step: 0.1}
         ]);
+        /*_addLayout('FontLayout', FontLayout, [
+            {name: 'segmentSize', value: [20, 2], min: [1, 1], max: [1000, 1000]},
+            {name: 'spacing', value: 10, min: 0, max: 100000}
+        ]);*/
         /*_addLayout('CoverLayout', CoverLayout, [
             {name: 'itemSize',   value: [260, 200], min: [0, 0], max: [1000, 1000]}
         ]);*/
@@ -508,18 +497,4 @@ define(function(require) {
     }
     _addLayouts();
     _selectLayout('CollectionLayout');
-
-    /**
-     * Lagometer
-     */
-    /*var lagometerModifier = new Modifier({
-        size: [100, 100],
-        align: [1.0, 0.0],
-        origin: [1.0, 0.0],
-        transform: Transform.translate(-10, 70, 1000)
-    });
-    var lagometer = new Lagometer({
-        size: lagometerModifier.getSize()
-    });
-    mainContext.add(lagometerModifier).add(lagometer);*/
 });
