@@ -163,12 +163,12 @@
 	                var dock = new LayoutDockHelper(context);
 	                context.set('back', {size: size});
 	                if (size[0] < 300) {
-	                    dock.bottom('details', 200, 1);
+	                    dock.bottom('details', 200, 2);
 	                }
 	                else {
-	                    dock.right('details', 200, 1);
+	                    dock.right('details', 200, 2);
 	                }
-	                dock.fill('list', 1);
+	                dock.fill('list', 2);
 	            },
 	            dataSource: {
 	                'list': _createLayoutListView(),
@@ -209,11 +209,11 @@
 	    }
 	    function _moveNextItem() {
 	        _hideSidebar.call(this);
-	        scrollView.goToNextPage();
+	        scrollView.goToNextPage(true);
 	    }
 	    function _movePrevItem() {
 	        _hideSidebar.call(this);
-	        scrollView.goToPreviousPage();
+	        scrollView.goToPreviousPage(true);
 	    }
 	    function _rotateLayout() {
 	        _hideSidebar.call(this);
@@ -235,7 +235,7 @@
 	            }
 	        });
 	        var background = new Surface({classes: ['navbar', 'navbar-default']});
-	        var title = new Surface({content: 'famous-flex', classes: ['title']});
+	        var title = new Surface({content: 'famous-flex', classes: ['title'], size: [true, undefined]});
 	        var addButton = _createButton('<i class="glyphicon glyphicon-plus"></i>');
 	        addButton.on('click', _insertItem);
 	        var removeButton = _createButton('<i class="glyphicon glyphicon-minus"></i>');
@@ -254,7 +254,6 @@
 	
 	        layoutController.setDataSource({
 	            background: background,
-	            title: title,
 	            rightItems: [
 	                removeButton,
 	                addButton,
@@ -264,7 +263,8 @@
 	                directionButton
 	            ],
 	            leftItems: [
-	                menuButton
+	                menuButton,
+	                title
 	            ]
 	        });
 	        return layoutController;
@@ -1213,7 +1213,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports =
-		"body, div {\n  font-family: \"HelveticaNeue-Light\", \"Helvetica Neue Light\", \"Helvetica Neue\", Helvetica, Arial, \"Lucida Grande\", sans-serif;\n  font-weight: bold;\n  /* prevent text selection */\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n\nbody {\n  background: black;\n}\n\n.title {\n  text-align: center;\n  font-size: 18px;\n  line-height: 40px;\n  color: white;\n}\n\n.panel {\n  background-color: rgba(34, 34, 34, 0.7);\n}\n\n.layout-list-item {\n  padding-left: 10px;\n  line-height: 50px;\n  cursor: pointer;\n  color: rgba(255, 255, 255, 0.7);\n}\n\n.layout-list-item.selected {\n  color: white;\n  background-color: rgba(255, 255, 255, 0.2);\n}\n\n.layout-detail-item-title {\n  color: #BBBBBB;\n  font-size: 13px;\n  text-align: center;\n}\n\n.layout-detail-item-input {\n  border: none;\n  color: white;\n  background: rgba(0, 0, 0, 0);\n  text-align: center;\n}\n\n";
+		"body, div {\n  font-family: \"HelveticaNeue-Light\", \"Helvetica Neue Light\", \"Helvetica Neue\", Helvetica, Arial, \"Lucida Grande\", sans-serif;\n  font-weight: bold;\n  /* prevent text selection */\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n\nbody {\n  background: black;\n}\n\n.title {\n  text-align: center;\n  font-size: 18px;\n  line-height: 42px;\n  color: white;\n  overflow: hidden;\n}\n\n.panel {\n  background-color: rgba(34, 34, 34, 0.7);\n}\n\n.layout-list-item {\n  padding-left: 10px;\n  line-height: 50px;\n  cursor: pointer;\n  color: rgba(255, 255, 255, 0.7);\n}\n\n.layout-list-item.selected {\n  color: white;\n  background-color: rgba(255, 255, 255, 0.2);\n}\n\n.layout-detail-item-title {\n  color: #BBBBBB;\n  font-size: 13px;\n  text-align: center;\n}\n\n.layout-detail-item-input {\n  border: none;\n  color: white;\n  background: rgba(0, 0, 0, 0);\n  text-align: center;\n}\n\n";
 
 /***/ },
 /* 7 */
@@ -3714,7 +3714,7 @@
 	     */
 	    LayoutController.prototype.get = function(indexOrId) {
 	      if (this._nodesById || (indexOrId instanceof String) || (typeof indexOrId === 'string')) {
-	        return this._nodesById[indexOrId];
+	        return this._nodesById ? this._nodesById[indexOrId] : undefined;
 	      }
 	      var viewSequence = _getViewSequenceAtIndex.call(this, indexOrId);
 	      return viewSequence ? viewSequence.get() : undefined;
@@ -5109,19 +5109,21 @@
 	        this._size = size;
 	        this._context = context;
 	        this._options = options;
-	        this._z = (options && options.translateZ) ? options.translateZ : 0;
+	        this._data = {
+	            z: (options && options.translateZ) ? options.translateZ : 0
+	        };
 	        if (options && options.margins) {
 	            var margins = LayoutUtility.normalizeMargins(options.margins);
-	            this._left = margins[3];
-	            this._top = margins[0];
-	            this._right = size[0] - margins[1];
-	            this._bottom = size[1] - margins[2];
+	            this._data.left = margins[3];
+	            this._data.top = margins[0];
+	            this._data.right = size[0] - margins[1];
+	            this._data.bottom = size[1] - margins[2];
 	        }
 	        else {
-	            this._left = 0;
-	            this._top = 0;
-	            this._right = size[0];
-	            this._bottom = size[1];
+	            this._data.left = 0;
+	            this._data.top = 0;
+	            this._data.right = size[0];
+	            this._data.bottom = size[1];
 	        }
 	    }
 	
@@ -5181,16 +5183,16 @@
 	            height = height[1];
 	        }
 	        if (height === undefined) {
-	            var size = this._context.resolveSize(node, [this._right - this._left, this._bottom - this._top]);
+	            var size = this._context.resolveSize(node, [this._data.right - this._data.left, this._data.bottom - this._data.top]);
 	            height = size[1];
 	        }
 	        this._context.set(node, {
-	            size: [this._right - this._left, height],
+	            size: [this._data.right - this._data.left, height],
 	            origin: [0, 0],
 	            align: [0, 0],
-	            translate: [this._left, this._top, (z === undefined) ? this._z : z]
+	            translate: [this._data.left, this._data.top, (z === undefined) ? this._data.z : z]
 	        });
-	        this._top += height;
+	        this._data.top += height;
 	        return this;
 	    };
 	
@@ -5207,16 +5209,16 @@
 	            width = width[0];
 	        }
 	        if (width === undefined) {
-	            var size = this._context.resolveSize(node, [this._right - this._left, this._bottom - this._top]);
+	            var size = this._context.resolveSize(node, [this._data.right - this._data.left, this._data.bottom - this._data.top]);
 	            width = size[0];
 	        }
 	        this._context.set(node, {
-	            size: [width, this._bottom - this._top],
+	            size: [width, this._data.bottom - this._data.top],
 	            origin: [0, 0],
 	            align: [0, 0],
-	            translate: [this._left, this._top, (z === undefined) ? this._z : z]
+	            translate: [this._data.left, this._data.top, (z === undefined) ? this._data.z : z]
 	        });
-	        this._left += width;
+	        this._data.left += width;
 	        return this;
 	    };
 	
@@ -5233,16 +5235,16 @@
 	            height = height[1];
 	        }
 	        if (height === undefined) {
-	            var size = this._context.resolveSize(node, [this._right - this._left, this._bottom - this._top]);
+	            var size = this._context.resolveSize(node, [this._data.right - this._data.left, this._data.bottom - this._data.top]);
 	            height = size[1];
 	        }
 	        this._context.set(node, {
-	            size: [this._right - this._left, height],
+	            size: [this._data.right - this._data.left, height],
 	            origin: [0, 1],
 	            align: [0, 1],
-	            translate: [this._left, -(this._size[1] - this._bottom), (z === undefined) ? this._z : z]
+	            translate: [this._data.left, -(this._size[1] - this._data.bottom), (z === undefined) ? this._data.z : z]
 	        });
-	        this._bottom -= height;
+	        this._data.bottom -= height;
 	        return this;
 	    };
 	
@@ -5260,18 +5262,18 @@
 	        }
 	        if (node) {
 	            if (width === undefined) {
-	                var size = this._context.resolveSize(node, [this._right - this._left, this._bottom - this._top]);
+	                var size = this._context.resolveSize(node, [this._data.right - this._data.left, this._data.bottom - this._data.top]);
 	                width = size[0];
 	            }
 	            this._context.set(node, {
-	                size: [width, this._bottom - this._top],
+	                size: [width, this._data.bottom - this._data.top],
 	                origin: [1, 0],
 	                align: [1, 0],
-	                translate: [-(this._size[0] - this._right), this._top, (z === undefined) ? this._z : z]
+	                translate: [-(this._size[0] - this._data.right), this._data.top, (z === undefined) ? this._data.z : z]
 	            });
 	        }
 	        if (width) {
-	            this._right -= width;
+	            this._data.right -= width;
 	        }
 	        return this;
 	    };
@@ -5285,8 +5287,8 @@
 	     */
 	    LayoutDockHelper.prototype.fill = function(node, z) {
 	        this._context.set(node, {
-	            size: [this._right - this._left, this._bottom - this._top],
-	            translate: [this._left, this._top, (z === undefined) ? this._z : z]
+	            size: [this._data.right - this._data.left, this._data.bottom - this._data.top],
+	            translate: [this._data.left, this._data.top, (z === undefined) ? this._data.z : z]
 	        });
 	        return this;
 	    };
@@ -5299,11 +5301,20 @@
 	     */
 	    LayoutDockHelper.prototype.margins = function(margins) {
 	        margins = LayoutUtility.normalizeMargins(margins);
-	        this._left += margins[3];
-	        this._top += margins[0];
-	        this._right -= margins[1];
-	        this._bottom -= margins[2];
+	        this._data.left += margins[3];
+	        this._data.top += margins[0];
+	        this._data.right -= margins[1];
+	        this._data.bottom -= margins[2];
 	        return this;
+	    };
+	
+	    /**
+	     * Gets the current left/right/top/bottom/z bounds used by the dock-helper.
+	     *
+	     * @return {Object} `{left: x, right: x, top: x, bottom: x, z: x}`
+	     */
+	    LayoutDockHelper.prototype.get = function() {
+	        return this._data;
 	    };
 	
 	    // Register the helper
@@ -5452,6 +5463,7 @@
 	 * |options|type|description|
 	 * |---|---|---|
 	 * |`[margins]`|Number/Array|Margins shorthand (e.g. 5, [10, 20], [2, 5, 2, 10])|
+	 * |`[translateZ]`|z-index to use when translating items in front of the background (default: 2)|
 	 * |`[itemWidth]`|Number|Width of the left & right items|
 	 * |`[leftItemWidth]`|Number|Width of the left items|
 	 * |`[rightItemWidth]`|Number|Width of the right items|
@@ -5501,11 +5513,23 @@
 	    module.exports = function NavBarLayout(context, options) {
 	        var dock = new LayoutDockHelper(context, {
 	            margins: options.margins,
-	            translateZ: 1
+	            translateZ: options.hasOwnProperty('translateZ') ? options.translateZ : 2
 	        });
 	
 	        // Position background
 	        context.set('background', {size: context.size});
+	
+	        // Position back-button
+	        var backIcon = context.get('backIcon');
+	        if (backIcon) {
+	            dock.left(backIcon, options.backIconWidth);
+	            dock.left(undefined, options.leftItemSpacer || options.itemSpacer);
+	        }
+	        var backItem = context.get('backItem');
+	        if (backItem) {
+	            dock.left(backItem, options.backItemWidth);
+	            dock.left(undefined, options.leftItemSpacer || options.itemSpacer);
+	        }
 	
 	        // Position right items
 	        var node;
@@ -5521,7 +5545,7 @@
 	            }
 	        }
 	
-	        // Position left item
+	        // Position left items
 	        var leftItems = context.get('leftItems');
 	        if (leftItems) {
 	            for (i = 0; i < leftItems.length; i++) {
@@ -5534,7 +5558,18 @@
 	        }
 	
 	        // Position title
-	        dock.fill('title');
+	        var title = context.get('title');
+	        if (title) {
+	            var titleSize = context.resolveSize(title, context.size);
+	            var left = Math.max((context.size[0] - titleSize[0]) / 2, dock.get().left);
+	            var right = Math.min((context.size[0] + titleSize[0]) / 2, dock.get().right);
+	            left = Math.max(left, context.size[0] - right);
+	            right = Math.min(right, context.size[0] - left);
+	            context.set(title, {
+	                size: [right - left, context.size[1]],
+	                translate: [left, 0, 0]
+	            });
+	        }
 	    };
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
@@ -6224,7 +6259,8 @@
 	        sequence: true,
 	        direction: [Utility.Direction.Y, Utility.Direction.X],
 	        scrolling: true,
-	        trueSize: true
+	        trueSize: true,
+	        sequentialScrollingOptimized: false
 	    };
 	
 	    // Data
@@ -7199,7 +7235,7 @@
 	 *
 	 * @author: Hein Rutjes (IjzerenHein)
 	 * @license MIT
-	 * @copyright Gloey Apps, 2014 - 2015
+	 * @copyright Gloey Apps, 2014/2015
 	 */
 	
 	/**
@@ -7221,6 +7257,8 @@
 	    // import dependencies
 	    var LayoutContext = __webpack_require__(/*! ./LayoutContext */ 48);
 	    var LayoutUtility = __webpack_require__(/*! ./LayoutUtility */ 18);
+	    var Surface = __webpack_require__(/*! famous/core/Surface */ 11);
+	    var RenderNode = __webpack_require__(/*! famous/core/RenderNode */ 44);
 	
 	    var MAX_POOL_SIZE = 100;
 	
@@ -7396,6 +7434,10 @@
 	                    result.modified = true;
 	                }
 	
+	                // Set meta data
+	                spec.usesTrueSize = node.usesTrueSize;
+	                spec.trueSizeRequested = node.trueSizeRequested;
+	
 	                // Add node to result output
 	                specs.push(spec);
 	                node = node._next;
@@ -7463,10 +7505,10 @@
 	     */
 	    LayoutNodeManager.prototype.preallocateNodes = function(count, spec) {
 	        var nodes = [];
-	        for (var i = 0; i < count ; i++) {
+	        for (var i = 0; i < count; i++) {
 	            nodes.push(this.createNode(undefined, spec));
 	        }
-	        for (i = 0; i < count ; i++) {
+	        for (i = 0; i < count; i++) {
 	            _destroyNode.call(this, nodes[i]);
 	        }
 	    };
@@ -7849,7 +7891,40 @@
 	    }
 	
 	    /**
-	     * Resolve the size of the layout-node from the renderable itsself
+	     * Helper function that recursively discovers the configured size for a
+	     * given renderNode.
+	     */
+	    function _resolveConfigSize(renderNode) {
+	        if (renderNode instanceof RenderNode) {
+	            var result = null;
+	            var target = renderNode.get();
+	            if (target) {
+	                result = _resolveConfigSize(target);
+	                if (result) {
+	                    return result;
+	                }
+	            }
+	            if (renderNode._child) {
+	                return _resolveConfigSize(renderNode._child);
+	            }
+	        }
+	        else if (renderNode instanceof Surface) {
+	            return renderNode.size ? {
+	                renderNode: renderNode,
+	                size: renderNode.size
+	            } : undefined;
+	        }
+	        else if (renderNode.options && renderNode.options.size) {
+	            return {
+	                renderNode: renderNode,
+	                size: renderNode.options.size
+	            };
+	        }
+	        return undefined;
+	    }
+	
+	    /**
+	     * Resolve the size of the layout-node from the renderable itsself.
 	     */
 	    function _contextResolveSize(contextNodeOrId, parentSize) {
 	        var contextNode = this._nodesById ? _contextGet.call(this, contextNodeOrId) : contextNodeOrId;
@@ -7872,54 +7947,54 @@
 	        // It contains portions that ensure that the true-size of a Surface is re-evaluated
 	        // and also workaround code that backs up the size of a Surface, so that when the surface
 	        // is re-added to the DOM (e.g. when scrolling) it doesn't temporarily have a size of 0.
-	        var configSize = renderNode.size && (renderNode._trueSizeCheck !== undefined) ? renderNode.size : undefined;
-	        if (configSize && ((configSize[0] === true) || (configSize[1] === true))) {
+	        var configSize = _resolveConfigSize(renderNode);
+	        if (configSize && ((configSize.size[0] === true) || (configSize.size[1] === true))) {
 	            contextNode.usesTrueSize = true;
-	            var backupSize = renderNode._backupSize;
-	            if (renderNode._contentDirty || renderNode._trueSizeCheck) {
-	              this._trueSizeRequested = true;
-	              contextNode.trueSizeRequested = true;
-	            }
-	            if (renderNode._trueSizeCheck) {
-	
-	                // Fix for true-size renderables. When true-size is used, the size
-	                // is incorrect for one render-cycle due to the fact that Surface.commit
-	                // updates the content after asking the DOM for the offsetHeight/offsetWidth.
-	                // The code below backs the size up, and re-uses that when this scenario
-	                // occurs.
-	                if (backupSize && (configSize !== size)) {
-	                    var newWidth = (configSize[0] === true) ? Math.max(backupSize[0], size[0]) : size[0];
-	                    var newHeight = (configSize[1] === true) ? Math.max(backupSize[1], size[1]) : size[1];
-	                    backupSize[0] = newWidth;
-	                    backupSize[1] = newHeight;
-	                    size = backupSize;
-	                    renderNode._backupSize = undefined;
-	                    backupSize = undefined;
+	            if (configSize.renderNode instanceof Surface) {
+	                var backupSize = configSize.renderNode._backupSize;
+	                if (configSize.renderNode._contentDirty || configSize.renderNode._trueSizeCheck) {
+	                  this._trueSizeRequested = true;
+	                  contextNode.trueSizeRequested = true;
 	                }
-	            }
-	            if (this._reevalTrueSize || (backupSize && ((backupSize[0] !== size[0]) || (backupSize[1] !== size[1])))) {
-	                renderNode._trueSizeCheck = true; // force request of true-size from DOM
-	                renderNode._sizeDirty = true;
-	                this._trueSizeRequested = true;
+	                if (configSize.renderNode._trueSizeCheck) {
+	
+	                    // Fix for true-size renderables. When true-size is used, the size
+	                    // is incorrect for one render-cycle due to the fact that Surface.commit
+	                    // updates the content after asking the DOM for the offsetHeight/offsetWidth.
+	                    // The code below backs the size up, and re-uses that when this scenario
+	                    // occurs.
+	                    if (backupSize && (configSize.size !== size)) {
+	                        var newWidth = (configSize.size[0] === true) ? Math.max(backupSize[0], size[0]) : size[0];
+	                        var newHeight = (configSize.size[1] === true) ? Math.max(backupSize[1], size[1]) : size[1];
+	                        backupSize[0] = newWidth;
+	                        backupSize[1] = newHeight;
+	                        size = backupSize;
+	                        configSize.renderNode._backupSize = undefined;
+	                        backupSize = undefined;
+	                    }
+	                }
+	                if (this._reevalTrueSize || (backupSize && ((backupSize[0] !== size[0]) || (backupSize[1] !== size[1])))) {
+	                    configSize.renderNode._trueSizeCheck = true; // force request of true-size from DOM
+	                    configSize.renderNode._sizeDirty = true;
+	                    this._trueSizeRequested = true;
+	                }
+	
+	                // Backup the size of the node
+	                if (!backupSize) {
+	                    configSize.renderNode._backupSize = [0, 0];
+	                    backupSize = configSize.renderNode._backupSize;
+	                }
+	                backupSize[0] = size[0];
+	                backupSize[1] = size[1];
 	            }
 	
-	            // Backup the size of the node
-	            if (!backupSize) {
-	                renderNode._backupSize = [0, 0];
-	                backupSize = renderNode._backupSize;
-	            }
-	            backupSize[0] = size[0];
-	            backupSize[1] = size[1];
-	        }
-	
-	        // Ensure re-layout when a child layout-controller is using true-size and it
-	        // has ben changed.
-	        configSize = renderNode._nodes ? renderNode.options.size : undefined;
-	        if (configSize && ((configSize[0] === true) || (configSize[1] === true))) {
-	            if (this._reevalTrueSize || renderNode._nodes._trueSizeRequested) {
-	                contextNode.usesTrueSize = true;
-	                contextNode.trueSizeRequested = true;
-	                this._trueSizeRequested = true;
+	            // Ensure re-layout when a child layout-controller is using true-size and it
+	            // has ben changed.
+	            else if (configSize.renderNode._nodes) {
+	                if (this._reevalTrueSize || configSize.renderNode._nodes._trueSizeRequested) {
+	                    contextNode.trueSizeRequested = true;
+	                    this._trueSizeRequested = true;
+	                }
 	            }
 	        }
 	
@@ -9458,6 +9533,9 @@
 	 * @copyright Gloey Apps, 2014 - 2015
 	 */
 	
+	/*global console*/
+	/*eslint no-console: 0*/
+	
 	/**
 	 * Scrollable layout-controller.
 	 *
@@ -9541,7 +9619,7 @@
 	     * @param {Bool} [options.useContainer] Embeds the view in a ContainerSurface to hide any overflow and capture input events (default: `false`).
 	     * @param {String} [options.container] Options that are passed to the ContainerSurface in case `useContainer` is true.
 	     * @param {Bool} [options.paginated] Enabled pagination when set to `true` (default: `false`).
-	     * @param {Number} [options.paginationEnergyThresshold] Thresshold after which pagination kicks in (default: `0.01`).
+	     * @param {Number} [options.paginationEnergyThreshold] Threshold after which pagination kicks in (default: `0.01`).
 	     * @param {PaginationMode} [options.paginationMode] Pagination-mode (either page-based or scroll-based) (default: `PaginationMode.PAGE`).
 	     * @param {Number} [options.alignment] Alignment of the renderables (0 = top/left, 1 = bottom/right) (default: `0`).
 	     * @param {Bool} [options.mouseMove] Enables scrolling by holding the mouse-button down and moving the mouse (default: `false`).
@@ -9678,9 +9756,9 @@
 	        overscroll: true,
 	        paginated: false,
 	        paginationMode: PaginationMode.PAGE,
-	        paginationEnergyThresshold: 0.01,
+	        paginationEnergyThreshold: 0.01,
 	        alignment: 0,         // [0: top/left, 1: bottom/right]
-	        touchMoveDirectionThresshold: undefined, // 0..1
+	        touchMoveDirectionThreshold: undefined, // 0..1
 	        touchMoveNoVelocityDuration: 100,
 	        mouseMove: false,
 	        enabled: true,          // set to false to disable scrolling
@@ -9695,7 +9773,7 @@
 	     *
 	     * @param {Object} options Configurable options (see LayoutController for all inherited options).
 	     * @param {Bool} [options.paginated] Enabled pagination when set to `true` (default: `false`).
-	     * @param {Number} [options.paginationEnergyThresshold] Thresshold after which pagination kicks in (default: `0.01`).
+	     * @param {Number} [options.paginationEnergyThreshold] Threshold after which pagination kicks in (default: `0.01`).
 	     * @param {PaginationMode} [options.paginationMode] Pagination-mode (either page-based or scroll-based) (default: `PaginationMode.PAGE`).
 	     * @param {Number} [options.alignment] Alignment of the renderables (0 = top/left, 1 = bottom/right) (default: `0`).
 	     * @param {Bool} [options.mouseMove] Enables scrolling by holding the mouse-button down and moving the mouse (default: `false`).
@@ -9710,6 +9788,18 @@
 	     */
 	    ScrollController.prototype.setOptions = function(options) {
 	        LayoutController.prototype.setOptions.call(this, options);
+	        if (options.hasOwnProperty('paginationEnergyThresshold')) {
+	            console.warn('option `paginationEnergyThresshold` has been deprecated, please rename to `paginationEnergyThreshold`.');
+	            this.setOptions({
+	                paginationEnergyThreshold: options.paginationEnergyThresshold
+	            });
+	        }
+	        if (options.hasOwnProperty('touchMoveDirectionThresshold')) {
+	            console.warn('option `touchMoveDirectionThresshold` has been deprecated, please rename to `touchMoveDirectionThreshold`.');
+	            this.setOptions({
+	                touchMoveDirectionThreshold: options.touchMoveDirectionThresshold
+	            });
+	        }
 	        if (this._scroll) {
 	            if (options.scrollSpring) {
 	                this._scroll.springForce.setOptions(options.scrollSpring);
@@ -9734,6 +9824,15 @@
 	        if (!spec && this.options.flowOptions.insertSpec) {
 	            node.setSpec(this.options.flowOptions.insertSpec);
 	        }
+	    }
+	
+	    /**
+	     * Helper that detects when layout is scrolling optimized (default: true).
+	     */
+	    function _isSequentiallyScrollingOptimized() {
+	        return !this._layout.capabilities ||
+	                (this._layout.capabilities.sequentialScrollingOptimized === undefined) ||
+	                this._layout.capabilities.sequentialScrollingOptimized;
 	    }
 	
 	    /**
@@ -9833,7 +9932,7 @@
 	            Math.abs(event.clientY - this._scroll.mouseMove.prev[1]),
 	            Math.abs(event.clientX - this._scroll.mouseMove.prev[0])) / (Math.PI / 2.0);
 	        var directionDiff = Math.abs(this._direction - moveDirection);
-	        if ((this.options.touchMoveDirectionThresshold === undefined) || (directionDiff <= this.options.touchMoveDirectionThresshold)){
+	        if ((this.options.touchMoveDirectionThreshold === undefined) || (directionDiff <= this.options.touchMoveDirectionThreshold)){
 	            this._scroll.mouseMove.prev = this._scroll.mouseMove.current;
 	            this._scroll.mouseMove.current = [event.clientX, event.clientY];
 	            this._scroll.mouseMove.prevTime = this._scroll.mouseMove.time;
@@ -9963,7 +10062,7 @@
 	                        Math.abs(changedTouch.clientY - touch.prev[1]),
 	                        Math.abs(changedTouch.clientX - touch.prev[0])) / (Math.PI / 2.0);
 	                    var directionDiff = Math.abs(this._direction - moveDirection);
-	                    if ((this.options.touchMoveDirectionThresshold === undefined) || (directionDiff <= this.options.touchMoveDirectionThresshold)){
+	                    if ((this.options.touchMoveDirectionThreshold === undefined) || (directionDiff <= this.options.touchMoveDirectionThreshold)){
 	                        touch.prev = touch.current;
 	                        touch.current = [changedTouch.clientX, changedTouch.clientY];
 	                        touch.prevTime = touch.time;
@@ -10151,7 +10250,7 @@
 	        // Local data
 	        var prevHeight = this._calcScrollHeight(false);
 	        var nextHeight = this._calcScrollHeight(true);
-	        var enforeMinSize = this._layout.capabilities && this._layout.capabilities.sequentialScrollingOptimized;
+	        var enforeMinSize = _isSequentiallyScrollingOptimized.call(this);
 	
 	        // 1. When the rendered height is smaller than the total height,
 	        //    then lock to the primary bounds
@@ -10363,7 +10462,7 @@
 	        var item;
 	        switch (this.options.paginationMode) {
 	            case PaginationMode.SCROLL:
-	                if (!this.options.paginationEnergyThresshold || (Math.abs(this._scroll.particle.getEnergy()) <= this.options.paginationEnergyThresshold)) {
+	                if (!this.options.paginationEnergyThreshold || (Math.abs(this._scroll.particle.getEnergy()) <= this.options.paginationEnergyThreshold)) {
 	                    item = this.options.alignment ? this.getLastVisibleItem() : this.getFirstVisibleItem();
 	                    if (item && item.renderNode) {
 	                        this.goToRenderNode(item.renderNode);
@@ -10489,7 +10588,7 @@
 	            }
 	
 	            // Adjust group offset
-	            if (caps && caps.sequentialScrollingOptimized) {
+	            if (_isSequentiallyScrollingOptimized.call(this)) {
 	                this._scroll.groupStart -= delta;
 	            }
 	        }
@@ -10647,7 +10746,7 @@
 	            this.halt();
 	            this._scroll.scrollDelta = 0;
 	            _setParticle.call(this, 0, 0, '_goToSequence');
-	            this._isDirty = true;
+	            this._scroll.scrollDirty = true;
 	        }
 	        else {
 	            this._scroll.scrollToSequence = viewSequence;
@@ -11026,6 +11125,11 @@
 	        }
 	        this._scroll.scrollForceCount++;
 	        this._scroll.scrollForce += delta;
+	        this._eventOutput.emit((this._scroll.scrollForceCount === 1) ? 'swipestart' : 'swipeupdate', {
+	            target: this,
+	            total: this._scroll.scrollForce,
+	            delta: delta
+	        });
 	        return this;
 	    };
 	
@@ -11044,6 +11148,11 @@
 	        this.halt();
 	        newDelta -= prevDelta;
 	        this._scroll.scrollForce += newDelta;
+	        this._eventOutput.emit('swipeupdate', {
+	            target: this,
+	            total: this._scroll.scrollForce,
+	            delta: newDelta
+	        });
 	        return this;
 	    };
 	
@@ -11071,7 +11180,7 @@
 	                    if (item.renderNode !== this._scroll.scrollForceStartItem.renderNode) {
 	                        this.goToRenderNode(item.renderNode);
 	                    }
-	                    else if (this.options.paginationEnergyThresshold && (Math.abs(this._scroll.particle.getEnergy()) >= this.options.paginationEnergyThresshold)) {
+	                    else if (this.options.paginationEnergyThreshold && (Math.abs(this._scroll.particle.getEnergy()) >= this.options.paginationEnergyThreshold)) {
 	                        velocity = velocity || 0;
 	                        if ((velocity < 0) && item._node._next && item._node._next.renderNode) {
 	                            this.goToRenderNode(item._node._next.renderNode);
@@ -11086,11 +11195,23 @@
 	                }
 	            }
 	            this._scroll.scrollForceStartItem = undefined;
+	            this._scroll.scrollForceCount--;
+	            this._eventOutput.emit('swipeend', {
+	                target: this,
+	                total: delta,
+	                delta: 0,
+	                velocity: velocity
+	            });
 	        }
 	        else {
 	            this._scroll.scrollForce -= delta;
+	            this._scroll.scrollForceCount--;
+	            this._eventOutput.emit('swipeupdate', {
+	                target: this,
+	                total: this._scroll.scrollForce,
+	                delta: delta
+	            });
 	        }
-	        this._scroll.scrollForceCount--;
 	        return this;
 	    };
 	
@@ -11104,7 +11225,7 @@
 	     */
 	    ScrollController.prototype.getSpec = function(node, normalize) {
 	        var spec = LayoutController.prototype.getSpec.apply(this, arguments);
-	        if (spec && this._layout.capabilities && this._layout.capabilities.sequentialScrollingOptimized) {
+	        if (spec && _isSequentiallyScrollingOptimized.call(this)) {
 	            spec = {
 	                origin: spec.origin,
 	                align: spec.align,
@@ -11338,7 +11459,7 @@
 	        groupTranslate[1] = 0;
 	        groupTranslate[2] = 0;
 	        groupTranslate[this._direction] = -this._scroll.groupStart - scrollOffset;
-	        var sequentialScrollingOptimized = this._layout.capabilities ? this._layout.capabilities.sequentialScrollingOptimized : false;
+	        var sequentialScrollingOptimized = _isSequentiallyScrollingOptimized.call(this);
 	        var result = this._nodes.buildSpecAndDestroyUnrenderedNodes(sequentialScrollingOptimized ? groupTranslate : undefined);
 	        this._specs = result.specs;
 	        if (!this._specs.length) {
@@ -11484,7 +11605,7 @@
 	 * @copyright Famous Industries, Inc. 2015
 	 */
 	var Entity = __webpack_require__(/*! ./Entity */ 34);
-	var SpecParser = __webpack_require__(/*! ./SpecParser */ 56);
+	var SpecParser = __webpack_require__(/*! ./SpecParser */ 58);
 	function RenderNode(object) {
 	    this._object = null;
 	    this._child = null;
@@ -11655,8 +11776,8 @@
 	 * @license MPL 2.0
 	 * @copyright Famous Industries, Inc. 2015
 	 */
-	var MultipleTransition = __webpack_require__(/*! ./MultipleTransition */ 57);
-	var TweenTransition = __webpack_require__(/*! ./TweenTransition */ 58);
+	var MultipleTransition = __webpack_require__(/*! ./MultipleTransition */ 56);
+	var TweenTransition = __webpack_require__(/*! ./TweenTransition */ 57);
 	function Transitionable(start) {
 	    this.currentAction = null;
 	    this.actionQueue = [];
@@ -13177,145 +13298,6 @@
 
 /***/ },
 /* 56 */
-/*!**************************************!*\
-  !*** ../~/famous/core/SpecParser.js ***!
-  \**************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/* This Source Code Form is subject to the terms of the Mozilla Public
-	 * License, v. 2.0. If a copy of the MPL was not distributed with this
-	 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
-	 *
-	 * @license MPL 2.0
-	 * @copyright Famous Industries, Inc. 2015
-	 */
-	var Transform = __webpack_require__(/*! ./Transform */ 38);
-	function SpecParser() {
-	    this.result = {};
-	}
-	SpecParser._instance = new SpecParser();
-	SpecParser.parse = function parse(spec, context) {
-	    return SpecParser._instance.parse(spec, context);
-	};
-	SpecParser.prototype.parse = function parse(spec, context) {
-	    this.reset();
-	    this._parseSpec(spec, context, Transform.identity);
-	    return this.result;
-	};
-	SpecParser.prototype.reset = function reset() {
-	    this.result = {};
-	};
-	function _vecInContext(v, m) {
-	    return [
-	        v[0] * m[0] + v[1] * m[4] + v[2] * m[8],
-	        v[0] * m[1] + v[1] * m[5] + v[2] * m[9],
-	        v[0] * m[2] + v[1] * m[6] + v[2] * m[10]
-	    ];
-	}
-	var _zeroZero = [
-	    0,
-	    0
-	];
-	SpecParser.prototype._parseSpec = function _parseSpec(spec, parentContext, sizeContext) {
-	    var id;
-	    var target;
-	    var transform;
-	    var opacity;
-	    var origin;
-	    var align;
-	    var size;
-	    if (typeof spec === 'number') {
-	        id = spec;
-	        transform = parentContext.transform;
-	        align = parentContext.align || _zeroZero;
-	        if (parentContext.size && align && (align[0] || align[1])) {
-	            var alignAdjust = [
-	                align[0] * parentContext.size[0],
-	                align[1] * parentContext.size[1],
-	                0
-	            ];
-	            transform = Transform.thenMove(transform, _vecInContext(alignAdjust, sizeContext));
-	        }
-	        this.result[id] = {
-	            transform: transform,
-	            opacity: parentContext.opacity,
-	            origin: parentContext.origin || _zeroZero,
-	            align: parentContext.align || _zeroZero,
-	            size: parentContext.size
-	        };
-	    } else if (!spec) {
-	        return;
-	    } else if (spec instanceof Array) {
-	        for (var i = 0; i < spec.length; i++) {
-	            this._parseSpec(spec[i], parentContext, sizeContext);
-	        }
-	    } else {
-	        target = spec.target;
-	        transform = parentContext.transform;
-	        opacity = parentContext.opacity;
-	        origin = parentContext.origin;
-	        align = parentContext.align;
-	        size = parentContext.size;
-	        var nextSizeContext = sizeContext;
-	        if (spec.opacity !== undefined)
-	            opacity = parentContext.opacity * spec.opacity;
-	        if (spec.transform)
-	            transform = Transform.multiply(parentContext.transform, spec.transform);
-	        if (spec.origin) {
-	            origin = spec.origin;
-	            nextSizeContext = parentContext.transform;
-	        }
-	        if (spec.align)
-	            align = spec.align;
-	        if (spec.size || spec.proportions) {
-	            var parentSize = size;
-	            size = [
-	                size[0],
-	                size[1]
-	            ];
-	            if (spec.size) {
-	                if (spec.size[0] !== undefined)
-	                    size[0] = spec.size[0];
-	                if (spec.size[1] !== undefined)
-	                    size[1] = spec.size[1];
-	            }
-	            if (spec.proportions) {
-	                if (spec.proportions[0] !== undefined)
-	                    size[0] = size[0] * spec.proportions[0];
-	                if (spec.proportions[1] !== undefined)
-	                    size[1] = size[1] * spec.proportions[1];
-	            }
-	            if (parentSize) {
-	                if (align && (align[0] || align[1]))
-	                    transform = Transform.thenMove(transform, _vecInContext([
-	                        align[0] * parentSize[0],
-	                        align[1] * parentSize[1],
-	                        0
-	                    ], sizeContext));
-	                if (origin && (origin[0] || origin[1]))
-	                    transform = Transform.moveThen([
-	                        -origin[0] * size[0],
-	                        -origin[1] * size[1],
-	                        0
-	                    ], transform);
-	            }
-	            nextSizeContext = parentContext.transform;
-	            origin = null;
-	            align = null;
-	        }
-	        this._parseSpec(target, {
-	            transform: transform,
-	            opacity: opacity,
-	            origin: origin,
-	            align: align,
-	            size: size
-	        }, nextSizeContext);
-	    }
-	};
-	module.exports = SpecParser;
-
-/***/ },
-/* 57 */
 /*!*****************************************************!*\
   !*** ../~/famous/transitions/MultipleTransition.js ***!
   \*****************************************************/
@@ -13359,7 +13341,7 @@
 	module.exports = MultipleTransition;
 
 /***/ },
-/* 58 */
+/* 57 */
 /*!**************************************************!*\
   !*** ../~/famous/transitions/TweenTransition.js ***!
   \**************************************************/
@@ -13610,6 +13592,145 @@
 	    };
 	};
 	module.exports = TweenTransition;
+
+/***/ },
+/* 58 */
+/*!**************************************!*\
+  !*** ../~/famous/core/SpecParser.js ***!
+  \**************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/* This Source Code Form is subject to the terms of the Mozilla Public
+	 * License, v. 2.0. If a copy of the MPL was not distributed with this
+	 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+	 *
+	 * @license MPL 2.0
+	 * @copyright Famous Industries, Inc. 2015
+	 */
+	var Transform = __webpack_require__(/*! ./Transform */ 38);
+	function SpecParser() {
+	    this.result = {};
+	}
+	SpecParser._instance = new SpecParser();
+	SpecParser.parse = function parse(spec, context) {
+	    return SpecParser._instance.parse(spec, context);
+	};
+	SpecParser.prototype.parse = function parse(spec, context) {
+	    this.reset();
+	    this._parseSpec(spec, context, Transform.identity);
+	    return this.result;
+	};
+	SpecParser.prototype.reset = function reset() {
+	    this.result = {};
+	};
+	function _vecInContext(v, m) {
+	    return [
+	        v[0] * m[0] + v[1] * m[4] + v[2] * m[8],
+	        v[0] * m[1] + v[1] * m[5] + v[2] * m[9],
+	        v[0] * m[2] + v[1] * m[6] + v[2] * m[10]
+	    ];
+	}
+	var _zeroZero = [
+	    0,
+	    0
+	];
+	SpecParser.prototype._parseSpec = function _parseSpec(spec, parentContext, sizeContext) {
+	    var id;
+	    var target;
+	    var transform;
+	    var opacity;
+	    var origin;
+	    var align;
+	    var size;
+	    if (typeof spec === 'number') {
+	        id = spec;
+	        transform = parentContext.transform;
+	        align = parentContext.align || _zeroZero;
+	        if (parentContext.size && align && (align[0] || align[1])) {
+	            var alignAdjust = [
+	                align[0] * parentContext.size[0],
+	                align[1] * parentContext.size[1],
+	                0
+	            ];
+	            transform = Transform.thenMove(transform, _vecInContext(alignAdjust, sizeContext));
+	        }
+	        this.result[id] = {
+	            transform: transform,
+	            opacity: parentContext.opacity,
+	            origin: parentContext.origin || _zeroZero,
+	            align: parentContext.align || _zeroZero,
+	            size: parentContext.size
+	        };
+	    } else if (!spec) {
+	        return;
+	    } else if (spec instanceof Array) {
+	        for (var i = 0; i < spec.length; i++) {
+	            this._parseSpec(spec[i], parentContext, sizeContext);
+	        }
+	    } else {
+	        target = spec.target;
+	        transform = parentContext.transform;
+	        opacity = parentContext.opacity;
+	        origin = parentContext.origin;
+	        align = parentContext.align;
+	        size = parentContext.size;
+	        var nextSizeContext = sizeContext;
+	        if (spec.opacity !== undefined)
+	            opacity = parentContext.opacity * spec.opacity;
+	        if (spec.transform)
+	            transform = Transform.multiply(parentContext.transform, spec.transform);
+	        if (spec.origin) {
+	            origin = spec.origin;
+	            nextSizeContext = parentContext.transform;
+	        }
+	        if (spec.align)
+	            align = spec.align;
+	        if (spec.size || spec.proportions) {
+	            var parentSize = size;
+	            size = [
+	                size[0],
+	                size[1]
+	            ];
+	            if (spec.size) {
+	                if (spec.size[0] !== undefined)
+	                    size[0] = spec.size[0];
+	                if (spec.size[1] !== undefined)
+	                    size[1] = spec.size[1];
+	            }
+	            if (spec.proportions) {
+	                if (spec.proportions[0] !== undefined)
+	                    size[0] = size[0] * spec.proportions[0];
+	                if (spec.proportions[1] !== undefined)
+	                    size[1] = size[1] * spec.proportions[1];
+	            }
+	            if (parentSize) {
+	                if (align && (align[0] || align[1]))
+	                    transform = Transform.thenMove(transform, _vecInContext([
+	                        align[0] * parentSize[0],
+	                        align[1] * parentSize[1],
+	                        0
+	                    ], sizeContext));
+	                if (origin && (origin[0] || origin[1]))
+	                    transform = Transform.moveThen([
+	                        -origin[0] * size[0],
+	                        -origin[1] * size[1],
+	                        0
+	                    ], transform);
+	            }
+	            nextSizeContext = parentContext.transform;
+	            origin = null;
+	            align = null;
+	        }
+	        this._parseSpec(target, {
+	            transform: transform,
+	            opacity: opacity,
+	            origin: origin,
+	            align: align,
+	            size: size
+	        }, nextSizeContext);
+	    }
+	};
+	module.exports = SpecParser;
 
 /***/ },
 /* 59 */

@@ -17,8 +17,9 @@ body {
 .title {
   text-align: center;
   font-size: 18px;
-  line-height: 40px;
+  line-height: 42px;
   color: white;
+  overflow: hidden;
 }
 
 .panel {

@@ -114,12 +114,12 @@ define(function(require) {
                 var dock = new LayoutDockHelper(context);
                 context.set('back', {size: size});
                 if (size[0] < 300) {
-                    dock.bottom('details', 200, 1);
+                    dock.bottom('details', 200, 2);
                 }
                 else {
-                    dock.right('details', 200, 1);
+                    dock.right('details', 200, 2);
                 }
-                dock.fill('list', 1);
+                dock.fill('list', 2);
             },
             dataSource: {
                 'list': _createLayoutListView(),
@@ -160,11 +160,11 @@ define(function(require) {
     }
     function _moveNextItem() {
         _hideSidebar.call(this);
-        scrollView.goToNextPage();
+        scrollView.goToNextPage(true);
     }
     function _movePrevItem() {
         _hideSidebar.call(this);
-        scrollView.goToPreviousPage();
+        scrollView.goToPreviousPage(true);
     }
     function _rotateLayout() {
         _hideSidebar.call(this);
@@ -186,7 +186,7 @@ define(function(require) {
             }
         });
         var background = new Surface({classes: ['navbar', 'navbar-default']});
-        var title = new Surface({content: 'famous-flex', classes: ['title']});
+        var title = new Surface({content: 'famous-flex', classes: ['title'], size: [true, undefined]});
         var addButton = _createButton('<i class="glyphicon glyphicon-plus"></i>');
         addButton.on('click', _insertItem);
         var removeButton = _createButton('<i class="glyphicon glyphicon-minus"></i>');
@@ -205,7 +205,6 @@ define(function(require) {
 
         layoutController.setDataSource({
             background: background,
-            title: title,
             rightItems: [
                 removeButton,
                 addButton,
@@ -215,7 +214,8 @@ define(function(require) {
                 directionButton
             ],
             leftItems: [
-                menuButton
+                menuButton,
+                title
             ]
         });
         return layoutController;
