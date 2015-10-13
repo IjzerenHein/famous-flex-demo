@@ -1,6 +1,6 @@
 {
   "name": "famous-flex-demo",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": "true",
   "homepage": "https://github.com/IjzerenHein/famous-flex-demo",
   "repository": {
@@ -35,7 +35,7 @@
     "css-loader": "^0.7.0",
     "expose-loader": "^0.5.3",
     "famous": "^0.3.5",
-    "famous-flex": "^0.3.1",
+    "famous-flex": "^0.3.5",
     "famous-polyfills": "^0.3.0",
     "fastclick": "^1.0.4",
     "file-loader": "^0.6.1",
