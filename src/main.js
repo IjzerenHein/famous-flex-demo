@@ -31,11 +31,11 @@ define(function(require) {
     // import dependencies
     var Engine = require('famous/core/Engine');
     var Surface = require('famous/core/Surface');
-    var ViewSequence = require('famous/core/ViewSequence');
     var ContainerSurface = require('famous/surfaces/ContainerSurface');
     var InputSurface = require('famous/surfaces/InputSurface');
     var LayoutController = require('famous-flex/LayoutController');
     var FlexScrollView = require('famous-flex/FlexScrollView');
+    var LinkedListViewSequence = require('famous-flex/LinkedListViewSequence');
     var LayoutUtility = require('famous-flex/LayoutUtility');
     var LayoutDockHelper = require('famous-flex/helpers/LayoutDockHelper');
     var ProportionalLayout = require('famous-flex/layouts/ProportionalLayout');
@@ -44,13 +44,14 @@ define(function(require) {
     var CollectionLayout = require('famous-flex/layouts/CollectionLayout');
     //var FontLayout = require('famous-flex/layouts/FontLayout');
     var WheelLayout = require('famous-flex/layouts/WheelLayout');
+    var CoverLayout = require('famous-flex/layouts/CoverLayout');
     var collectionItemId = 0;
 
     // create the main context
     var mainContext = Engine.createContext();
 
     // Create the shell
-    var layoutListRenderables = [];
+    var layoutListRenderables = new LinkedListViewSequence();
     var collection = [];
     var layouts = [];
     var layoutDetailsView;
@@ -391,7 +392,7 @@ define(function(require) {
         });
     }
     function _updateLayoutDetails(name) {
-        var viewSequence = new ViewSequence();
+        var viewSequence = new LinkedListViewSequence();
         var layout = _findLayout(name);
         for (var i = 0; i < layout.options.length; i++) {
             if ((layout.options[i].editable === undefined) || layout.options[i].editable) {
@@ -475,6 +476,12 @@ define(function(require) {
             {name: 'itemSize', value: 70, min: 0, max: 1000},
             {name: 'diameter', value: 500, min: 10, max: 100000},
             {name: 'radialOpacity', value: 0, min: -2, max: 1, step: 0.1}
+        ]);
+        _addLayout('CoverLayout', CoverLayout, [
+            {name: 'itemSize', value: 400, min: 0, max: 1000},
+            {name: 'zOffset', value: 400, min: 0, max: 1000},
+            {name: 'itemAngle', value: 0.78, min: 0, max: Math.PI * 2},
+            {name: 'radialOpacity', value: 1, min: -2, max: 1, step: 0.1}
         ]);
         /*_addLayout('FontLayout', FontLayout, [
             {name: 'segmentSize', value: [20, 2], min: [1, 1], max: [1000, 1000]},
