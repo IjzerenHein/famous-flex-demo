@@ -1,0 +1,66 @@
+{
+  "name": "famous-flex-demo",
+  "version": "0.7.0",
+  "private": "true",
+  "homepage": "https://github.com/IjzerenHein/famous-flex-demo",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/IjzerenHein/famous-flex-demo.git"
+  },
+  "author": {
+    "name": "Hein Rutjes <hrutjes@gmail.com>"
+  },
+  "description": "Demo for showcasing famous-flex",
+  "keywords": [
+    "famo.us",
+    "famous",
+    "famous-flex",
+    "famous-flex-demo"
+  ],
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/IjzerenHein/famous-flex-demo/blob/master/LICENSE"
+    }
+  ],
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/IjzerenHein/famous-flex-demo/issues"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "devDependencies": {
+    "babel-core": "^5.8.22",
+    "babel-eslint": "^4.0.10",
+    "babel-loader": "^5.3.2",
+    "css-loader": "^0.15.4",
+    "famous": "^0.7.1",
+    "famous-flex": "^0.7.0",
+    "fastclick": "^1.0.6",
+    "file-loader": "^0.8.4",
+    "glsl-loader": "0.0.1",
+    "grunt": "latest",
+    "grunt-eslint": "^17.3.1",
+    "grunt-exec": "latest",
+    "grunt-includes": "^0.5.1",
+    "grunt-jscs": "latest",
+    "grunt-lesslint": "^1.1.14",
+    "handlebars": "^2.0.0",
+    "handlebars-loader": "^0.1.8",
+    "html-webpack-plugin": "^1.7.0",
+    "ismobilejs": "^0.3.9",
+    "less": "^2.5.1",
+    "less-loader": "^2.2.0",
+    "optimist": "^0.6.1",
+    "raw-loader": "^0.5.1",
+    "style-loader": "^0.12.3",
+    "url-loader": "^0.5.6",
+    "webpack": "^1.12.0",
+    "webpack-dev-server": "^1.10.1"
+  },
+  "main": "dist/index.html",
+  "dependencies": {
+    "grunt-ftp-deploy": "^0.1.10"
+  }
+}

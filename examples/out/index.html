@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>famous-flex Examples</title>
+    <style>
+      html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        position: absolute;
+        -webkit-transform-style: preserve-3d;
+        transform-style: preserve-3d;
+        -webkit-font-smoothing: antialiased;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-perspective: 0;
+        perspective: none;
+        overflow: hidden;
+     }
+      .pre-setup, .post-setup {
+        display: none;
+      }
+    </style
+  </head>
+  <body>
+    <h1>famous-flex</h1>
+    <div class="item">
+      <h2>Slider</h2>
+
+      <code class="pre-setup">
+        var Slider = require('famous-flex/controls/Slider');
+      </code>
+      <code class="post-setup">
+        this.add(slider);
+      </code>
+
+      <div class="example">
+        <h3>iOS</h3>
+        <code>
+          var slider = new Slider();
+        </code>
+      </div>
+
+    </div>
+
+    <script type="text/javascript" src="bundle.js"></script>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+{
+    "esnext": true,
+    "preset": "airbnb",
+    "requirePaddingNewLinesAfterBlocks": false,
+    "requireTrailingComma": false
+}
