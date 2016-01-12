@@ -37,7 +37,7 @@
     "babel-preset-es2015": "^6.3.13",
     "css-loader": "^0.23.1",
     "famous": "^0.7.1",
-    "famous-flex": "^0.7.0",
+    "famous-flex": "^0.3.5",
     "fastclick": "^1.0.6",
     "file-loader": "^0.8.5",
     "glsl-loader": "0.0.1",
