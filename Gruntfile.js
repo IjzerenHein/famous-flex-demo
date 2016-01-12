@@ -50,7 +50,7 @@ module.exports = function(grunt) {
       'build': 'webpack -d',
       'open': 'open dist/index.html',
       'clean': 'rm -rf ./dist',
-      'serve': 'webpack-dev-server -d --reload=localhost',
+      'serve': 'webpack-dev-server -d --inline --reload=localhost --host=localhost',
       'open-serve': 'open http://localhost:8080'
     }
   });

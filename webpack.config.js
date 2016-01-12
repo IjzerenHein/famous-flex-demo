@@ -1,6 +1,7 @@
 /*global module, process, __dirname*/
 
 var webpack = require('webpack');
+var webpackDevServer = require('webpack-dev-server');
 var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -28,10 +29,9 @@ var config = {
   reload: isDevServer() ? 'localhost' : null,
   module: {
     loaders: [
-      { test: /famous-flex\/.*\.js$/,loader: 'babel-loader'},
-      { test: /famous-flex-demo\/src\/.*\.js$/,loader: 'babel-loader'},
-      { test: /\.glsl$/,            loader: 'raw-loader'},
-      { test: /\.glsl$/,            loader: 'glslify-loader'},
+      { test: /\.js$/,              loader: 'babel?presets[]=es2015', exclude: /(node_modules\/ismobile)/ },
+      { test: /\.glsl$/,            loader: 'raw-loader' },
+      { test: /\.glsl$/,            loader: 'glslify-loader' },
       { test: /\.json$/,            loader: 'file-loader?name=' + pathPrefix + '[path][name].[ext]&context=.' },
       { test: /\.css$/,             loader: 'style-loader!css-loader' },
       { test: /\.less$/,            loader: 'style-loader!css-loader!less-loader' },

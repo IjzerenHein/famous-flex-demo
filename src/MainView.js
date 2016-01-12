@@ -11,8 +11,8 @@ export default class MainView extends DrawerView {
     super({
       drawerSize: 100,
       drawerMode: 'move',
-      drawer: new DOMNode({styles: {backgroundColor: Theme.secondaryColor}, innerHTML: 'header'}),
-      //content: new DOMNode({styles: {backgroundColor: Theme.color}, innerHTML: 'content'}),
+      drawer: new DOMNode({style: {backgroundColor: Theme.secondaryColor}, innerHTML: 'header'}),
+      //content: new DOMNode({style: {backgroundColor: Theme.color}, innerHTML: 'content'}),
       /*content: new ImageNode({
         src: 'http://vignette1.wikia.nocookie.net/memoryalpha/images/f/fe/Klingons2285.jpg/revision/latest?cb=20040915215955&path-prefix=en',
         size: 'cover'
@@ -32,10 +32,10 @@ export default class MainView extends DrawerView {
   constructor() {
     super({
       headerSize: 50,
-      header: new DOMNode({styles: {backgroundColor: Theme.color2}, innerHTML: 'header'}),
-      content: new DOMNode({styles: {backgroundColor: Theme.color}, innerHTML: 'content'}),
+      header: new DOMNode({style: {backgroundColor: Theme.color2}, innerHTML: 'header'}),
+      content: new DOMNode({style: {backgroundColor: Theme.color}, innerHTML: 'content'}),
       footerSize: 50,
-      footer: new DOMNode({styles: {backgroundColor: Theme.color2}, innerHTML: 'footer'})
+      footer: new DOMNode({style: {backgroundColor: Theme.color2}, innerHTML: 'footer'})
     });
     this.header.on('tap', () => {
       this.animate('easeIn', 500, () => {
