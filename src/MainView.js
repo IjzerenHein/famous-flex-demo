@@ -17,7 +17,9 @@ export default class MainView extends DrawerView {
         src: 'http://vignette1.wikia.nocookie.net/memoryalpha/images/f/fe/Klingons2285.jpg/revision/latest?cb=20040915215955&path-prefix=en',
         size: 'cover'
       })*/
-      content: new Button(),
+      content: new Button({
+        text: 'open'
+      }),
       contentMode: 'move'
     });
     this.content.on('tap', () => {

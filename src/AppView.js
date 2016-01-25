@@ -13,10 +13,10 @@ export default class AppView extends LayoutNode {
       }
     });
     this.header = this.addChild(new DOMNode({
-      styles: {backgroundColor: Theme.color}
+      style: {backgroundColor: Theme.color}
     }));
     this.footer = this.addChild(new DOMNode({
-      styles: {backgroundColor: Theme.color}
+      style: {backgroundColor: Theme.color}
     }));
     /*this.content = this.addChild(new ShowNode({
       animation: {
@@ -25,8 +25,8 @@ export default class AppView extends LayoutNode {
       }
     }));*/
 
-    const redNode = new DOMNode({styles: {backgroundColor: '#FF0000', backfaceVisibility: 'hidden'}, innerHTML: 'red'});
-    const blueNode = new DOMNode({styles: {backgroundColor: '#0000FF', backfaceVisibility: 'hidden'}, innerHTML: 'blue'});
+    const redNode = new DOMNode({style: {backgroundColor: '#FF0000', backfaceVisibility: 'hidden'}, innerHTML: 'red'});
+    const blueNode = new DOMNode({style: {backgroundColor: '#0000FF', backfaceVisibility: 'hidden'}, innerHTML: 'blue'});
     const scrollNode = new ScrollNode({
       layoutOptions: {
         itemSize: 100,
@@ -61,8 +61,8 @@ export default class AppView extends LayoutNode {
       animated: true,
     });
 
-    scrollNode.nodes.push(redNode);
-    scrollNode.nodes.push(blueNode);
+    //scrollNode.nodes.push(redNode);
+    //scrollNode.nodes.push(blueNode);
 
     let whoop = true;
     this.header.on('tap', () => {

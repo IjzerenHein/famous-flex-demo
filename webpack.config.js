@@ -29,7 +29,8 @@ var config = {
   reload: isDevServer() ? 'localhost' : null,
   module: {
     loaders: [
-      { test: /\.js$/,              loader: 'babel?presets[]=es2015', exclude: /(node_modules\/ismobile)/ },
+      { test: /famous-flex\/.*\/.*\.js$/, loader: 'babel?presets[]=es2015' },
+      { test: /\.js$/,              loader: 'babel?presets[]=es2015', exclude: /(node_modules)/ },
       { test: /\.glsl$/,            loader: 'raw-loader' },
       { test: /\.glsl$/,            loader: 'glslify-loader' },
       { test: /\.json$/,            loader: 'file-loader?name=' + pathPrefix + '[path][name].[ext]&context=.' },
@@ -44,13 +45,15 @@ var config = {
   resolve: {
     root: __dirname,
     alias: {
-      famous: 'node_modules/famous'
+      famous: 'node_modules/famous-v7'
+      //famous: 'node_modules/famous'
     }
   },
   plugins: [
     new webpack.DefinePlugin({
       __VERSION__: JSON.stringify(require('./package.json').version)
     }),
+    //new webpack.optimize.DedupePlugin(),
     new HtmlWebpackPlugin({
       filename: 'examples/index.html',
       template: 'examples/out/index.html'
